@@ -1,0 +1,64 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+*.sqlite3
+media/
+staticfiles/
+
+# Local environment
+.env
+.idea/
+.vscode/
+*.swp
+
+# Migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# macOS
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.Python
+pip-log.txt
+
+# Testing
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# mypy
+.mypy_cache/
+
+# Pyre type checker
+.pyre/
+
+# Pycharm
+.idea/
+
+# JetBrains IDEs
+*.iml
+*.ipr
+*.iws
