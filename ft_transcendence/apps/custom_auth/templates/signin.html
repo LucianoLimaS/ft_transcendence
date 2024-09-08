@@ -1,0 +1,70 @@
+{% extends 'boilerplate_base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- ALERT DE ERRO AO TENTAR LOGAR  -->
+<div id="alert" class="alert alert-danger" role="alert" style="display: none;">
+    Usuário ou senha Inválidos!
+</div>
+
+<div class="container full-height d-flex justify-content-center align-items-center">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card mx-auto p-3 card-glow">
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="mb-4 text-center">Entrar</h3>
+                        </div>
+                    </div>
+
+                    <!--INICIO DO FORM-->
+                    <form action="{% url 'signin' %}" method="post" class="signin-form">
+
+                        {% csrf_token %}
+                        <div class="form-group mt-3">
+                            <label class="form-control-placeholder" for="username">Nome de Usuário</label>
+                            <input id="login_field" name="login_field" type="text" class="form-control" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-control-placeholder" for="password">Senha</label>
+                            <input id="password_field" name="password_field" type="password" class="form-control" required>
+                            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        </div>
+
+                        <div class="form-group ">
+                            <button id="btSubmit" type="submit" class="form-control btn btn-primary rounded submit px-3">Entrar</button>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <div class="form-group ">
+
+                                    <div class="text-center">
+                                        <a href="#">Esqueci minha Senha</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                    <!--FIM DO FORM-->
+                    <p class="text-center mt-5">Não possui Cadastro?😯 <a id="register" class="btn btn-link" data-toggle="modal" data-target="#registrationModal">Cadastrar</a></p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'auth/auth.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'auth/auth.js' %}"></script>
+{% endblock %}

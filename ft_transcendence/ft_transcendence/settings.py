@@ -29,7 +29,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,6 +36,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'apps.custom_auth',
+    'apps.chat',
+    'apps.core',
+    'apps.match',
+    'apps.tournaments',
+    'apps.users'
 ]
 
 MIDDLEWARE = [
@@ -54,7 +59,15 @@ ROOT_URLCONF = 'ft_transcendence.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'apps' / 'common_templates',             # Diretório para templates base
+            BASE_DIR / 'apps' / 'chat' / 'templates',           # Templates do chat
+            BASE_DIR / 'apps' / 'core' / 'templates',           # Templates do core
+            BASE_DIR / 'apps' / 'custom_auth' / 'templates',    # Templates do custom_auth
+            BASE_DIR / 'apps' / 'match' / 'templates',          # Templates do match
+            BASE_DIR / 'apps' / 'tournaments' / 'templates',    # Templates do tournaments
+            BASE_DIR / 'apps' / 'users' / 'templates',          # Templates do users
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,8 +80,13 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Backend padrão
+    'apps.custom_auth.backends.CustomAuthBackend'
+    # Adicione outros backends personalizados, se necessário
+]
 
+WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -79,7 +97,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -99,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -111,11 +127,23 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+STATIC_URL = '/static/'
 
-STATIC_URL = 'static/'
+# Diretório para arquivos estáticos comuns (CSS, JS globais, etc.)
+STATICFILES_DIRS = [
+    BASE_DIR / 'apps' / 'static',                 # Static base para todos os apps
+    BASE_DIR / 'apps' / 'chat' / 'static',         # Static do chat
+    BASE_DIR / 'apps' / 'core' / 'static',         # Static do core
+    BASE_DIR / 'apps' / 'custom_auth' / 'static',  # Static do custom_auth
+    BASE_DIR / 'apps' / 'match' / 'static',        # Static do match
+    BASE_DIR / 'apps' / 'tournaments' / 'static',  # Static do tournaments
+    BASE_DIR / 'apps' / 'users' / 'static',        # Static do users
+]
+
+# Diretório para arquivos estáticos após o collectstatic
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
