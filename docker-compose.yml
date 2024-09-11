@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  ft_transcendence:
+    container_name: ft_transcendence
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./ft_transcendence:/ft_transcendence
+      #- ./data/web/static:/data/web/static/
+      #- ./data/web/media:/data/web/media/
+    env_file:
+      - ./dotenv_files/.env
+    depends_on:
+      - psql
+  psql:
+    container_name: psql
+    image: postgres:16.4-alpine3.20
+    volumes:
+      - ./data/postgres/data:/var/lib/postgresql/data/
+    env_file:
+      - ./dotenv_files/.env
