@@ -15,6 +15,7 @@ services:
       - ./dotenv_files/.env
     depends_on:
       - psql
+
   psql:
     container_name: psql
     image: postgres:16.4-alpine3.20
@@ -22,3 +23,30 @@ services:
       - ./data/postgres/data:/var/lib/postgresql/data/
     env_file:
       - ./dotenv_files/.env
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    user: "$UID:$GID"
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-lifecycle'
+    depends_on:
+      - grafana
+
+volumes:
+  psql_data:
+  grafana_data:
+  prometheus_data:

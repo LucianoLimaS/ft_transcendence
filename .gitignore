@@ -62,3 +62,6 @@ coverage.xml
 *.iml
 *.ipr
 *.iws
+
+# Docker
+data/

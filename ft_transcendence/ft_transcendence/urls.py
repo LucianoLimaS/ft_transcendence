@@ -14,11 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import path, include
 
 #registrando as views
 from apps.custom_auth.views import CustomLoginView
 
 urlpatterns = [
     path('', CustomLoginView.as_view(), name='signin'),     #rota da tela de login (raiz)
+    path('', include('django_prometheus.urls')),
 ]
