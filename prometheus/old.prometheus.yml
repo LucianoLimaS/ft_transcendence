@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s  # Intervalo padrão de coleta de métricas
+  evaluation_interval: 15s  # Intervalo para avaliar regras
+  scrape_timeout: 10s  # Tempo máximo permitido para a coleta
+
+# Regras de alertas
+rule_files:
+  - "alert.rules.yml"  # Referência para um arquivo separado de regras de alertas (opcional)
+
+# Configurações de alertas (se estiver usando o Alertmanager)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # Adicione o endereço do seu Alertmanager (se estiver usando)
+          # - 'alertmanager:9093'
+
+# Configurações de coleta (scrape_configs) para diferentes serviços
+scrape_configs:
+  # Monitoramento do próprio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Monitoramento do seu serviço ft_transcendence (substitua pela porta correta)
+  - job_name: 'ft_transcendence'
+    metrics_path: '/metrics'  # Caso tenha um endpoint de métricas exposto
+    static_configs:
+      - targets: ['transcendence:8000']
+
+  # Monitoramento do PostgreSQL usando um exporter (caso esteja usando o postgres_exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres_exporter:9187']
+
+  # Exemplo de um outro serviço qualquer
+  - job_name: 'psql'
+    static_configs:
+      - targets: ['psql:5432']
+    # Definir parâmetros adicionais como autenticação, etc.
