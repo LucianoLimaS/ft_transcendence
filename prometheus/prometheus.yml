@@ -8,3 +8,8 @@ scrape_configs:
     static_configs:
       - targets:
         - transcendence:8000
+        
+# Monitoramento do próprio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
