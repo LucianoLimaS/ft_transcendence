@@ -523,3 +523,223 @@ O `Prometheus` é uma ferramenta de monitoramento e alertas.
   - `prometheus_data`: Volume dedicado para as configurações do Prometheus.
 
 Este arquivo Docker Compose facilita o desenvolvimento e a configuração de um ambiente de execução completo para a aplicação `ft_transcendence`, integrando o banco de dados PostgreSQL, uma interface de gerenciamento com pgAdmin, além de ferramentas de monitoramento como Grafana e Prometheus.
+
+# Prometheus e Grafana
+
+Para integrar o Prometheus ao Django e expor as métricas da aplicação, você pode seguir estes passos, que incluem a instalação de pacotes e a configuração necessária no Django para que o Prometheus colete as métricas. Veja o passo a passo:
+
+## Configurando o Django para utilizar o Prometheus luciano
+
+Aqui está o passo a passo atualizado para configurar o Prometheus e o Grafana, incluindo as configurações necessárias no Django para expor métricas:
+
+
+## Configurando o Prometheus e Grafana para monitorar a aplicação
+
+### 1. Configuração do Prometheus
+
+O Prometheus é responsável por coletar métricas da sua aplicação. Para configurá-lo, siga os passos abaixo:
+
+#### Passo 1: Criar o arquivo de configuração do Prometheus
+
+1. Crie um arquivo de configuração chamado `prometheus.yml` no diretório `./prometheus/`. Este arquivo vai dizer ao Prometheus onde coletar as métricas.
+
+   Exemplo de arquivo `prometheus.yml`:
+
+   ```yaml
+   global:
+     scrape_interval: 15s  # Intervalo de coleta das métricas
+
+   scrape_configs:
+     - job_name: 'transcendence'
+       static_configs:
+         - targets: ['transcendence:8000']  # Nome do serviço e porta onde as métricas serão expostas
+   ```
+
+2. Certifique-se de que o diretório `./prometheus/` está devidamente montado no contêiner do Prometheus no arquivo `docker-compose.yml`:
+
+   ```yaml
+   prometheus:
+     image: prom/prometheus
+     volumes:
+       - ./prometheus/:/etc/prometheus/  # Mapeando o diretório de configuração
+     ports:
+       - "9090:9090"
+     networks:
+       - transcendence
+   ```
+
+3. Reinicie os contêineres para aplicar a configuração:
+
+   ```bash
+   docker-compose down
+   docker-compose up -d
+   ```
+
+#### Passo 2: Acessar a interface do Prometheus
+
+1. Abra o navegador e vá até `http://localhost:9090`. Esta é a interface do Prometheus.
+
+2. Verifique se o Prometheus está coletando métricas corretamente clicando em **Status** > **Targets**. Você deverá ver o serviço `ft_transcendence` como um alvo sendo coletado.
+
+### 2. Configuração do Grafana
+
+O Grafana será usado para visualizar os dados coletados pelo Prometheus. Siga os passos abaixo para configurar.
+
+#### Passo 1: Acessar o Grafana
+
+1. Abra o navegador e vá até `http://localhost:3000`.
+
+2. Faça login no Grafana. O login padrão é:
+
+   - **Usuário**: `admin`
+   - **Senha**: `admin`
+
+   Você será solicitado a mudar a senha após o primeiro login.
+
+#### Passo 2: Adicionar o Prometheus como Data Source
+
+1. No menu lateral esquerdo, clique em **Configuration** (ícone de engrenagem) e selecione **Data Sources**.
+
+2. Clique em **Add data source**.
+
+3. Selecione **Prometheus**.
+
+4. No campo **URL**, insira `http://prometheus:9090` (use o nome do serviço Prometheus do Docker Compose).
+
+5. Clique em **Save & Test**. O Grafana verificará se consegue se conectar ao Prometheus.
+
+#### Passo 3: Criar um Dashboard para visualizar as métricas
+
+1. No menu lateral, clique em **Create** (ícone de “+”) e selecione **Dashboard**.
+
+2. Clique em **Add new panel**.
+
+3. No painel de edição:
+   - Em **Query**, selecione o Data Source `Prometheus`.
+   - No campo de **Métricas**, digite a métrica que você quer visualizar. Exemplo: `http_requests_total` ou outra métrica coletada pela sua aplicação.
+
+4. Ajuste as configurações visuais e clique em **Apply**.
+
+5. Repita o processo para adicionar mais painéis ao dashboard.
+
+6. Após configurar os painéis, você pode salvar o dashboard clicando no ícone de disquete no topo da página e dando um nome ao seu dashboard.
+
+OBS: Também é possível importar dashboards diretamente do site do Grafana https://grafana.com/grafana/dashboards/
+
+### 3. Configuração no Django para expor métricas
+
+Para que o Prometheus possa coletar métricas da sua aplicação Django, você precisa expor essas métricas. Siga os passos abaixo para configurar:
+
+#### Passo 1: Instalar o pacote `django-prometheus`
+
+1. Adicione o pacote `django-prometheus` às suas dependências no `requirements.txt` ou instale-o diretamente:
+
+   ```bash
+   pip install django-prometheus
+   ```
+
+#### Passo 2: Configurar o Django
+
+1. Adicione `django_prometheus` à lista de `INSTALLED_APPS` no seu `settings.py`:
+
+   ```python
+   INSTALLED_APPS = [
+       ...
+       'django_prometheus',
+       ...
+   ]
+   ```
+
+2. Adicione o middleware `django_prometheus.middleware.PrometheusBeforeMiddleware` e `django_prometheus.middleware.PrometheusAfterMiddleware` ao seu `MIDDLEWARE` no `settings.py`:
+
+   ```python
+   MIDDLEWARE = [
+       ...
+       'django_prometheus.middleware.PrometheusBeforeMiddleware',
+       ...
+       'django_prometheus.middleware.PrometheusAfterMiddleware',
+       ...
+   ]
+   ```
+
+3. Adicione uma URL para expor as métricas no seu `urls.py`:
+
+   ```python
+   from django.urls import path
+   from django_prometheus import exports
+
+   urlpatterns = [
+       ...
+       path('metrics/', exports.ExportToDjangoPrometheus.as_view(), name='prometheus-metrics'),
+       ...
+   ]
+   ```
+
+#### Passo 3: Configurar o Prometheus para coletar métricas do Django
+
+Certifique-se de que o Prometheus está configurado para coletar métricas do endpoint exposto pelo Django. No arquivo `prometheus.yml`, o `targets` deve apontar para o endpoint `/metrics/` da sua aplicação Django:
+
+   ```yaml
+   scrape_configs:
+     - job_name: 'transcendence'
+       static_configs:
+         - targets: ['transcendence:8000']
+   ```
+
+### 4. Verificando a Integração
+
+#### Verifique a Exposição de Métricas no Django
+
+1. Abra o navegador e vá até o endpoint de métricas da sua aplicação Django: `http://localhost:8000/metrics`.
+   - Se tudo estiver configurado corretamente, você verá uma lista de métricas no formato texto expostas pela aplicação.
+
+#### Verifique a Coleta de Métricas no Prometheus
+
+1. Acesse a interface do Prometheus em `http://localhost:9090`.
+
+2. Vá até **Status** > **Targets**.
+   - Você deverá ver o alvo da sua aplicação (`ft_transcendence`) na lista de *targets* que estão sendo monitorados. O estado deve ser "UP".
+
+3. Para verificar se as métricas estão sendo coletadas corretamente, clique em **Graph** e digite o nome de uma métrica exposta pela sua aplicação, como `django_http_requests_total_by_method_total`.
+
+4. Clique em **Execute** para visualizar os dados da métrica coletada pelo Prometheus.
+
+#### Verifique a Exibição de Métricas no Grafana
+
+1. Acesse o Grafana em `http://localhost:3000`.
+
+2. No dashboard que você criou anteriormente, adicione novos painéis com as métricas expostas pelo Django. Algumas métricas comuns que o pacote `django-prometheus` fornece incluem:
+
+   - `django_http_requests_total_by_method_total`: Número total de requisições HTTP, agrupadas por método (GET, POST, etc.).
+   - `django_http_requests_latency_seconds_by_view`: Latência das requisições, agrupada pela *view* no Django.
+   - `django_db_execute_total`: Total de execuções no banco de dados pelo Django.
+
+3. Use o campo de busca de métricas no Grafana para encontrar as métricas que você configurou no Django e exiba essas informações nos painéis.
+
+4. Após configurar os painéis, salve o dashboard para futuras visualizações.
+
+### 5. Resolvendo Erros Comuns
+
+- **Erro ao rodar comandos do Docker sem `sudo`:**
+  Se você está recebendo erros ao rodar comandos Docker sem `sudo`, siga os passos de [Configuração pós-instalação do Docker](https://docs.docker.com/engine/install/linux-postinstall/) para adicionar seu usuário ao grupo `docker` e permitir executar comandos sem privilégios de superusuário.
+
+- **Métricas não estão sendo coletadas pelo Prometheus:**
+  Verifique se o endpoint `/metrics` da aplicação Django está acessível e se o Prometheus está configurado corretamente no arquivo `prometheus.yml`. Confira os logs do Prometheus para investigar possíveis problemas de conectividade ou erro de scrape.
+
+- **Problemas de visualização no Grafana:**
+  Certifique-se de que o Data Source do Prometheus foi configurado corretamente em `http://prometheus:9090` e que as métricas estão disponíveis no Prometheus antes de configurar os painéis no Grafana.
+
+### 6. Atualizações Futuras e Melhorias
+
+- **Adicionando alertas no Prometheus:**
+  Considere configurar regras de alerta no Prometheus para receber notificações sobre problemas na aplicação, como alta latência ou número elevado de erros HTTP.
+
+- **Monitoramento adicional:**
+  Além das métricas básicas, você pode expor métricas personalizadas no Django para monitorar partes específicas da aplicação que são importantes para o seu projeto.
+
+- **Integração com serviços de notificação:**
+  Você pode integrar o Prometheus com o [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) para enviar alertas via email, Slack ou outras plataformas quando certas condições forem atendidas.
+
+### 7. Conclusão
+
+Com o Prometheus e o Grafana configurados, você terá um sistema completo de monitoramento para sua aplicação Django. O Prometheus coleta métricas detalhadas e o Grafana permite criar dashboards personalizados para visualizar o desempenho e a saúde da aplicação. Seguindo este guia, você pode ajustar o monitoramento conforme as necessidades do seu projeto e adicionar novos alvos ou métricas personalizadas conforme o projeto evolui.
