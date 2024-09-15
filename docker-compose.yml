@@ -12,15 +12,27 @@ services:
     env_file:
       - ./dotenv_files/.env
     depends_on:
-      - psql
+      - psql_transcendence
     networks:
       - transcendence
 
-  psql:
+  psql_transcendence:
     container_name: psql
     image: postgres:16.4-alpine3.20
     volumes:
       - ./data/postgres/data:/var/lib/postgresql/data/
+    env_file:
+      - ./dotenv_files/.env
+    networks:
+      - transcendence
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - 5050:80
     env_file:
       - ./dotenv_files/.env
     networks:
