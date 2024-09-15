@@ -1,8 +1,6 @@
-version: '3.9'
-
 services:
   ft_transcendence:
-    container_name: ft_transcendence
+    container_name: transcendence
     build:
       context: .
     ports:
@@ -15,6 +13,8 @@ services:
       - ./dotenv_files/.env
     depends_on:
       - psql
+    networks:
+      - transcendence
 
   psql:
     container_name: psql
@@ -23,28 +23,32 @@ services:
       - ./data/postgres/data:/var/lib/postgresql/data/
     env_file:
       - ./dotenv_files/.env
+    networks:
+      - transcendence
 
   grafana:
+    container_name: grafana
     image: grafana/grafana:latest
     ports:
       - 3000:3000
     volumes:
       - ./data/grafana:/var/lib/grafana
     user: "$UID:$GID"
-
+    networks:
+      - transcendence
 
   prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - 9090:9090
+    image: prom/prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./data/prometheus:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.enable-lifecycle'
-    depends_on:
-      - grafana
+      - ./prometheus/:/etc/prometheus/
+    ports:
+      - "9090:9090"
+    networks:
+      - transcendence
+
+networks:
+  transcendence:
+    driver: bridge
 
 volumes:
   psql_data:

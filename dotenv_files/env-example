@@ -4,7 +4,7 @@ SECRET_KEY="django-insecure-hy0f)6#-mkp1kq9+4o2dh!(uv=oa07yy&eaamu*y@6(di22rm("
 DEBUG="1"
 
 # Comma Separated values
-ALLOWED_HOSTS="127.0.0.1, localhost"
+ALLOWED_HOSTS="transcendence, 127.0.0.1, localhost"
 
 DB_ENGINE="django.db.backends.postgresql"
 POSTGRES_DB="transcendence"
