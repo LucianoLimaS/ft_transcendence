@@ -45,6 +45,7 @@ services:
       - '--web.enable-lifecycle'
     depends_on:
       - grafana
+    user: "$UID:$GID"
 
 volumes:
   psql_data:

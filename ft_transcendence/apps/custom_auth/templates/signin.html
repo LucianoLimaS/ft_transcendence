@@ -1,10 +1,12 @@
 {% extends 'boilerplate_base.html' %}
 {% load static %}
 
+{% load i18n %}
+
 {% block content %}
 <!-- ALERT DE ERRO AO TENTAR LOGAR  -->
 <div id="alert" class="alert alert-danger" role="alert" style="display: none;">
-    Usuário ou senha Inválidos!
+    {% trans "Invalid username or password!" %}
 </div>
 
 <div class="container full-height d-flex justify-content-center align-items-center">
@@ -16,7 +18,7 @@
 
                     <div class="row">
                         <div class="col">
-                            <h3 class="mb-4 text-center">Entrar</h3>
+                            <h3 class="mb-4 text-center">{% trans "Login" %}</h3>
                         </div>
                     </div>
 
@@ -25,25 +27,25 @@
 
                         {% csrf_token %}
                         <div class="form-group mt-3">
-                            <label class="form-control-placeholder" for="username">Nome de Usuário</label>
+                            <label class="form-control-placeholder" for="username">{% trans "Username:" %}</label>
                             <input id="login_field" name="login_field" type="text" class="form-control" required />
                         </div>
 
                         <div class="form-group">
-                            <label class="form-control-placeholder" for="password">Senha</label>
+                            <label class="form-control-placeholder" for="password">{% trans "Password:" %}</label>
                             <input id="password_field" name="password_field" type="password" class="form-control" required>
                             <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                         </div>
 
                         <div class="form-group ">
-                            <button id="btSubmit" type="submit" class="form-control btn btn-primary rounded submit px-3">Entrar</button>
+                            <button id="btSubmit" type="submit" class="form-control btn btn-primary rounded submit px-3">{% trans "Login" %}</button>
                         </div>
                         <div class="row mt-3">
                             <div class="col">
                                 <div class="form-group ">
 
                                     <div class="text-center">
-                                        <a href="#">Esqueci minha Senha</a>
+                                        <a href="#">{% trans "I forgot my password" %}</a>
                                     </div>
 
                                 </div>
@@ -52,7 +54,7 @@
 
                     </form>
                     <!--FIM DO FORM-->
-                    <p class="text-center mt-5">Não possui Cadastro?😯 <a id="register" class="btn btn-link" data-toggle="modal" data-target="#registrationModal">Cadastrar</a></p>
+                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a id="register" class="btn btn-link" data-toggle="modal" data-target="#registrationModal">{% trans "Register" %}</a></p>
 
                 </div>
             </div>

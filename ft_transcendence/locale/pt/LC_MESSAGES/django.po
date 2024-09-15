@@ -1,0 +1,52 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-15 15:18-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ft_transcendence/apps/common_templates/boilerplate_base.html:24
+msgid "ft_transcendence"
+msgstr "ft_transcendence"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:9
+msgid "Invalid username or password!"
+msgstr "Usuário ou senha Inválidos!"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:21
+#: ft_transcendence/apps/custom_auth/templates/signin.html:41
+msgid "Login"
+msgstr "Entrar"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:30
+msgid "Username:"
+msgstr "Nome de Usuário"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:35
+msgid "Password:"
+msgstr "Senha"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:48
+msgid "I forgot my password"
+msgstr "Esqueci minha Senha"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:57
+msgid "Not registered?"
+msgstr "Não possui Cadastro?"
+
+#: ft_transcendence/apps/custom_auth/templates/signin.html:57
+msgid "Register"
+msgstr "Cadastrar"
