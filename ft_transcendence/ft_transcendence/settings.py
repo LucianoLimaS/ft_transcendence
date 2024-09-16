@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,6 +61,8 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusAfterMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 ]
+
+ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'ft_transcendence.urls'
 
@@ -130,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'pt-br'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'America/Sao_Paulo'
 
@@ -140,17 +143,16 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 LANGUAGES = [
-    ('en', 'English'),
-    ('es', 'Spanish'),
-    ('pt-br', 'Portuguese (Brazil)'),
+        ('en', _('English')),
+        ('es', _('Spanish')),
+        ('pt-br', _('Portuguese (Brazil)')),
 ]
 
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
