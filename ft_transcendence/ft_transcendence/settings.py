@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.custom_auth',
     'apps.chat',
-    'apps.core',
+    'apps.badges',
     'apps.match',
     'apps.tournaments',
     'apps.users',
@@ -72,7 +72,7 @@ TEMPLATES = [
         'DIRS': [
             BASE_DIR / 'apps' / 'common_templates',             # Diretório para templates base
             BASE_DIR / 'apps' / 'chat' / 'templates',           # Templates do chat
-            BASE_DIR / 'apps' / 'core' / 'templates',           # Templates do core
+            BASE_DIR / 'apps' / 'badges' / 'templates',         # Templates do badges
             BASE_DIR / 'apps' / 'custom_auth' / 'templates',    # Templates do custom_auth
             BASE_DIR / 'apps' / 'match' / 'templates',          # Templates do match
             BASE_DIR / 'apps' / 'tournaments' / 'templates',    # Templates do tournaments
@@ -162,7 +162,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'apps' / 'static',                 # Static base para todos os apps
     BASE_DIR / 'apps' / 'chat' / 'static',         # Static do chat
-    BASE_DIR / 'apps' / 'core' / 'static',         # Static do core
+    BASE_DIR / 'apps' / 'badges' / 'static',         # Static do badges
     BASE_DIR / 'apps' / 'custom_auth' / 'static',  # Static do custom_auth
     BASE_DIR / 'apps' / 'match' / 'static',        # Static do match
     BASE_DIR / 'apps' / 'tournaments' / 'static',  # Static do tournaments
