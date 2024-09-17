@@ -4,7 +4,7 @@ services:
     build:
       context: .
     ports:
-      - 8000:8000
+      - 8001:8001
     volumes:
       - ./ft_transcendence:/ft_transcendence
       #- ./data/web/static:/data/web/static/

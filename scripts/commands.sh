@@ -10,5 +10,14 @@ done
 
 echo "✅ Postgres Database Started Successfully ($POSTGRES_HOST:$POSTGRES_PORT)"
 
+# Executa as migrações do Django
 python manage.py migrate --noinput
-python manage.py runserver 0.0.0.0:8000
+
+# Inicia o Django em background
+python manage.py runserver 0.0.0.0:8001 &
+
+# Mantém o container rodando com um shell interativo
+# Se você quer um loop infinito em vez de um shell interativo para manter o container vivo:
+while true; do
+  sleep 1000
+done
