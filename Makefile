@@ -1,6 +1,23 @@
 name = ft_transcendence
+
+containers = app \
+			 db  \
+			 db_admin \
+			 grafana  \
+			 promet   \
+			 selenium \
+			 minio
+
+volumes = ${name}_app_vol \
+		  ${name}_db_vol  \
+		  ${name}_grafana_vol \
+		  ${name}_promet_vol  \
+		  ${name}_minio_vol
+
+network = ${name}_net
+
 all:
-	@printf "Launch configuration ${name}...\n"
+	@printf "Launching configuration ${name}...\n"
 	@docker compose -f ./docker-compose.yml up -d
 
 build:
@@ -12,20 +29,32 @@ down:
 	@docker compose -f ./docker-compose.yml down
 
 re:
-	@printf "Rebuild configuration ${name}...\n"
+	@printf "Rebuilding configuration ${name}...\n"
 	@docker compose -f ./docker-compose.yml up -d --build
 
 clean: down
 	@printf "Cleaning configuration ${name}...\n"
-	@docker system prune -a
-	@sudo rm -rf data/*
-
-fclean:
-	@printf "Total clean of all configurations docker\n"
-	@docker stop $$(docker ps -qa)
-	@docker system prune --all --force --volumes
-	@docker network prune --force
-	@docker volume prune --force
+	@docker compose -p ${name} -f ./docker-compose.yml down --volumes --remove-orphans
+	@imagens=$$(docker images -f "dangling=true" -q); \
+		if [ -n "$$imagens" ]; then \
+			docker rmi $$imagens; \
+		fi;
 	@sudo rm -rf ./data/*
 
-.PHONY	: all build down re clean fclean
+fclean: down
+	@printf "Total clean of project ${name}...\n"
+
+	@for volume in ${volumes}; do \
+	  if docker volume inspect $$volume > /dev/null 2>&1; then \
+	    docker volume rm $$volume; \
+	  fi; \
+	done
+
+	@if docker network inspect ${network} > /dev/null 2>&1; then \
+	  docker network rm ${network}; \
+	fi
+	@docker volume prune -f
+	@sudo rm -rf ./data/*
+
+
+.PHONY: all build down re clean fclean

@@ -10,8 +10,12 @@ DB_ENGINE="django.db.backends.postgresql"
 POSTGRES_DB="transcendence"
 POSTGRES_USER="transcendence"
 POSTGRES_PASSWORD="transcendence"
-POSTGRES_HOST="psql"
+POSTGRES_HOST="db"
 POSTGRES_PORT="5432"
 
 PGADMIN_DEFAULT_EMAIL="admin@admin.com"
 PGADMIN_DEFAULT_PASSWORD="root"
+
+# Acesso ao storage
+MINIO_ROOT_USER="minioadmin"
+MINIO_ROOT_PASSWORD="minioadmin"

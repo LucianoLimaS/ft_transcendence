@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'apps.match',
     'apps.tournaments',
     'apps.users',
-    'django_prometheus'
+    'django_prometheus',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -176,3 +177,20 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configurações do MinIO usando o backend do S3
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = 'minioadmin'  # Credenciais do MinIO
+AWS_SECRET_ACCESS_KEY = 'minioadmin'
+AWS_STORAGE_BUCKET_NAME = 'profile-pictures'  # Nome do bucket no MinIO
+AWS_S3_ENDPOINT_URL = 'http://minio-server:9001'  # URL do MinIO no Docker Compose
+AWS_S3_REGION_NAME = ''  # MinIO não requer uma região
+AWS_S3_USE_SSL = False  # Usar HTTP em vez de HTTPS
+AWS_QUERYSTRING_AUTH = False  # Desabilitar autenticação em URLs
+
+# Configurações para arquivos de mídia (uploads de usuário)
+MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
+MEDIA_ROOT = '/media/'
+
+deve-se colocar no requirements as dependencias, e fazer o settings pegar usuario e senha do .env (recomendação usar o python-decouple)

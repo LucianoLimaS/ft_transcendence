@@ -1,42 +1,40 @@
 services:
-  ft_transcendence:
-    container_name: transcendence
+  app:
+    container_name: app
     build:
       context: .
     ports:
       - 8001:8001
     volumes:
-      - ./ft_transcendence:/ft_transcendence
-      #- ./data/web/static:/data/web/static/
-      #- ./data/web/media:/data/web/media/
+      - app_vol:/ft_transcendence
     env_file:
       - ./dotenv_files/.env
     depends_on:
-      - psql_transcendence
+      - db
     networks:
-      - transcendence
+      - net
 
-  psql_transcendence:
-    container_name: psql
+  db:
+    container_name: db
     image: postgres:16.4-alpine3.20
     volumes:
-      - ./data/postgres/data:/var/lib/postgresql/data/
+      - db_vol:/var/lib/postgresql/data
     env_file:
       - ./dotenv_files/.env
     networks:
-      - transcendence
+      - net
     ports:
       - 5432:5432
 
-  pgadmin:
-    container_name: pgadmin
+  db_admin:
+    container_name: db_admin
     image: dpage/pgadmin4
     ports:
       - 5050:80
     env_file:
       - ./dotenv_files/.env
     networks:
-      - transcendence
+      - net
 
   grafana:
     container_name: grafana
@@ -44,36 +42,54 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./data/grafana:/var/lib/grafana
-    user: "$UID:$GID"
+      - grafana_vol:/var/lib/grafana
+    env_file:
+      - ./dotenv_files/.env
     networks:
-      - transcendence
+      - net
 
-  prometheus:
+  promet:
+    container_name: promet
     image: prom/prometheus
     volumes:
-      - ./prometheus/:/etc/prometheus/
+      - promet_vol:/etc/prometheus
     ports:
-      - "9090:9090"
+      - 9090:9090
     networks:
-      - transcendence
+      - net
 
   selenium:
     container_name: selenium
     image: selenium/standalone-chrome-debug
     ports:
-      - "4444:4444"
-      - "5900:5900"
+      - 4444:4444
+      - 5900:5900
     networks:
-      - transcendence
+      - net
     depends_on:
-      - ft_transcendence
+      - app
+
+  minio:
+    container_name: minio
+    image: minio/minio
+    ports:
+      - 9001:9001
+      - 9002:9002
+    env_file:
+      - ./dotenv_files/.env
+    volumes:
+      - minio_vol:/data
+    networks:
+      - net
+    command: server /data --console-address ":9002"
 
 networks:
-  transcendence:
+  net:
     driver: bridge
 
 volumes:
-  psql_data:
-  grafana_data:
-  prometheus_data:
+  app_vol:
+  db_vol:
+  grafana_vol:
+  promet_vol:
+  minio_vol:
