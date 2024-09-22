@@ -4,6 +4,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from apps.users.models import Users
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -64,7 +67,27 @@ def signout(request):
     logout(request)
     return redirect('/')  # Redireciona para a página de login após logout
 
-
+def recoverPassword(request):
+    if request.method == 'GET':
+        email = request.POST.get('email')
+        email = "uluboladao@gmail.com"
+        user = Users.objects.get(email=email)
+        if user:
+            # Crie um contexto SSL sem verificação de certificado (temporário, não recomendado em produção)
+            send_mail(
+                'Recuperação de senha',
+                'o link para recuperação da sua senha é : ' + user.email,
+                settings.DEFAULT_FROM_EMAIL, [user.email], 
+                fail_silently=False, 
+                )
+            return HttpResponse("Email enviado com sucesso")
+        else:
+            return HttpResponse("Email não cadastrado")
+    else:
+        return render(request, 'recoverPassword.html')
+    
+def reset_password(request, token, email, password):
+    pass
 
 @login_required(login_url='/')
 def logado(request):

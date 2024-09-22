@@ -9,5 +9,6 @@ urlpatterns = [
     path('reset_password/<str:token>/', views.reset_password, name='reset_password'),    #rota de reset de senha
     path('reset_password/<str:token>/<str:email>/', views.reset_password, name='reset_password'),    #rota de reset de senha
     path('reset_password/<str:token>/<str:email>/<str:password>/', views.reset_password, name='reset_password'),    #rota de reset de senha
+    path('recoverPassword/', views.recoverPassword, name='recoverPassword'),    #rota de recuperação de senha
     path('logado/', views.logado, name='logado'),    #rota de usuário logado
 ]

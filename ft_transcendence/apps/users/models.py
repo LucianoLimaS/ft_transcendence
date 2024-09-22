@@ -11,7 +11,7 @@ class Users(AbstractUser):
     user_status = models.CharField(max_length=50, default='Ativo')
 
     def __str__(self):
-        return self.nickname
+        return self.username
     
 class Friendship(models.Model):
     user1 = models.ForeignKey(Users, related_name='friends1', on_delete=models.CASCADE)
@@ -19,4 +19,4 @@ class Friendship(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user1.nickname} and {self.user2.nickname}"
+        return f"{self.user1.username} and {self.user2.username}"
