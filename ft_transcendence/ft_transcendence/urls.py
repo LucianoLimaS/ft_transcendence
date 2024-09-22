@@ -20,6 +20,7 @@ from django.urls import path, include
 from apps.custom_auth.views import CustomLoginView
 
 urlpatterns = [
-    path('', CustomLoginView.as_view(), name='signin'),     #rota da tela de login (raiz)
+    #path('', CustomLoginView.as_view(), name='signin'),     #rota da tela de login (raiz)
+    path('', include('apps.custom_auth.urls')),        #rota de autenticação
     path('', include('django_prometheus.urls')),
 ]

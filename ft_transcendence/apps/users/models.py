@@ -1,10 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser
 
-class Users(models.Model):
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)  # Consider using Django's built-in User model for password management
-    nickname = models.CharField(max_length=50)
+class Users(AbstractUser):
     description = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

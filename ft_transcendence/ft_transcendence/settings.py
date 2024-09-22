@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
+# Usando o model customizado de usuário
+AUTH_USER_MODEL = "users.Users"
 
 # Application definition
 INSTALLED_APPS = [
