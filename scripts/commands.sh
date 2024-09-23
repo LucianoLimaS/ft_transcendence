@@ -11,6 +11,12 @@ done
 echo "✅ Postgres Database Started Successfully ($POSTGRES_HOST:$POSTGRES_PORT)"
 
 # Executa as migrações do Django
+#rm apps/chat/migrations/0001_initial.py
+#rm apps/tournaments/migrations/0001_initial.py
+#rm apps/users/migrations/0001_initial.py
+#rm apps/badges/migrations/0001_initial.py
+#rm apps/match/migrations/0001_initial.py
+python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
 # Inicia o Django em background

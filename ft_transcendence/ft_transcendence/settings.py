@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
+# Usando o model customizado de usuário
+AUTH_USER_MODEL = "users.Users"
 
 # Application definition
 INSTALLED_APPS = [
@@ -46,8 +48,7 @@ INSTALLED_APPS = [
     'apps.match',
     'apps.tournaments',
     'apps.users',
-    'django_prometheus',
-    'storages'
+    'django_prometheus'
 ]
 
 MIDDLEWARE = [
@@ -178,19 +179,16 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configurações do MinIO usando o backend do S3
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#Email settings
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-AWS_ACCESS_KEY_ID = 'minioadmin'  # Credenciais do MinIO
-AWS_SECRET_ACCESS_KEY = 'minioadmin'
-AWS_STORAGE_BUCKET_NAME = 'profile-pictures'  # Nome do bucket no MinIO
-AWS_S3_ENDPOINT_URL = 'http://minio-server:9001'  # URL do MinIO no Docker Compose
-AWS_S3_REGION_NAME = ''  # MinIO não requer uma região
-AWS_S3_USE_SSL = False  # Usar HTTP em vez de HTTPS
-AWS_QUERYSTRING_AUTH = False  # Desabilitar autenticação em URLs
-
-# Configurações para arquivos de mídia (uploads de usuário)
-MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
-MEDIA_ROOT = '/media/'
-
-deve-se colocar no requirements as dependencias, e fazer o settings pegar usuario e senha do .env (recomendação usar o python-decouple)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
+EMAIL_USE_SSL = bool(int(os.getenv('EMAIL_USE_SSL', 0)))
+EMAIL_USE_TLS = bool(int(os.getenv('EMAIL_USE_TLS', 0)))
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
