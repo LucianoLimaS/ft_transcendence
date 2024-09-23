@@ -1,0 +1,152 @@
+<html><head><base href="https://websimcreation.com/pong/">
+<meta charset="UTF-8">
+<title>Pong Clássico</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #000;
+        font-family: 'Press Start 2P', cursive;
+    }
+    #gameCanvas {
+        border: 2px solid #fff;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="400"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Game objects
+    const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 10,
+        speedX: 5,
+        speedY: 5
+    };
+
+    const paddleHeight = 100;
+    const paddleWidth = 10;
+
+    const leftPaddle = {
+        x: 0,
+        y: canvas.height / 2 - paddleHeight / 2
+    };
+
+    const rightPaddle = {
+        x: canvas.width - paddleWidth,
+        y: canvas.height / 2 - paddleHeight / 2
+    };
+
+    let leftScore = 0;
+    let rightScore = 0;
+
+    // Keyboard control
+    const keys = {};
+
+    document.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+    });
+
+    function movePaddles() {
+        if (keys['KeyW'] && leftPaddle.y > 0) {
+            leftPaddle.y -= 5;
+        }
+        if (keys['KeyS'] && leftPaddle.y < canvas.height - paddleHeight) {
+            leftPaddle.y += 5;
+        }
+        if (keys['ArrowUp'] && rightPaddle.y > 0) {
+            rightPaddle.y -= 5;
+        }
+        if (keys['ArrowDown'] && rightPaddle.y < canvas.height - paddleHeight) {
+            rightPaddle.y += 5;
+        }
+    }
+
+    function moveBall() {
+        ball.x += ball.speedX;
+        ball.y += ball.speedY;
+
+        // Top and bottom collision
+        if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+            ball.speedY = -ball.speedY;
+        }
+
+        // Paddle collision
+        if (
+            (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) ||
+            (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight)
+        ) {
+            ball.speedX = -ball.speedX;
+        }
+
+        // Score
+        if (ball.x + ball.radius > canvas.width) {
+            leftScore++;
+            resetBall();
+        } else if (ball.x - ball.radius < 0) {
+            rightScore++;
+            resetBall();
+        }
+    }
+
+    function resetBall() {
+        ball.x = canvas.width / 2;
+        ball.y = canvas.height / 2;
+        ball.speedX = -ball.speedX;
+        ball.speedY = Math.random() > 0.5 ? 5 : -5;
+    }
+
+    function draw() {
+        // Clear canvas
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw paddles
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+        ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
+
+        // Draw ball
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw scores
+        ctx.font = '24px "Press Start 2P"';
+        ctx.fillText(leftScore, canvas.width / 4, 50);
+        ctx.fillText(rightScore, 3 * canvas.width / 4, 50);
+
+        // Draw center line
+        ctx.setLineDash([10, 10]);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+    }
+
+    function gameLoop() {
+        movePaddles();
+        moveBall();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</body>
+</html>

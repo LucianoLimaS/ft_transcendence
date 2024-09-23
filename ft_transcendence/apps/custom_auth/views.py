@@ -6,7 +6,8 @@ from apps.users.models import Users
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
-
+import hashlib
+from datetime import datetime
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -70,19 +71,21 @@ def signout(request):
 def recoverPassword(request):
     if request.method == 'GET':
         email = request.POST.get('email')
-        email = "uluboladao@gmail.com"
-        user = Users.objects.get(email=email)
+        user = Users.objects.get(email=email) 
         if user:
-            # Crie um contexto SSL sem verificação de certificado (temporário, não recomendado em produção)
+            token = makeUniqueHash(user.email + getData())
+            user.token = token
+            user.token_expires = datetime.now()
+            user.save()
             send_mail(
                 'Recuperação de senha',
-                'o link para recuperação da sua senha é : ' + user.email,
+                'o link para recuperação da sua senha é : localhost:8080/changePassword/' + token,
                 settings.DEFAULT_FROM_EMAIL, [user.email], 
                 fail_silently=False, 
                 )
-            return HttpResponse("Email enviado com sucesso")
+            return HttpResponse("E-mail Enviado")
         else:
-            return HttpResponse("Email não cadastrado")
+            return HttpResponse("E-mail não cadastrado")
     else:
         return render(request, 'recoverPassword.html')
     
@@ -92,3 +95,22 @@ def reset_password(request, token, email, password):
 @login_required(login_url='/')
 def logado(request):
     return HttpResponse('você está logado')
+
+def makeUniqueHash(input_string):
+    # Cria um objeto de hash SHA-256
+    sha256 = hashlib.sha256()
+    
+    # Atualiza o objeto de hash com a string de entrada codificada
+    sha256.update(input_string.encode('utf-8'))
+    
+    # Retorna o hash hexadecimal gerado
+    return sha256.hexdigest()
+
+def getData():
+    # Obter a data e hora atuais
+    agora = datetime.now()
+    
+    # Formatar a data e hora no formato desejado
+    data_hora_formatada = agora.strftime('%d/%m/%Y %H:%M:%S')
+    
+    return data_hora_formatada

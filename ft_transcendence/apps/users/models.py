@@ -9,6 +9,8 @@ class Users(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     last_login = models.DateTimeField(blank=True, null=True)
     user_status = models.CharField(max_length=50, default='Ativo')
+    token = models.CharField(max_length=100, blank=True, null=True, default=None)
+    token_expires = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.username
