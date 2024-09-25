@@ -3,20 +3,41 @@ name: compilation
 on:
   pull_request:
     branches:
-    - main
-    - developer
-    - back
-    - front
-    - devops
+      - main
+      - developer
+      - back
+      - front
+      - devops
+
 jobs:
   build:
     runs-on: debian-latest
     name: compilation
     steps:
-    - uses: actions/checkout@v3
-    - name: basic_install
-      run: sudo apt-get update && sudo apt upgrade && sudo apt-get install -y 
-    - name: transcendence
-      run: make
-    # - name: test
-    #   run: make tests
+      # Faz checkout do repositório
+      - uses: actions/checkout@v3
+      
+      # Instalação básica e configuração do Docker
+      - name: basic_install
+        run: |
+          sudo apt update && sudo apt upgrade -y && \
+          sudo apt install -y make curl ca-certificates && \
+          sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
+          sudo chmod a+r /etc/apt/keyrings/docker.asc && \
+          echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $$(. /etc/os-release && echo $$VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+          sudo apt update && \
+          sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+      # Verifica a instalação do Docker
+      - name: Verify Docker Installation
+        run: |
+          sudo docker --version
+          sudo docker-compose --version
+
+      # Compila o projeto
+      - name: transcendence
+        run: sudo make
+
+      # Rodar testes (descomente quando estiver pronto)
+      # - name: test
+      #   run: sudo make tests
