@@ -3,8 +3,11 @@ name: compilation
 on:
   pull_request:
     branches:
-    - develop
     - main
+    - developer
+    - back
+    - front
+    - devops
 jobs:
   build:
     runs-on: debian-latest
