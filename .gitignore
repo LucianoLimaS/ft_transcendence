@@ -21,6 +21,8 @@ db.sqlite3
 media/
 staticfiles/
 *0001_initial.py
+*0002_initial.py
+*0003_initial.py
 
 # Local environment
 .env

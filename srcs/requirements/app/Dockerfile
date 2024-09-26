@@ -10,15 +10,15 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Copia a pasta "ft_transcendence" e "scripts" para dentro do container.
-COPY ft_transcendence /ft_transcendence
-COPY scripts /scripts
+COPY ./srcs/requirements/app/transcendence /ft_transcendence
+COPY ./srcs/requirements/app/scripts /scripts
 
 # Entra na pasta ft_transcendence no container
 WORKDIR /ft_transcendence
 
 # A porta 8000 estará disponível para conexões externas ao container
 # É a porta que vamos usar para o Django.
-EXPOSE 8000
+EXPOSE 8001
 
 # RUN executa comandos em um shell dentro do container para construir a imagem. 
 # O resultado da execução do comando é armazenado no sistema de arquivos da 
