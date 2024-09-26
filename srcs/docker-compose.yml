@@ -1,0 +1,153 @@
+services:
+  app:
+    image: app
+    container_name: app
+    env_file:
+      - ./.env
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/app/Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./requirements/app/transcendence:/ft_transcendence
+    networks:
+      - transcendence
+    depends_on:
+      - postgres
+    restart: always
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    env_file:
+      - ./.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_vol:/var/lib/postgresql/data
+    networks:
+      - transcendence
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - ./.env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_vol:/var/lib/pgadmin
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+  
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    env_file:
+      - ./.env
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_vol:/var/lib/grafana
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_vol:/prometheus
+      - ./requirements/prometheus/:/etc/prometheus/
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    env_file:
+      - ./.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_vol:/data
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+  
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    volumes:
+      - selenium_vol:/var/log/selenium
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+
+volumes:
+  postgres_vol:
+    name: postgres_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/postgres
+
+  pgadmin_vol:
+    name: pgadmin_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/pgadmin
+
+  grafana_vol:
+    name: grafana_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/grafana
+
+  prometheus_vol:
+    name: prometheus_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/prometheus
+
+  selenium_vol:
+    name: selenium_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/selenium
+
+  minio_vol:
+    name: minio_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/minio
+
+networks:
+    transcendence:
+        name: transcendence
+        driver: bridge

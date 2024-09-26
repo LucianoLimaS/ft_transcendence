@@ -10,12 +10,18 @@ DB_ENGINE="django.db.backends.postgresql"
 POSTGRES_DB="transcendence"
 POSTGRES_USER="transcendence"
 POSTGRES_PASSWORD="transcendence"
-POSTGRES_HOST="psql"
+POSTGRES_HOST="postgres"
 POSTGRES_PORT="5432"
 TZ="America/Sao_Paulo"
 
 PGADMIN_DEFAULT_EMAIL="admin@admin.com"
 PGADMIN_DEFAULT_PASSWORD="root"
+
+GF_SECURITY_ADMIN_USER="grafana"
+GF_SECURITY_ADMIN_PASSWORD="5432"
+
+MINIO_ROOT_USER="minio"
+MINIO_ROOT_PASSWORD="87654321"
 
 EMAIL_HOST="smtp.gmx.com"
 EMAIL_HOST_USER="ft_transcendence@gmx.com"
