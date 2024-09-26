@@ -10,7 +10,7 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - app_vol:/ft_transcendence
+      - ./requirements/app/transcendence:/ft_transcendence
     networks:
       - transcendence
     depends_on:
@@ -105,13 +105,6 @@ services:
     restart: always
 
 volumes:
-  app_vol:
-    name: app_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/app
-
   postgres_vol:
     name: postgres_vol
     driver_opts:

@@ -7,6 +7,11 @@ all:
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
+dev:
+	@printf "Launching development ${name}...\n"
+	@bash srcs/requirements/tools/make_db_dirs.sh
+	@docker compose -f ./srcs/docker-compose-dev.yml up --build
+
 build:
 	@printf "Building  ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
@@ -36,4 +41,4 @@ fclean: down
 	@docker volume prune --force
 	@sudo rm -rf ~/data
  
-.PHONY : all build down re clean fclean
+.PHONY : all build down re clean fclean dev
