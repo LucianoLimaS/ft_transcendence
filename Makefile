@@ -26,7 +26,6 @@ clean: down
 	@docker compose -f ./srcs/docker-compose.yml down --volumes
 	@docker container prune --force
 	@docker image prune --force
-	@sudo rm -rf ~/data
 
 fclean: down
 	@printf "Clean of all docker configs\n"
@@ -37,4 +36,4 @@ fclean: down
 	@docker volume prune --force
 	@sudo rm -rf ~/data
  
-.PHONY : all build down re clean fclean info
+.PHONY : all build down re clean fclean
