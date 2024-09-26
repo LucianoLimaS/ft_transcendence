@@ -1,0 +1,71 @@
+{% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
+<!-- ALERT DE ERRO NO CADASTRO -->
+<div id="alert" class="alert alert-danger" role="alert" style="display: none;">
+    {% trans "Error while creating your account!" %}
+</div>
+
+<div class="container full-height d-flex justify-content-center align-items-center">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card mx-auto p-3 card-glow">
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="mb-4 text-center">{% trans "Register" %}</h3>
+                        </div>
+                    </div>
+
+                    <!--INICIO DO FORM-->
+                    <form action="{% url 'signup' %}" method="post" class="signup-form">
+
+                        {% csrf_token %}
+                        <div class="form-group mt-3">
+                            <label class="form-control-placeholder" for="username">{% trans "Username:" %}</label>
+                            <input id="username" name="username" type="text" class="form-control" required />
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label class="form-control-placeholder" for="email">{% trans "Email:" %}</label>
+                            <input id="email" name="email" type="email" class="form-control" required />
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label class="form-control-placeholder" for="password">{% trans "Password:" %}</label>
+                            <input id="password" name="password" type="password" class="form-control" required>
+                            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label class="form-control-placeholder" for="confirm_password">{% trans "Confirm Password:" %}</label>
+                            <input id="confirm_password" name="confirm_password" type="password" class="form-control" required>
+                            <span toggle="#confirm_password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                        </div>
+
+                        <div class="form-group ">
+                            <button id="btSubmit1" type="submit" class="form-control btn btn-primary rounded submit px-3">{% trans "Register" %}</button>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col">
+                                <div class="form-group ">
+                                    <div class="text-center">
+                                        <a href="{% url 'signin' %}">{% trans "Already have an account? Login" %}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                    <!--FIM DO FORM-->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'auth.css' %}"> {% endblock %} {% block extra_js %}
+<script src="{% static 'auth.js' %}"></script>
+{% endblock %}

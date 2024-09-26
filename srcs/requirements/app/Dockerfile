@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Copia a pasta "ft_transcendence" e "scripts" para dentro do container.
-COPY ./ft_transcendence /ft_transcendence
+COPY ./srcs/requirements/app/transcendence /ft_transcendence
 COPY ./srcs/requirements/app/scripts /scripts
 
 # Entra na pasta ft_transcendence no container

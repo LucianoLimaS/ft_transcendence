@@ -5,7 +5,7 @@ name = ft_transcendence
 all:
 	@printf "Launching ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
-	@docker compose -f ./srcs/docker-compose.yml up --build
+	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
 build:
 	@printf "Building  ${name}...\n"
@@ -23,7 +23,7 @@ re: fclean
 
 clean: down
 	@printf "Cleaning  ${name}...\n"
-	@docker compose -f ./srcs/docker-compose.yml down --volumes
+	@docker compose -f ./srcs/docker-compose.yml down
 	@docker container prune --force
 	@docker image prune --force
 
