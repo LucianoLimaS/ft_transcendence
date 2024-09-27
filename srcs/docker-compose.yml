@@ -6,7 +6,7 @@ services:
       - ./.env
     build:
       context: ../ #raiz do projeto
-      dockerfile: srcs/requirements/app/Dockerfile
+      dockerfile: srcs/app/Dockerfile
     ports:
       - "8001:8001"
     volumes:
