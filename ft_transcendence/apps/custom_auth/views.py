@@ -10,7 +10,9 @@ import hashlib
 from datetime import datetime, timedelta
 import re
 from django.contrib.auth.hashers import make_password
-
+from django.contrib.messages import constants
+from django.contrib import messages
+from django.utils.translation import gettext as getTranslated
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -29,30 +31,33 @@ def signup(request):
 
         # Verificação de campos vazios
         fields = {
-            'username': username,
+            'nome do usuário': username,
             'email': email,
             'password': password,
             'confirm_password': confirm_password,
-            'first_name': first_name,
+            'nome': first_name,
             'last_name': last_name,
             'description': description,
         }
-        
         are_empty, message = are_fields_empty(fields)
         if are_empty:
-            return HttpResponse(message)
+            messages.add_message(request, constants.ERROR, message)
+            return redirect("signup")
 
         if password != confirm_password:
-            return HttpResponse("As senhas não conferem")
+            messages.add_message(request, constants.ERROR, "As senhas não conferem")
+            return redirect("signup")
 
         # Verificação da força da senha
         is_strong, message = is_password_strong(password)
         if not is_strong:
-            return HttpResponse(message)
+            messages.add_message(request, constants.ERROR, message)
+            return redirect("signup")
 
         user = Users.objects.filter(username=username);
         if user:
-            return HttpResponse("Usuário já cadastrado")
+            messages.add_message(request, constants.ERROR, "Usuário já cadastrado")
+            return redirect("signup")
         else:
             user = Users.objects.create_user(
                 username = username,
@@ -64,7 +69,8 @@ def signup(request):
                 profile_picture= profile_picture,
                 )
             user.save()
-            return redirect('/')
+            messages.add_message(request, constants.ERROR, "Usuário cadastrado com sucesso")
+            return redirect("/")
     else:
         return render(request, 'signup.html')
 
@@ -82,14 +88,15 @@ def signin(request):
         
         are_empty, message = are_fields_empty(fields)
         if are_empty:
-            return HttpResponse(message)
-
+            messages.add_message(request, constants.ERROR, message)
+            return redirect("/")
         user = authenticate(username = username, password = password)
         if user:
             login(request, user)
             return redirect('logado')
         else:
-            return HttpResponse("Usuário inválido")
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid username or password!"))
+            return redirect("/")
     else:
         return render(request, 'signin.html')
 
@@ -225,6 +232,7 @@ def is_password_strong(password):
 
 def are_fields_empty(fields):
     for field_name, field_value in fields.items():
+        print(field_name, field_value)
         if field_value is None:
             return True, f"O campo {field_name} não pode ser vazio."
         if not field_value.strip():

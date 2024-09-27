@@ -192,3 +192,13 @@ EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
 EMAIL_USE_SSL = bool(int(os.getenv('EMAIL_USE_SSL', 0)))
 EMAIL_USE_TLS = bool(int(os.getenv('EMAIL_USE_TLS', 0)))
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
+
+from django.contrib.messages import constants
+
+MESSAGE_TAGS = {
+    constants.DEBUG: 'alert-primary',
+    constants.INFO: 'alert-info',
+    constants.SUCCESS: 'alert-success',
+    constants.WARNING: 'alert-warning',
+    constants.ERROR: 'alert-danger',
+}
