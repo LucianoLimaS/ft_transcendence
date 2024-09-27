@@ -28,17 +28,12 @@ re: fclean
 
 clean: down
 	@printf "Cleaning  ${name}...\n"
-	@docker compose -f ./srcs/docker-compose.yml down
-	@docker container prune --force
-	@docker image prune --force
+	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
+	@sudo rm -rf ~/data
 
 fclean: down
 	@printf "Clean of all docker configs\n"
-	@docker compose -f ./srcs/docker-compose.yml down --volumes
-	@docker image prune --all --force
-	@docker system prune --all --force --volumes
-	@docker network prune --force
-	@docker volume prune --force
+	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
 .PHONY : all build down re clean fclean dev
