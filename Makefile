@@ -7,6 +7,17 @@ all:
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
+info:
+	@bash ./info.sh
+
+sudoers:
+	@sudo echo -ne "Checking Sudo... " || exit 1 && echo OK!
+	@echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions
+
+remove_sudoers:
+	@sudo rm /etc/sudoers.d/$(USER)-permissions
+	@echo "Removed sudoers configuration for $(USER)"
+
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
@@ -28,17 +39,12 @@ re: fclean
 
 clean: down
 	@printf "Cleaning  ${name}...\n"
-	@docker compose -f ./srcs/docker-compose.yml down
-	@docker container prune --force
-	@docker image prune --force
+	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
+	@sudo rm -rf ~/data
 
 fclean: down
 	@printf "Clean of all docker configs\n"
-	@docker compose -f ./srcs/docker-compose.yml down --volumes
-	@docker image prune --all --force
-	@docker system prune --all --force --volumes
-	@docker network prune --force
-	@docker volume prune --force
+	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
-.PHONY : all build down re clean fclean dev
+.PHONY : all build down re clean fclean dev info sudoers remove-sudoers
