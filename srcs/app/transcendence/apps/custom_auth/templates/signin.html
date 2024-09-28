@@ -1,8 +1,11 @@
 {% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
 <!-- ALERT DE ERRO AO TENTAR LOGAR  -->
-<div id="alert" class="alert alert-danger" role="alert" style="display: none;">
-    {% trans "Invalid username or password!" %}
+
+{% if messages %} {% for message in messages %}
+<div id="alert" class="alert {{ message.tags }}" role="alert">
+    {{ message }}
 </div>
+{% endfor %} {% endif %}
 
 <div class="container full-height d-flex justify-content-center align-items-center">
     <div class="row">
@@ -49,7 +52,7 @@
 
                     </form>
                     <!--FIM DO FORM-->
-                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a id="register" class="btn btn-link" data-toggle="modal" data-target="#registrationModal">{% trans "Register" %}</a></p>
+                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a href="signup" class="btn btn-link">{% trans "Register" %}</a></p>
 
                 </div>
             </div>

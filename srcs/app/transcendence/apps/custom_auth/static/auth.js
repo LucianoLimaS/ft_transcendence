@@ -30,8 +30,8 @@ $(document).ready(function () {
     });
 
     // Evento de clique no botão de cadastro
-    $('#btRegister').on('click', function(event) {
-          event.preventDefault(); // Impede o envio do formulário de cadastro
+    /* $('#btRegister').on('click', function(event) {
+          //event.preventDefault(); // Impede o envio do formulário de cadastro
 
           var email = $('#email_field').val();
           var password = $('#password_field').val();
@@ -62,7 +62,7 @@ $(document).ready(function () {
                   $('#registrationModal').modal('hide');
               }, 2000);
           }
-      });
+      }); */
 
       // Evento de clique em qualquer parte da tela para esconder alertas
       $(document).on('click', function(event) {

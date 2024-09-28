@@ -1,8 +1,12 @@
 {% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
 <!-- ALERT DE ERRO NO CADASTRO -->
-<div id="alert" class="alert alert-danger" role="alert" style="display: none;">
-    {% trans "Error while creating your account!" %}
-</div>
+{% if messages %}
+        {% for message in messages %}
+        <div id="alert" class="alert {{ message.tags }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
 
 <div class="container full-height d-flex justify-content-center align-items-center">
     <div class="row">
