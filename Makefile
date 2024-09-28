@@ -10,6 +10,14 @@ all:
 info:
 	@bash ./info.sh
 
+sudoers:
+	@sudo echo -ne "Checking Sudo... " || exit 1 && echo OK!
+	@echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions
+
+remove_sudoers:
+	@sudo rm /etc/sudoers.d/$(USER)-permissions
+	@echo "Removed sudoers configuration for $(USER)"
+
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
@@ -39,4 +47,4 @@ fclean: down
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
-.PHONY : all build down re clean fclean dev info
+.PHONY : all build down re clean fclean dev info sudoers remove-sudoers
