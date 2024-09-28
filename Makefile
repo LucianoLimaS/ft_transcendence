@@ -7,6 +7,9 @@ all:
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
+info:
+	@bash ./info.sh
+
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
@@ -36,4 +39,4 @@ fclean: down
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
-.PHONY : all build down re clean fclean dev
+.PHONY : all build down re clean fclean dev info
