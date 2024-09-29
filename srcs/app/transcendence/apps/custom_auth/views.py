@@ -42,22 +42,38 @@ def signup(request):
         are_empty, message = are_fields_empty(fields)
         if are_empty:
             messages.add_message(request, constants.ERROR, message)
-            return redirect("signup")
+            return render(
+                request,
+                "response.html",
+                {"response": message},
+            )
 
         if password != confirm_password:
             messages.add_message(request, constants.ERROR, "As senhas não conferem")
-            return redirect("signup")
+            return render(
+                request,
+                "response.html",
+                {"response": message},
+            )
 
         # Verificação da força da senha
         is_strong, message = is_password_strong(password)
         if not is_strong:
             messages.add_message(request, constants.ERROR, message)
-            return redirect("signup")
+            return render(
+                request,
+                "response.html",
+                {"response": message},
+            )
 
         user = Users.objects.filter(username=username);
         if user:
             messages.add_message(request, constants.ERROR, "Usuário já cadastrado")
-            return redirect("signup")
+            return render(
+                request,
+                "response.html",
+                {"response": message},
+            )
         else:
             user = Users.objects.create_user(
                 username = username,
@@ -70,9 +86,17 @@ def signup(request):
                 )
             user.save()
             messages.add_message(request, constants.ERROR, "Usuário cadastrado com sucesso")
-            return redirect("/")
+            return render(
+                request,
+                "response.html",
+                {"response": message},
+            )
     else:
-        return render(request, 'signup.html')
+        if request.htmx:
+            return render(request, 'signup.html')
+        else:
+            return render(request, 'signup_full.html')
+
 
 # Função de login
 def signin(request):

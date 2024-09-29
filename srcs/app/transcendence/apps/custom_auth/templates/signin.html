@@ -52,7 +52,7 @@
 
                     </form>
                     <!--FIM DO FORM-->
-                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a href="signup" class="btn btn-link">{% trans "Register" %}</a></p>
+                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a hx-get="signup/" class="btn btn-link" hx-target="#content-div" hx-push-url="true">{% trans "Register" %}</a></p>
 
                 </div>
             </div>

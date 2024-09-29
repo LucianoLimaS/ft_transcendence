@@ -25,6 +25,8 @@ EXPOSE 8001
 # imagem como uma nova camada.
 # Agrupar os comandos em um único RUN pode reduzir a quantidade de camadas da 
 # imagem e torná-la mais eficiente.
+RUN apk update
+RUN apk add gettext
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
   /venv/bin/pip install -r /ft_transcendence/requirements.txt && \

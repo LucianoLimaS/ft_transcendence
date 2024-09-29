@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'apps.match',
     'apps.tournaments',
     'apps.users',
-    'django_prometheus'
+    'django_prometheus',
+    'django_htmx',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ALLOWED_HOSTS = ['*']

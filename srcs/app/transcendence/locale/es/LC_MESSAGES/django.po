@@ -50,3 +50,6 @@ msgstr "¿No está registrado?"
 #: ft_transcendence/apps/custom_auth/templates/signin.html:57
 msgid "Register"
 msgstr "Regístrese"
+
+msgid "Already have an account? Login"
+msgstr "¿Ya tienes una cuenta? Iniciar sesión"
