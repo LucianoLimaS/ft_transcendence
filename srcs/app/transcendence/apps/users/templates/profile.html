@@ -1,0 +1,58 @@
+{% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
+
+<div class="container full-height d-flex justify-content-center align-items-center">
+    <div class="card card-profile">
+        <div class="card-body">
+            <!-- Botão de edição -->
+            <button type="button" class="btn btn-warning edit-btn" id="editButton">Editar</button>
+
+            <!-- Área de imagem do perfil -->
+            <div class="profile-img" id="profileImg">
+                <!-- Imagem de perfil -->
+                <img src="assets/profileDefault.png" class="rounded-circle" height="150" alt="User Photo">
+            </div>
+
+            <!-- Botão para carregar nova imagem -->
+            <input type="file" id="uploadImage" accept="image/*">
+
+            <!-- Campos read-only -->
+            <form id="profileForm">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="userNameField">Name:</label>
+                            <input type="text" class="form-control" id="userNameField" value="João" readonly>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="nicknameField">Username:</label>
+                            <input type="text" class="form-control" id="nicknameField" value="User123" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailField">E-mail</label>
+                    <input type="email" class="form-control" id="emailField" value="user@example.com" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordField">Senha</label>
+                    <input type="password" class="form-control" id="passwordField" value="********" readonly>
+                </div>
+
+                <div id="confirmPasswordDiv" class="form-group" style="display: none;">
+                    <label for="confirmPasswordField">Confirme a Senha</label>
+                    <input type="password" class="form-control" id="confirmPasswordField" value="********" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="descriptionField">Descrição</label>
+                    <textarea class="form-control" id="descriptionField" rows="3"
+                        readonly>Essa é uma breve descrição do usuário.</textarea>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

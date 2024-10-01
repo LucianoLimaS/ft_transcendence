@@ -1,4 +1,4 @@
-{% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
+{% load static %} {% load i18n %} {% block content %}
 <!-- ALERT DE ERRO AO TENTAR LOGAR  -->
 
 {% if messages %} {% for message in messages %}
@@ -43,7 +43,7 @@
                                 <div class="form-group ">
 
                                     <div class="text-center">
-                                        <a href="#">{% trans "I forgot my password" %}</a>
+                                        <a hx-get="recover_password" hx-target="#content-div" hx-push-url="true">{% trans "I forgot my password" %}</a>
                                     </div>
 
                                 </div>
