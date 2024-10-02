@@ -11,7 +11,7 @@ services:
       - "8001:8001"
     volumes:
       - app_vol:/ft_transcendence
-      - static_vol:/ft_transcendence/static
+      - static_vol:/ft_transcendence/staticfiles
     networks:
       - transcendence
     depends_on:

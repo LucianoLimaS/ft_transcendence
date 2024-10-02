@@ -174,6 +174,15 @@ STATIC_URL = '/static/'
 # # Diretório para arquivos estáticos após o collectstatic
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Certifique-se que esse caminho existe
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'apps/custom_auth/custom_static'),  # Caminho correto para custom_auth
+    os.path.join(BASE_DIR, 'apps/match/static'),         # Exemplo para o app match, adicione conforme necessário
+    os.path.join(BASE_DIR, 'apps/users/static'),         # Exemplo para o app users
+    os.path.join(BASE_DIR, 'apps/badges/static'),        # Exemplo para o app badges
+    os.path.join(BASE_DIR, 'apps/chat/static'),          # Exemplo para o app chat
+    os.path.join(BASE_DIR, 'apps/tournaments/static'),    # Exemplo para o app tournaments
+    os.path.join(BASE_DIR, 'apps/static'),                # Se houver um diretório estático global
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
