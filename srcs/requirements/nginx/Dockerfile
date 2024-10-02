@@ -5,7 +5,7 @@ FROM nginx:latest
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copie a configuração customizada do Nginx para o container
-COPY ./srcs/app/requirements/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./requirements/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Copie o diretório de arquivos estáticos do host para o container (opcional)
 # Se estiver usando volumes no Docker Compose, pode omitir essa parte
