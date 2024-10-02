@@ -111,13 +111,14 @@ services:
     build:
       context: ../ #raiz do projeto
       dockerfile: srcs/requirements/nginx/Dockerfile
+    ports:
+      - "80:80"
+      # - "443:443"
     volumes:
       - ./requirements/nginx/nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
       # - ./requirements/certs:/ft_transcendence/srcs/requirements/certs
-      - static_vol:/static  # Mapeia o diretório de arquivos estáticos no host para o container
+      - static_vol:/static  # Arquivos estáticos com volume persistente
       - nginx_vol:/var/log/nginx # Logs do nginx
-    ports:
-      - "80:80"
     networks:
       - transcendence
     depends_on:
