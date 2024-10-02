@@ -160,19 +160,20 @@ LOCALE_PATHS = [
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 
-# Diretório para arquivos estáticos comuns (CSS, JS globais, etc.)
-STATICFILES_DIRS = [
-    BASE_DIR / 'apps' / 'static',                 # Static base para todos os apps
-    BASE_DIR / 'apps' / 'chat' / 'static',         # Static do chat
-    BASE_DIR / 'apps' / 'badges' / 'static',         # Static do badges
-    BASE_DIR / 'apps' / 'custom_auth' / 'static',  # Static do custom_auth
-    BASE_DIR / 'apps' / 'match' / 'static',        # Static do match
-    BASE_DIR / 'apps' / 'tournaments' / 'static',  # Static do tournaments
-    BASE_DIR / 'apps' / 'users' / 'static',        # Static do users
-]
+# # Diretório para arquivos estáticos comuns (CSS, JS globais, etc.)
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'apps' / 'static',                 # Static base para todos os apps
+#     BASE_DIR / 'apps' / 'chat' / 'static',         # Static do chat
+#     BASE_DIR / 'apps' / 'badges' / 'static',         # Static do badges
+#     BASE_DIR / 'apps' / 'custom_auth' / 'static',  # Static do custom_auth
+#     BASE_DIR / 'apps' / 'match' / 'static',        # Static do match
+#     BASE_DIR / 'apps' / 'tournaments' / 'static',  # Static do tournaments
+#     BASE_DIR / 'apps' / 'users' / 'static',        # Static do users
+# ]
 
-# Diretório para arquivos estáticos após o collectstatic
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# # Diretório para arquivos estáticos após o collectstatic
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Certifique-se que esse caminho existe
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
