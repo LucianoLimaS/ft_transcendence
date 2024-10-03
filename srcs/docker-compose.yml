@@ -125,22 +125,22 @@ services:
       - app
     restart: always
 
-  # daphne:
-  #   image: daphne:latest
-  #   container_name: daphne
-  #   build:
-  #     context: ../ #raiz do projeto
-  #     dockerfile: srcs/requirements/daphne/Dockerfile
-  #   ports:
-  #     - "8001:8001"
-  #   volumes:
-  #     - static_vol:/static  # Arquivos estáticos com volume persistente
-  #     - daphne_vol:/ft_transcendence
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - app
-  #   restart: always
+  daphne:
+    image: daphne:latest
+    container_name: daphne
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/daphne/Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - static_vol:/static  # Arquivos estáticos com volume persistente
+      - daphne_vol:/ft_transcendence
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
 
 volumes:
   app_vol:
@@ -199,12 +199,12 @@ volumes:
       type: none
       device: /home/${USER}/data/nginx
   
-  # daphne_vol:
-  #   name: daphne_vol
-  #   driver_opts:
-  #     o: bind
-  #     type: none
-  #     device: /home/${USER}/data/daphne
+  daphne_vol:
+    name: daphne_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/daphne
 
   static_vol:
     name: static_vol

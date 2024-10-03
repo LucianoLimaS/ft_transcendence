@@ -29,6 +29,10 @@ certs:
 	-subj "/C=BR/ST=RJ/L=Rio/O=MyOrg/OU=IT/CN=localhost"
 	echo "✅ SSL Certificates Generated at $(CERT_DIR)"
 
+service:
+	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local $(name) 
+	@docker compose -f ./srcs/docker-compose.yml up -d --build $(name)
+
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
@@ -63,4 +67,4 @@ fclean: down
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
-.PHONY : all build down re clean fclean dev info sudoers remove-sudoers certs win
+.PHONY : all build down re clean fclean dev info sudoers remove-sudoers certs win daph

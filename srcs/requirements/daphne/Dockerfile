@@ -17,6 +17,8 @@ RUN python -m venv /venv && \
 # Adiciona a pasta venv/bin no $PATH do container
 ENV PATH="/venv/bin:$PATH"
 
+ENV PYTHONPATH="${PYTHONPATH}:/ft_transcendence/srcs/app"
+
 # Definindo o diretório de trabalho
 WORKDIR /ft_transcendence/srcs/app/transcendence
 

@@ -10,7 +10,7 @@ command -v daphne >/dev/null 2>&1 || { echo >&2 "Daphne não está instalado. Ab
 echo "Diretório atual: $(pwd)"
 
 # Inicia o daphne
-exec daphne --bind 0.0.0.0:8001 ft_transcendence.asgi:application
+exec daphne -p 8001 -b 0.0.0.0 ft_transcendence.asgi:application
 
 # # Mantém o container rodando com um shell interativo
 # # Se você quer um loop infinito em vez de um shell interativo para manter o container vivo:

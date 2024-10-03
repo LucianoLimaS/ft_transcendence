@@ -15,12 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-
-#registrando as views
-from apps.custom_auth.views import CustomLoginView
+from apps.chat.views import chat_index  # Importe a função 'index'
 
 urlpatterns = [
-    #path('', CustomLoginView.as_view(), name='signin'),     #rota da tela de login (raiz)
-    path('', include('apps.custom_auth.urls')),        #rota de autenticação
-    path('', include('django_prometheus.urls')),
+    # path('', CustomLoginView.as_view(), name='signin'),  # Tela de login
+    path('', include('apps.custom_auth.urls')),  # Rota de autenticação
+    path('', include('django_prometheus.urls')),  # Monitoramento
+    path('', include('apps.chat.urls')),  # Adicione isso para incluir as URLs do chat
 ]
