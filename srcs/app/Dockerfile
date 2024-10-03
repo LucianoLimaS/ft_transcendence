@@ -19,6 +19,8 @@ WORKDIR /ft_transcendence
 # Exponha a porta que os servidores vão usar
 EXPOSE 8000
 
+RUN apk update && apk add gettext
+ 
 # RUN executa comandos em um shell dentro do container para construir a imagem. 
 # O resultado da execução do comando é armazenado no sistema de arquivos da 
 # imagem como uma nova camada.
