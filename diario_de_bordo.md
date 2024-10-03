@@ -754,40 +754,48 @@ O projeto está estruturado da seguinte forma:
 
 ## Makefile features
 
+
 ```bash
 make
    ```
    Inicia o projeto no modo de produção - todos os containers são criados no host.
+
 
 ```bash
 make info
    ```
    Fornece o acesso, credenciais e testes para os serviços instalados.
 
+
 ```bash
 make certs
    ```
    Monta os certificados ssl na pasta requirements.
+
 
 ```bash
 make sudoers
    ```
    Adiciona permissões de usuário ao host.
 
+
 ```bash
 make remove_sudoers
    ```
    Remove permissões de usuário do host.
+
 
 ```bash
 make dev
    ```
    Inicia o projeto no modo de desenvolvimento - todos os containers são criados no host, exceto o container relativo à aplicação.
 
+
 ```bash
 make win
    ```
    Inicia o projeto no modo de desenvolvimento para Windows- containers não possuem alias.
+   
 
 ```bash
 make service name=<service name>
