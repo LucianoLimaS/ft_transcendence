@@ -2,7 +2,7 @@
 FROM nginx:latest
 
 # Remova a configuração padrão do Nginx
-RUN rm /etc/nginx/conf.d/default.conf
+# RUN rm /etc/nginx/conf.d/default.conf
 
 # Copie a configuração customizada do Nginx para o container
 COPY ./srcs/requirements/nginx/nginx.conf /etc/nginx/nginx.conf
