@@ -470,21 +470,21 @@ Se tudo estiver correto, o comando deve rodar sem a necessidade de sudo.
 
 Este projeto utiliza o Docker Compose para orquestrar múltiplos serviços necessários para a aplicação `ft_transcendence`. Abaixo estão os serviços configurados:
 
-### 1. `ft_transcendence`
+### 1. `app`
 Este é o serviço principal da aplicação.
 
 - **Build**: O contêiner é construído a partir do Dockerfile no diretório atual (`.`).
 - **Ports**: O serviço mapeia a porta `8000` do contêiner para a porta `8000` do host.
 - **Volumes**: O diretório local `./ft_transcendence` é montado no contêiner em `/ft_transcendence`, permitindo persistir dados e facilitar o desenvolvimento.
 - **Variáveis de ambiente**: As variáveis são carregadas a partir do arquivo `.env` localizado em `./dotenv_files/.env`.
-- **Dependências**: Este serviço depende do banco de dados Postgres (`psql_transcendence`) para ser iniciado.
+- **Dependências**: Este serviço depende do banco de dados Postgres (`postgres`) para ser iniciado.
 - **Network**: O serviço está conectado à rede Docker `transcendence`.
 
-### 2. `psql_transcendence`
+### 2. `postgres`
 Este serviço fornece o banco de dados PostgreSQL.
 
 - **Image**: A imagem utilizada é `postgres:16.4-alpine3.20`, uma versão leve e estável do Postgres.
-- **Volumes**: Os dados do Postgres são persistidos no diretório local `./data/postgres/data`, que é montado como `/var/lib/postgresql/data/` no contêiner.
+- **Volumes**: Os dados do Postgres são persistidos no diretório local `/home/${USER}/data/postgres`, que é montado como `/var/lib/postgresql/data/` no contêiner.
 - **Ports**: O Postgres está acessível na porta `5432`, mapeada para a porta `5432` do host.
 - **Variáveis de ambiente**: As variáveis são carregadas do mesmo arquivo `.env` utilizado no serviço `ft_transcendence`.
 - **Network**: Conectado à rede `transcendence`.
@@ -502,7 +502,7 @@ O `Grafana` é uma plataforma de visualização de métricas.
 
 - **Image**: A imagem utilizada é `grafana/grafana:latest`.
 - **Ports**: O Grafana está acessível na porta `3000` do host, mapeada para a porta `3000` do contêiner.
-- **Volumes**: Os dados do Grafana são armazenados no diretório local `./data/grafana`, montado em `/var/lib/grafana` no contêiner, garantindo persistência.
+- **Volumes**: Os dados do Grafana são armazenados no diretório local `/home/${USER}/data/grafana`, montado em `/var/lib/grafana` no contêiner, garantindo persistência.
 - **User**: O contêiner é executado com as permissões definidas por `$UID` e `$GID`, variáveis que podem ser configuradas no `.env`.
 - **Network**: Conectado à rede `transcendence`.
 
@@ -510,7 +510,7 @@ O `Grafana` é uma plataforma de visualização de métricas.
 O `Prometheus` é uma ferramenta de monitoramento e alertas.
 
 - **Image**: A imagem utilizada é `prom/prometheus`.
-- **Volumes**: As configurações do Prometheus são montadas no diretório local `./prometheus/`, acessível dentro do contêiner em `/etc/prometheus/`.
+- **Volumes**: As configurações do Prometheus são montadas no diretório local `/home/${USER}/data/prometheus`, acessível dentro do contêiner em `/etc/prometheus/`.
 - **Ports**: O Prometheus está acessível na porta `9090`, mapeada para a porta `9090` do host.
 - **Network**: Conectado à rede `transcendence`.
 
@@ -518,9 +518,12 @@ O `Prometheus` é uma ferramenta de monitoramento e alertas.
 
 - **Network `transcendence`**: Todos os serviços estão conectados à mesma rede Docker `transcendence` com driver `bridge`, permitindo que eles se comuniquem entre si.
 - **Volumes**:
-  - `psql_data`: Volume dedicado para os dados do PostgreSQL.
-  - `grafana_data`: Volume dedicado para os dados do Grafana.
-  - `prometheus_data`: Volume dedicado para as configurações do Prometheus.
+
+  - `app_vol`: Volume dedicado para os dados do app.
+  - `static_vol`: Volume dedicado para os dados estáticos do app que serão servidos pelo nginx.
+  - `postgres_vol`: Volume dedicado para os dados do PostgreSQL.
+  - `grafana_vol`: Volume dedicado para os dados do Grafana.
+  - `prometheus_vol`: Volume dedicado para as configurações do Prometheus.
 
 Este arquivo Docker Compose facilita o desenvolvimento e a configuração de um ambiente de execução completo para a aplicação `ft_transcendence`, integrando o banco de dados PostgreSQL, uma interface de gerenciamento com pgAdmin, além de ferramentas de monitoramento como Grafana e Prometheus.
 
@@ -571,8 +574,7 @@ O Prometheus é responsável por coletar métricas da sua aplicação. Para conf
 3. Reinicie os contêineres para aplicar a configuração:
 
    ```bash
-   docker-compose down
-   docker-compose up -d
+   make down && make (opt)
    ```
 
 #### Passo 2: Acessar a interface do Prometheus
@@ -743,3 +745,61 @@ Certifique-se de que o Prometheus está configurado para coletar métricas do en
 ### 7. Conclusão
 
 Com o Prometheus e o Grafana configurados, você terá um sistema completo de monitoramento para sua aplicação Django. O Prometheus coleta métricas detalhadas e o Grafana permite criar dashboards personalizados para visualizar o desempenho e a saúde da aplicação. Seguindo este guia, você pode ajustar o monitoramento conforme as necessidades do seu projeto e adicionar novos alvos ou métricas personalizadas conforme o projeto evolui.
+
+# DEVOPS
+
+O projeto está estruturado da seguinte forma:
+
+![schem_transcendence](image.png)
+
+## Makefile features
+
+```bash
+make
+   ```
+   Inicia o projeto no modo de produção - todos os containers são criados no host.
+
+```bash
+make info
+   ```
+   Fornece o acesso, credenciais e testes para os serviços instalados.
+
+```bash
+make certs
+   ```
+   Monta os certificados ssl na pasta requirements.
+
+```bash
+make sudoers
+   ```
+   Adiciona permissões de usuário ao host.
+
+```bash
+make remove_sudoers
+   ```
+   Remove permissões de usuário do host.
+
+```bash
+make dev
+   ```
+   Inicia o projeto no modo de desenvolvimento - todos os containers são criados no host, exceto o container relativo à aplicação.
+
+```bash
+make win
+   ```
+   Inicia o projeto no modo de desenvolvimento para Windows- containers não possuem alias.
+
+```bash
+make service name=<service name>
+   ```
+   Apaga o container, volume, remonta a imagem relativa ao serviço.
+   Serviços disponíveis:
+   - app
+   - postgres
+   - pgadmin
+   - grafana
+   - prometheus
+   - selenium
+   - minio
+   - nginx
+   - daphne
