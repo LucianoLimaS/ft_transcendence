@@ -6,6 +6,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 # Copie a configuração customizada do Nginx para o container
 COPY ./srcs/requirements/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./srcs/requirements/certs /etc/nginx/certs
 
 # Copie o diretório de arquivos estáticos do host para o container (opcional)
 # Se estiver usando volumes no Docker Compose, pode omitir essa parte
@@ -13,3 +14,4 @@ COPY ./srcs/requirements/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Expõe a porta 80 para o tráfego HTTP
 EXPOSE 80
+EXPOSE 443

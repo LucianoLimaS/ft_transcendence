@@ -35,7 +35,23 @@ ALLOWED_HOSTS = [
 AUTH_USER_MODEL = "users.Users"
 
 # Application definition
+
+WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
+
+ASGI_APPLICATION = 'ft_transcendence.asgi.application'
+
+# # Configurações Redis no Django
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
+
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -97,8 +113,6 @@ AUTHENTICATION_BACKENDS = [
     'apps.custom_auth.backends.CustomAuthBackend'
     # Adicione outros backends personalizados, se necessário
 ]
-
-WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

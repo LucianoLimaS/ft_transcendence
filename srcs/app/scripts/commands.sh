@@ -24,7 +24,7 @@ python manage.py collectstatic --noinput
 # python manage.py runserver 0.0.0.0:8001 &
 
 # Inicia o gunicorn
-exec gunicorn --workers 4 --bind 0.0.0.0:8001 ft_transcendence.wsgi:application
+exec gunicorn --workers 4 --bind 0.0.0.0:8000 ft_transcendence.wsgi:application
 
 # Mantém o container rodando com um shell interativo
 # Se você quer um loop infinito em vez de um shell interativo para manter o container vivo:
