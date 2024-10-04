@@ -12,6 +12,10 @@ scrape_configs:
     static_configs:
       - targets: ['nginx-exporter:9113']  # Endereço do nginx-exporter
 
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
 # Normalmente, o PostgreSQL não expõe métricas no endpoint /metrics por padrão.
 # Você pode precisar de um exporter, como o PostgreSQL Exporter,
 # que pode ser configurado para coletar métricas do banco de dados
