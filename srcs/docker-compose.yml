@@ -125,6 +125,19 @@ services:
       - app
     restart: always
 
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    ports:
+      - "9113:9113"  # Porta onde o exporter estará disponível
+    volumes:
+      - nginx-exporter_vol:/etc/nginx-exporter/data
+    networks:
+      - transcendence
+    depends_on:
+      - nginx
+    restart: always
+
   daphne:
     image: daphne:latest
     container_name: daphne
@@ -199,6 +212,13 @@ volumes:
       type: none
       device: /home/${USER}/data/nginx
   
+  nginx-exporter_vol:
+      name: nginx-exporter_vol
+      driver_opts:
+        o: bind
+        type: none
+        device: /home/${USER}/data/nginx-exporter
+
   daphne_vol:
     name: daphne_vol
     driver_opts:

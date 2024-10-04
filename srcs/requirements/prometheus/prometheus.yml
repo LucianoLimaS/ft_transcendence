@@ -6,7 +6,11 @@ scrape_configs:
   - job_name: 'app'
     metrics_path: /metrics
     static_configs:
-      - targets: ['app:8001'] # Endpoint da aplicação que expõe métricas
+      - targets: ['app:8000'] # Endpoint da aplicação que expõe métricas
+
+  - job_name: 'nginx-exporter'  # Nome do trabalho para coletar métricas do exporter do Nginx
+    static_configs:
+      - targets: ['nginx-exporter:9113']  # Endereço do nginx-exporter
 
 # Normalmente, o PostgreSQL não expõe métricas no endpoint /metrics por padrão.
 # Você pode precisar de um exporter, como o PostgreSQL Exporter,
