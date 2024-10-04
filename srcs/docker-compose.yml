@@ -105,6 +105,20 @@ services:
       - app
     restart: always
   
+  selenium-exporter:
+    image: selenium-exporter
+    container_name: selenium-exporter
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/selenium/Dockerfile
+    ports:
+      - "8003:8003"
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+  
   nginx:
     image: nginx:latest
     container_name: nginx

@@ -12,30 +12,18 @@ scrape_configs:
     static_configs:
       - targets: ['nginx-exporter:9113']  # Endereço do nginx-exporter
 
+  # O pgAdmin não expõe métricas Prometheus por padrão
   - job_name: 'postgres-exporter'
     static_configs:
       - targets: ['postgres-exporter:9187']
+  
+  - job_name: 'selenium-exporter'
+    static_configs:
+      - targets: ['selenium-exporter:8003']
 
-# Normalmente, o PostgreSQL não expõe métricas no endpoint /metrics por padrão.
-# Você pode precisar de um exporter, como o PostgreSQL Exporter,
-# que pode ser configurado para coletar métricas do banco de dados
-# e expô-las em um formato que o Prometheus entenda.
-  # - job_name: 'postgres'
-  #   static_configs:
-  #     - targets: ['postgres:5432'] # Endpoint do banco de dados PostgreSQL
-
-# O pgAdmin não expõe métricas Prometheus por padrão.
-# Assim como no caso do PostgreSQL, é necessário verificar se há suporte para isso,
-# ou considerar a utilização de um exporter.
-  # - job_name: 'pgadmin'
-  #   static_configs:
-  #     - targets: ['pgadmin:5050'] # Endpoint do banco de dados PostgreSQL
-
-# O Grafana também não expõe métricas nativamente para o Prometheus.
-# Para coletar métricas do Grafana, você pode usar o Grafana Exporter.
-  # - job_name: 'grafana'
-  #   static_configs:
-  #     - targets: ['grafana:3000'] # Endpoint do Grafana
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000'] # Endpoint do Grafana
 
   - job_name: 'prometheus'
     static_configs:

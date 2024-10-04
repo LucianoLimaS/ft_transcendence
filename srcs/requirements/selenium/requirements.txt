@@ -1,0 +1,3 @@
+selenium
+prometheus_client
+bash

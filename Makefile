@@ -33,6 +33,9 @@ service:
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local $(name) 
 	@docker compose -f ./srcs/docker-compose.yml up -d --build $(name)
 
+getin:
+	@docker compose -f ./srcs/docker-compose.yml exec -it $(name) sh 
+
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
@@ -67,4 +70,10 @@ fclean: down
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
+deepclean: down
+	@printf "Clean of all docker configs\n"
+	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
+	@sudo rm -rf ~/data
+	@docker system prune --all
+
 .PHONY : all build down re clean fclean dev info sudoers remove-sudoers certs win daph

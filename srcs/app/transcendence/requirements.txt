@@ -1,3 +1,5 @@
+bash
+
 # Pacotes essenciais para Django e Channels
 asgiref==3.8.1
 Django==5.1.1
