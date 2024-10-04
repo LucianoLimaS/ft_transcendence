@@ -752,6 +752,24 @@ O projeto está estruturado da seguinte forma:
 
 ![schem_transcendence](image.png)
 
+# Configuração de Exposição de Métricas para Cada Serviço
+
+Cada serviço deve ser configurado para expor métricas que o Prometheus pode coletar.
+
+    Postgres: Usa o Postgres Exporter para expor métricas do banco de dados.
+
+    PgAdmin: O PgAdmin em si não expõe métricas.
+
+    Grafana: O Grafana pode ser monitorado através de seu próprio endpoint de métricas, mas isso não é necessário.
+
+    Selenium: Usa o Selenium Exporter para coletar métricas de desempenho.
+
+    MinIO: MinIO possui métricas nativas que podem ser expostas em /minio/v2/metrics.
+
+    Nginx: Usa o módulo nginx-prometheus-exporter, configurado junto ao Nginx para coletar e expor essas métricas.
+
+    Daphne: Usa o Django Prometheus para coletar métricas.
+
 ## Makefile features
 
 
@@ -804,10 +822,31 @@ make service name=<service name>
    Serviços disponíveis:
    - app
    - postgres
+   - postgres-exporter
    - pgadmin
    - grafana
    - prometheus
    - selenium
+   - selenium-exporter
    - minio
    - nginx
+   - nginx-exporter
+   - daphne
+
+```bash
+make getin name=<service name>
+   ```
+   Entra em um container em execução.
+   Serviços disponíveis:
+   - app
+   - postgres
+   - postgres-exporter
+   - pgadmin
+   - grafana
+   - prometheus
+   - selenium
+   - selenium-exporter
+   - minio
+   - nginx
+   - nginx-exporter
    - daphne
