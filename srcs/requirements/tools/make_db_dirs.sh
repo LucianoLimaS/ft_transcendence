@@ -8,5 +8,8 @@ if [ ! -d "/home/${USER}/data" ]; then
         mkdir /home/${USER}/data/postgres
         mkdir /home/${USER}/data/prometheus
         mkdir /home/${USER}/data/selenium
+        mkdir /home/${USER}/data/nginx
+        mkdir /home/${USER}/data/daphne
+        mkdir /home/${USER}/data/staticfiles
         sudo chmod -R 777 /home/${USER}/data
 fi

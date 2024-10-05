@@ -19,9 +19,13 @@ echo "✅ Postgres Database Started Successfully ($POSTGRES_HOST:$POSTGRES_PORT)
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 python manage.py compilemessages --verbosity=0
+python manage.py collectstatic --noinput
 
-# Inicia o Django em background
-python manage.py runserver 0.0.0.0:8001 &
+# # Inicia o Django em background
+# python manage.py runserver 0.0.0.0:8001 &
+
+# Inicia o gunicorn
+exec gunicorn --workers 4 --bind 0.0.0.0:8000 ft_transcendence.wsgi:application
 
 # Mantém o container rodando com um shell interativo
 # Se você quer um loop infinito em vez de um shell interativo para manter o container vivo:

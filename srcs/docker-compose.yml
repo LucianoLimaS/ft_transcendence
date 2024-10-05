@@ -8,9 +8,10 @@ services:
       context: ../ #raiz do projeto
       dockerfile: srcs/app/Dockerfile
     ports:
-      - "8001:8001"
+      - "8000:8000" # gunicorn (web)
     volumes:
       - app_vol:/ft_transcendence
+      - static_vol:/ft_transcendence/staticfiles
     networks:
       - transcendence
     depends_on:
@@ -103,6 +104,81 @@ services:
     depends_on:
       - app
     restart: always
+  
+  selenium-exporter:
+    image: selenium-exporter
+    container_name: selenium-exporter
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/selenium/Dockerfile
+    ports:
+      - "8003:8003"
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/nginx/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./requirements/nginx/nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
+      - ./requirements/certs:/etc/nginx/certs
+      - static_vol:/static  # Arquivos estáticos com volume persistente
+      - nginx_vol:/var/log/nginx # Logs do nginx
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+
+  daphne:
+    image: daphne:latest
+    container_name: daphne
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/daphne/Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - static_vol:/static  # Arquivos estáticos com volume persistente
+      - daphne_vol:/ft_transcendence
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+
+  nginx-exporter:
+      image: nginx/nginx-prometheus-exporter:latest
+      container_name: nginx-exporter
+      ports:
+        - "9113:9113"
+      networks:
+        - transcendence
+      depends_on:
+        - nginx
+      restart: always
+
+  postgres-exporter:
+      image: wrouesnel/postgres_exporter:latest
+      container_name: postgres-exporter
+      env_file:
+      - ./.env
+      ports:
+        - "9187:9187"
+      networks:
+        - transcendence
+      depends_on:
+        - postgres
+      restart: always
 
 volumes:
   app_vol:
@@ -153,6 +229,27 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/minio
+  
+  nginx_vol:
+    name: nginx_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/nginx
+
+  daphne_vol:
+    name: daphne_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/daphne
+
+  static_vol:
+    name: static_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/staticfiles
 
 networks:
     transcendence:
