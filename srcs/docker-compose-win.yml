@@ -148,7 +148,7 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - static_vol:/static  # Arquivos estáticos com volume persistente
+      - /home/${USER}/data/staticfiles:/static  # Arquivos estáticos com volume persistente
       - /home/${USER}/data/daphne:/ft_transcendence
     networks:
       - transcendence
