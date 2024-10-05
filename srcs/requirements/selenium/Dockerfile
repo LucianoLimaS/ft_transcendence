@@ -21,5 +21,8 @@ RUN python -m venv /venv && \
 COPY ./srcs/requirements/selenium/custom_exporter.py ./
 COPY ./srcs/requirements/selenium/wait_for_selenium.sh ./
 
+# Tornar o script de espera executável
+RUN chmod +x ./wait_for_selenium.sh
+
 # Definir o comando para iniciar seu script usando o Python do ambiente virtual
-CMD ["/bin/sh", "-c", "source /venv/bin/activate ./wait_for_selenium.sh"]
+CMD ["/bin/sh", "-c", "/usr/src/app/wait_for_selenium.sh"]

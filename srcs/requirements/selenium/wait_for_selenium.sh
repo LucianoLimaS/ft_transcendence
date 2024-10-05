@@ -4,12 +4,12 @@
 set -e
 
 # Esperar até que o Selenium esteja disponível
-while ! wget -q --spider http://localhost:4444/wd/hub/status; do
+while ! wget -q --spider http://selenium:4444/status; do
     echo "🟡 Waiting for Selenium Startup ..."
     sleep 2
 done
 
 echo "✅ Selenium Started Successfully"
 
-# Iniciar o seu script de coleta de métricas
-exec /venv/bin/python ./custom_exporter.py  # Altere para o nome do seu script se necessário
+# Iniciar o script de coleta de métricas
+exec /venv/bin/python ./custom_exporter.py 

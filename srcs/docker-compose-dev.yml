@@ -8,7 +8,7 @@ services:
       context: ../ #raiz do projeto
       dockerfile: srcs/app/Dockerfile
     ports:
-      - "8000:8000"
+      - "8000:8000" # gunicorn (web)
     volumes:
       - ./app/transcendence:/ft_transcendence
       - static_vol:/ft_transcendence/staticfiles
@@ -21,6 +21,9 @@ services:
   postgres:
     image: postgres
     container_name: postgres
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/postgres/Dockerfile
     env_file:
       - ./.env
     ports:
@@ -30,6 +33,19 @@ services:
     networks:
       - transcendence
     restart: always
+
+  postgres-exporter:
+      image: wrouesnel/postgres_exporter:latest
+      container_name: postgres-exporter
+      env_file:
+      - ./.env
+      ports:
+        - "9187:9187"
+      networks:
+        - transcendence
+      depends_on:
+        - postgres
+      restart: always
 
   pgadmin:
     image: dpage/pgadmin4
@@ -102,12 +118,14 @@ services:
     networks:
       - transcendence
     depends_on:
-      - app
+      - collector
     restart: always
   
   selenium-exporter:
     image: selenium-exporter
     container_name: selenium-exporter
+    environment:
+      - SELENIUM_URL=http://selenium:4444
     build:
       context: ../ #raiz do projeto
       dockerfile: srcs/requirements/selenium/Dockerfile
@@ -116,11 +134,11 @@ services:
     networks:
       - transcendence
     depends_on:
-      - app
+      - selenium
     restart: always
-
+  
   nginx:
-    image: nginx:latest
+    image: nginx
     container_name: nginx
     build:
       context: ../ #raiz do projeto
@@ -139,8 +157,20 @@ services:
       - app
     restart: always
 
+  nginx-exporter:
+      image: nginx/nginx-prometheus-exporter:latest
+      container_name: nginx-exporter
+      command: [ "--nginx.scrape-uri=http://nginx:8080/stub_status" ] 
+      ports:
+        - "9113:9113"
+      networks:
+        - transcendence
+      depends_on:
+        - nginx
+      restart: always
+
   daphne:
-    image: daphne:latest
+    image: daphne
     container_name: daphne
     build:
       context: ../ #raiz do projeto
@@ -155,29 +185,19 @@ services:
     depends_on:
       - app
     restart: always
-    
-  nginx-exporter:
-      image: nginx/nginx-prometheus-exporter:latest
-      container_name: nginx-exporter
+  
+  collector:
+      image: otel/opentelemetry-collector-contrib
+      container_name: collector
+      volumes:
+        - ./requirements/collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
       ports:
-        - "9113:9113"
+        - "4317:4317"
+        - "4318:4318"
       networks:
         - transcendence
       depends_on:
         - nginx
-      restart: always
-
-  postgres-exporter:
-      image: wrouesnel/postgres_exporter:latest
-      container_name: postgres-exporter
-      env_file:
-      - ./.env
-      ports:
-        - "9187:9187"
-      networks:
-        - transcendence
-      depends_on:
-        - postgres
       restart: always
 
 volumes:
@@ -236,7 +256,7 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/nginx
-  
+
   daphne_vol:
     name: daphne_vol
     driver_opts:
