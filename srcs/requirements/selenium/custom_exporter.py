@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 from prometheus_client import start_http_server, Summary, Counter
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
 
 # Métrica do tempo de execução dos testes

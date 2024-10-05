@@ -21,10 +21,6 @@ scrape_configs:
     static_configs:
       - targets: ['selenium-exporter:8003']
 
-  - job_name: 'grafana'
-    static_configs:
-      - targets: ['grafana:3000'] # Endpoint do Grafana
-
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['prometheus:9090']

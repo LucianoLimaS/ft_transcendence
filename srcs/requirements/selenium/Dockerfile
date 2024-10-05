@@ -19,6 +19,7 @@ RUN python -m venv /venv && \
 
 # Copiar seu script de coleta de métricas para o contêiner
 COPY ./srcs/requirements/selenium/custom_exporter.py ./
+COPY ./srcs/requirements/selenium/wait_for_selenium.sh ./
 
 # Definir o comando para iniciar seu script usando o Python do ambiente virtual
-CMD ["/bin/sh", "-c", "source /venv/bin/activate && exec python ./custom_exporter.py"]
+CMD ["/bin/sh", "-c", "source /venv/bin/activate ./wait_for_selenium.sh"]
