@@ -4,7 +4,7 @@
 set -e
 
 # Esperar até que o Selenium esteja disponível
-while ! wget -q --spider http://selenium:4444/status; do
+while ! wget -q --spider http://selenium:4444/wd/hub/status; do
     echo "🟡 Waiting for Selenium Startup ..."
     sleep 2
 done

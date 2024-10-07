@@ -1,68 +1,60 @@
-#!/usr/bin/env python3
-
+import os
+import logging
 from prometheus_client import start_http_server, Summary, Counter
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
-from opentelemetry import trace
-# from opentelemetry.exporter.otlp.proto.grpc.exporter import OTLPSpanExporter
-from opentelemetry.exporter.otlp.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
 import time
+import requests
 
-# Configuração do OpenTelemetry
-trace.set_tracer_provider(TracerProvider())
-tracer = trace.get_tracer(__name__)
+# Desativando a telemetria do Selenium
+os.environ["SELENIUM_REMOTE_SESSION_ID"] = ""
 
-# Configuração do exportador
-otlp_exporter = OTLPSpanExporter(endpoint="otel_collector:4317", insecure=True)
-span_processor = BatchSpanProcessor(otlp_exporter)
-trace.get_tracer_provider().add_span_processor(span_processor)
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
 
-# Métrica do tempo de execução dos testes
+# Métricas
 REQUEST_TIME = Summary('selenium_test_duration_seconds', 'Duration of Selenium tests')
-# Contador de testes realizados
 TESTS_RUN = Counter('selenium_tests_run_total', 'Total number of Selenium tests run')
-# Contador de falhas nos testes
 TESTS_FAILED = Counter('selenium_tests_failed_total', 'Total number of Selenium tests failed')
 
 @REQUEST_TIME.time()
 def run_selenium_test():
-    TESTS_RUN.inc()  # Incrementa o contador de testes realizados
-    driver = None  # Inicializa a variável driver
+    """Executa um teste com Selenium e coleta métricas."""
+    TESTS_RUN.inc()
+    driver = None
     try:
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless')  # Executar sem interface gráfica
+        options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        
-        # Conectando ao OpenTelemetry Collector
-        options.add_argument('--enable-telemetry')
-        options.add_argument('--otlp-endpoint=otel_collector:4317')
+        options.add_argument('--ignore-certificate-errors')
 
-        # Conectar ao Selenium Grid na porta 4444
-        driver = webdriver.Remote(
-            command_executor='http://selenium:4444/status',  # Corrigido para o endpoint correto do Selenium
-            options=options
-        )
-        
-        driver.set_page_load_timeout(10)  # Timeout para carregar a página
-        driver.get('http://nginx:80')  # Ajuste a URL se necessário
-        time.sleep(5)  # Simulação de tempo de teste
+        driver = webdriver.Chrome(options=options)
+        driver.get('http://localhost:4444')  # Acesse a interface do Selenium Grid
+        logging.info(f"Title of the page: {driver.title}")
+
+        if "Selenium Grid" not in driver.title:
+            logging.error("Título da página não corresponde ao esperado.")
+            TESTS_FAILED.inc()
+
     except WebDriverException as e:
-        print(f"Error occurred: {e}")
-        TESTS_FAILED.inc()  # Incrementa o contador de falhas
+        logging.error(f"Error occurred: {e}")
+        TESTS_FAILED.inc()
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        TESTS_FAILED.inc()
     finally:
-        if driver is not None:  # Verifica se o driver foi inicializado
+        if driver is not None:
             driver.quit()
 
 if __name__ == '__main__':
-    print("Iniciando o exporter...")
+    logging.info("Iniciando o servidor de métricas...")
     start_http_server(8003, addr='0.0.0.0')
-    print("Servidor de métricas disponível em http://localhost:8003")
-    while True:
-        run_selenium_test()
-        time.sleep(10)  # Intervalo entre os testes
-        print("Página carregada com sucesso")
+    logging.info("Servidor de métricas disponível em http://localhost:8003")
+
+    try:
+        while True:
+            run_selenium_test()
+            time.sleep(10)
+    except KeyboardInterrupt:
+        logging.info("Encerrando o servidor de métricas...")

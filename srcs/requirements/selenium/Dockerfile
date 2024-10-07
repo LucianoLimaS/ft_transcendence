@@ -4,6 +4,7 @@ FROM python:3.12.6-alpine3.20
 RUN apk add --no-cache \
     chromium \
     chromium-chromedriver \
+    curl \
     && ln -s /usr/bin/chromium-browser /usr/bin/chrome
 
 # Definir o diretório de trabalho

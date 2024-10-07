@@ -1,21 +1,27 @@
 receivers:
   otlp:
     protocols:
-      grpc:
-        endpoint: "0.0.0.0:4317"
       http:
         endpoint: "0.0.0.0:4318"
+
 processors:
   batch:
+    send_batch_size: 512
 
 exporters:
+  debug: {}  # Exporter de debug para verificação
   otlp:
-    endpoint: "collector:4317"
+    endpoint: "collector:4318"
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: "0.0.0.0:9091"  # Endpoint para o Prometheus coletar métricas
 
 extensions:
   health_check:
-  pprof:
-  zpages:
+    endpoint: "0.0.0.0:13133"
+  pprof: {}
+  zpages: {}
 
 service:
   extensions: [health_check, pprof, zpages]
@@ -27,7 +33,7 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [prometheus]  # Exporter para Prometheus
     logs:
       receivers: [otlp]
       processors: [batch]

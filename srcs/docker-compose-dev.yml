@@ -111,6 +111,9 @@ services:
   selenium:
     image: selenium/standalone-chrome
     container_name: selenium
+    environment:
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318
     ports:
       - "4444:4444"
     volumes:
@@ -160,7 +163,7 @@ services:
   nginx-exporter:
       image: nginx/nginx-prometheus-exporter:latest
       container_name: nginx-exporter
-      command: [ "--nginx.scrape-uri=http://nginx:8080/stub_status" ] 
+      command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
       ports:
         - "9113:9113"
       networks:
@@ -192,12 +195,13 @@ services:
       volumes:
         - ./requirements/collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
       ports:
-        - "4317:4317"
         - "4318:4318"
+        - "13133:13133" # Mapeia a porta de health check
+        - "9091:9091"    # Mapeia a nova porta para o exporter do Prometheus
       networks:
         - transcendence
       depends_on:
-        - nginx
+        - app
       restart: always
 
 volumes:
