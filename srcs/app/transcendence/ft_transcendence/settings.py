@@ -172,6 +172,8 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://localhost', 'http://127.0.0.1:8000']
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'

@@ -21,9 +21,8 @@
                     </div>
 
                     <!--INICIO DO FORM-->
-                    <form action="{% url 'signin' %}" method="post" class="signin-form">
+                    <form hx-post="{% url 'signin' %}" hx-target="#content-div" hx-swap="afterbegin" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-                        {% csrf_token %}
                         <div class="form-group mt-3">
                             <label class="form-control-placeholder" for="username">{% trans "Username:" %}</label>
                             <input id="username" name="username" type="text" class="form-control" required />
@@ -43,7 +42,7 @@
                                 <div class="form-group ">
 
                                     <div class="text-center">
-                                        <a hx-get="recover_password" hx-target="#content-div" hx-push-url="true">{% trans "I forgot my password" %}</a>
+                                        <a hx-get="recover_password" hx-target="#content-div" hx-push-url="true" class="btn btn-link">{% trans "I forgot my password" %}</a>
                                     </div>
 
                                 </div>
@@ -59,7 +58,22 @@
         </div>
     </div>
 </div>
-{% endblock %} {% block extra_css %}
-<link rel="stylesheet" href="{% static 'auth.css' %}"> {% endblock %} {% block extra_js %}
-<script src="{% static 'auth.js' %}"></script>
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        var response = evt.detail.xhr.response;
+        try {
+            var data = JSON.parse(response);
+            if (data.redirect) {
+                window.location.href = data.redirect;  // Faz o redirecionamento para a view 'logado'
+            }
+        } catch (e) {
+            // A resposta não era um JSON, então o redirecionamento não é necessário
+        }
+    });
+</script>
+{% endblock %} 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'auth.css' %}"> {% endblock %} 
+{% block extra_js %}
+    <script src="{% static 'auth.js' %}"></script>
 {% endblock %}
