@@ -63,17 +63,19 @@ re: fclean
 clean: cleandev cleanwin
 	@printf "Cleaning  ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
-	@sudo rm -rf ~/data
+	@sudo rm -rf ~/data 
 
 cleandev:
 	@printf "Cleaning  ${name}...\n"
 	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
 	@sudo rm -rf ~/data
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles
 
 cleanwin:
 	@printf "Cleaning  ${name}...\n"
 	@docker compose -f ./srcs/docker-compose-win.yml down --volumes --rmi local
 	@sudo rm -rf ~/data
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles
 
 fclean: clean
 	@printf "Clean of all ${name} configs\n"
