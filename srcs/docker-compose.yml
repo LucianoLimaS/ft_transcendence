@@ -114,29 +114,15 @@ services:
     ports:
       - "4444:4444"
     volumes:
+      - /dev/shm:/dev/shm
       - selenium_vol:/var/log/selenium
+      # - chrome_profiles:/tmp/chrome
     networks:
       - transcendence
     depends_on:
-      - collector
+      - app
     restart: always
-  
-  selenium-exporter:
-    image: selenium-exporter
-    container_name: selenium-exporter
-    environment:
-      - SELENIUM_URL=http://selenium:4444
-    build:
-      context: ../ #raiz do projeto
-      dockerfile: srcs/requirements/selenium/Dockerfile
-    ports:
-      - "8003:8003"
-    networks:
-      - transcendence
-    depends_on:
-      - selenium
-    restart: always
-  
+
   nginx:
     image: nginx
     container_name: nginx
@@ -160,6 +146,7 @@ services:
   nginx-exporter:
       image: nginx/nginx-prometheus-exporter:latest
       container_name: nginx-exporter
+      command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
       ports:
         - "9113:9113"
       networks:
@@ -184,20 +171,6 @@ services:
     depends_on:
       - app
     restart: always
-  
-  collector:
-      image: otel/opentelemetry-collector-contrib
-      container_name: collector
-      volumes:
-        - ./requirements/collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
-      ports:
-        - "4317:4317"
-        - "4318:4318"
-      networks:
-        - transcendence
-      depends_on:
-        - nginx
-      restart: always
 
 volumes:
   app_vol:

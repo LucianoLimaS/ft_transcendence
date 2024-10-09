@@ -60,13 +60,23 @@ re: fclean
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
-clean: down
+clean: cleandev cleanwin
 	@printf "Cleaning  ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
 	@sudo rm -rf ~/data
 
-fclean: down
-	@printf "Clean of all docker configs\n"
+cleandev:
+	@printf "Cleaning  ${name}...\n"
+	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
+	@sudo rm -rf ~/data
+
+cleanwin:
+	@printf "Cleaning  ${name}...\n"
+	@docker compose -f ./srcs/docker-compose-win.yml down --volumes --rmi local
+	@sudo rm -rf ~/data
+
+fclean: clean
+	@printf "Clean of all ${name} configs\n"
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
@@ -76,4 +86,4 @@ deepclean: down
 	@sudo rm -rf ~/data
 	@docker system prune --all
 
-.PHONY : all build down re clean fclean dev info sudoers remove-sudoers certs win daph
+.PHONY : all build down re clean cleandev cleanwin fclean dev info sudoers remove-sudoers certs win daph
