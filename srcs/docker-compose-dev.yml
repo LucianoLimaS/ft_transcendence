@@ -8,7 +8,7 @@ services:
       context: ../ #raiz do projeto
       dockerfile: srcs/app/Dockerfile
     ports:
-      - "800:8000"
+      - "8000:8000" # gunicorn (web)
     volumes:
       - ./app/transcendence:/ft_transcendence
       - static_vol:/ft_transcendence/staticfiles
@@ -21,6 +21,9 @@ services:
   postgres:
     image: postgres
     container_name: postgres
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/postgres/Dockerfile
     env_file:
       - ./.env
     ports:
@@ -30,6 +33,19 @@ services:
     networks:
       - transcendence
     restart: always
+
+  postgres-exporter:
+      image: wrouesnel/postgres_exporter:latest
+      container_name: postgres-exporter
+      env_file:
+      - ./.env
+      ports:
+        - "9187:9187"
+      networks:
+        - transcendence
+      depends_on:
+        - postgres
+      restart: always
 
   pgadmin:
     image: dpage/pgadmin4
@@ -92,27 +108,55 @@ services:
       - app
     restart: always
   
+  # selenium:
+  #   image: selenium/standalone-chrome
+  #   container_name: selenium
+  #   # environment:
+  #   # - SE_OPENTELEMETRY_ENABLED=false
+  #   # - OTEL_EXPORTER_OTLP_ENDPOINT=http://00000:4317
+  #   ports:
+  #     - "4444:4444"
+  #   volumes:
+  #     - /dev/shm:/dev/shm
+  #     - selenium_vol:/var/log/selenium
+  #     - chrome_profiles:/tmp/chrome
+  #   command: ["selenium-standalone", "start"]
+  #   networks:
+  #     - transcendence
+  #   depends_on:
+  #     - app
+  #   restart: always
+  
+  # otel-collector:
+  #   image: otel/opentelemetry-collector
+  #   container_name: otel-collector
+  #   ports:
+  #     - "8888:8889"  # Exponha a porta 8888 para as métricas Prometheus
+  #     - "4318:4318"  # Exponha a porta 4318 para o OTLP (spans e logs)
+  #     - "4317:4317"  # Exponha a porta 4318 para o OTLP (spans e logs)
+  #   volumes:
+  #     - ./requirements/otel-collector/otel-collector-config.yaml:/etc/otel/otel-collector-config.yaml  # Seu arquivo de configuração
+  #   command: ["--config", "/etc/otel/otel-collector-config.yaml"]
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - transcendence
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8888/metrics"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+
   selenium:
     image: selenium/standalone-chrome
     container_name: selenium
     ports:
       - "4444:4444"
     volumes:
+      - /dev/shm:/dev/shm
       - selenium_vol:/var/log/selenium
-    networks:
-      - transcendence
-    depends_on:
-      - app
-    restart: always
-  
-  selenium-exporter:
-    image: selenium-exporter
-    container_name: selenium-exporter
-    build:
-      context: ../ #raiz do projeto
-      dockerfile: srcs/requirements/selenium/Dockerfile
-    ports:
-      - "8003:8003"
+      # - chrome_profiles:/tmp/chrome
     networks:
       - transcendence
     depends_on:
@@ -120,7 +164,7 @@ services:
     restart: always
 
   nginx:
-    image: nginx:latest
+    image: nginx
     container_name: nginx
     build:
       context: ../ #raiz do projeto
@@ -139,8 +183,20 @@ services:
       - app
     restart: always
 
+  nginx-exporter:
+      image: nginx/nginx-prometheus-exporter:latest
+      container_name: nginx-exporter
+      command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
+      ports:
+        - "9113:9113"
+      networks:
+        - transcendence
+      depends_on:
+        - nginx
+      restart: always
+
   daphne:
-    image: daphne:latest
+    image: daphne
     container_name: daphne
     build:
       context: ../ #raiz do projeto
@@ -155,32 +211,15 @@ services:
     depends_on:
       - app
     restart: always
-    
-  nginx-exporter:
-      image: nginx/nginx-prometheus-exporter:latest
-      container_name: nginx-exporter
-      ports:
-        - "9113:9113"
-      networks:
-        - transcendence
-      depends_on:
-        - nginx
-      restart: always
-
-  postgres-exporter:
-      image: wrouesnel/postgres_exporter:latest
-      container_name: postgres-exporter
-      env_file:
-      - ./.env
-      ports:
-        - "9187:9187"
-      networks:
-        - transcendence
-      depends_on:
-        - postgres
-      restart: always
 
 volumes:
+#   chrome_profiles:
+#     name: app_vol
+#     driver_opts:
+#       o: bind
+#       type: none
+#       device: /home/${USER}/data/app
+  
   app_vol:
     name: app_vol
     driver_opts:
@@ -236,7 +275,7 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/nginx
-  
+
   daphne_vol:
     name: daphne_vol
     driver_opts:

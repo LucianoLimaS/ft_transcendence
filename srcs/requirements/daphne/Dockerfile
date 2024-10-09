@@ -23,4 +23,4 @@ ENV PYTHONPATH="${PYTHONPATH}:/ft_transcendence/srcs/app"
 WORKDIR /ft_transcendence/srcs/app/transcendence
 
 # Executa o script de inicialização do Daphne
-CMD ["sh", "/ft_transcendence/srcs/app/scripts/commands_daphne.sh"]
+CMD ["/bin/sh", "-c", "source /venv/bin/activate && exec /ft_transcendence/srcs/app/scripts/commands_daphne.sh"]
