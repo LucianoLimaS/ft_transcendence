@@ -49,7 +49,6 @@ def signup(request):
 
 # Função de login
 def signin(request):
-    print("PASSOU AQUI!!!!!!!!!!KHJVDEVEKDKJWBDKJWBJ")
     if request.method == 'GET':
         return render(request, 'signin.html')
     else:
