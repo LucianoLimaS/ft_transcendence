@@ -13,8 +13,7 @@ echo "✅ Postgres Database Started Successfully ($POSTGRES_HOST:$POSTGRES_PORT)
 # Executa as migrações do Django
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
-
-# Coleta os arquivos estáticos
+python manage.py compilemessages --verbosity=0
 python manage.py collectstatic --noinput
 
 # Ajusta as permissões para o diretório de arquivos estáticos

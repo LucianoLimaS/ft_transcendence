@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     'apps.match',
     'apps.tournaments',
     'apps.users',
-    'django_prometheus'
+    'django_prometheus',
+    'django_htmx',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 ]
 
 ALLOWED_HOSTS = ['*']
@@ -170,6 +172,8 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://localhost', 'http://127.0.0.1:8000']
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
@@ -216,3 +220,13 @@ EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
 EMAIL_USE_SSL = bool(int(os.getenv('EMAIL_USE_SSL', 0)))
 EMAIL_USE_TLS = bool(int(os.getenv('EMAIL_USE_TLS', 0)))
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
+
+from django.contrib.messages import constants
+
+MESSAGE_TAGS = {
+    constants.DEBUG: 'alert-primary',
+    constants.INFO: 'alert-info',
+    constants.SUCCESS: 'alert-success',
+    constants.WARNING: 'alert-warning',
+    constants.ERROR: 'alert-danger',
+}

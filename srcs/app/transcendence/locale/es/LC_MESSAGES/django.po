@@ -33,11 +33,14 @@ msgstr "Inicio de sesión"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:30
 msgid "Username:"
-msgstr "Nombre de usuario"
+msgstr "Nombre de usuario:"
+
+msgid "Name:"
+msgstr "Nombre:"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:35
 msgid "Password:"
-msgstr "Contraseña"
+msgstr "Contraseña:"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:48
 msgid "I forgot my password"
@@ -50,3 +53,51 @@ msgstr "¿No está registrado?"
 #: ft_transcendence/apps/custom_auth/templates/signin.html:57
 msgid "Register"
 msgstr "Regístrese"
+
+msgid "Already have an account? Login"
+msgstr "¿Ya tienes una cuenta? Iniciar sesión"
+
+msgid "The field username cannot be empty."
+msgstr "El campo nombre de usuario no puede estar vacío."
+
+msgid "The field e-mail cannot be empty."
+msgstr "El campo correo electrónico no puede estar vacío."
+
+msgid "The field password cannot be empty."
+msgstr "El campo contraseña no puede estar vacío."
+
+msgid "The field confirm password cannot be empty."
+msgstr "El campo confirmación de contraseña no puede estar vacío."
+
+msgid "Passwords do not match"
+msgstr "Las contraseñas no coinciden"
+
+msgid "User registered successfully"
+msgstr "Usuario registrado con éxito"
+
+msgid "The password must be at least 8 characters long."
+msgstr "La contraseña debe tener al menos 8 caracteres."
+
+msgid "The password must contain at least one uppercase letter."
+msgstr "La contraseña debe contener al menos una letra mayúscula."
+
+msgid "The password must contain at least one lowercase letter."
+msgstr "La contraseña debe contener al menos una letra minúscula."
+
+msgid "The password must contain at least one digit."
+msgstr "La contraseña debe contener al menos un dígito."
+
+msgid "The password must contain at least one special character."
+msgstr "La contraseña debe contener al menos un carácter especial."
+
+msgid "E-mail not registered."
+msgstr "Correo electrónico no registrado."
+
+msgid "E-mail sent successfully."
+msgstr "Correo electrónico enviado con éxito."
+
+msgid "Invalid token."
+msgstr "Token no válido."
+
+msgid "Reset password"
+msgstr "Restablecer contraseña"

@@ -1,8 +1,11 @@
-{% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
+{% load static %} {% load i18n %} {% block content %}
 <!-- ALERT DE ERRO AO TENTAR LOGAR  -->
-<div id="alert" class="alert alert-danger" role="alert" style="display: none;">
-    {% trans "Invalid username or password!" %}
+
+{% if messages %} {% for message in messages %}
+<div id="alert" class="alert {{ message.tags }}" role="alert">
+    {{ message }}
 </div>
+{% endfor %} {% endif %}
 
 <div class="container full-height d-flex justify-content-center align-items-center">
     <div class="row">
@@ -18,9 +21,8 @@
                     </div>
 
                     <!--INICIO DO FORM-->
-                    <form action="{% url 'signin' %}" method="post" class="signin-form">
+                    <form hx-post="{% url 'signin' %}" hx-target="#content-div" hx-swap="afterbegin" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-                        {% csrf_token %}
                         <div class="form-group mt-3">
                             <label class="form-control-placeholder" for="username">{% trans "Username:" %}</label>
                             <input id="username" name="username" type="text" class="form-control" required />
@@ -40,7 +42,7 @@
                                 <div class="form-group ">
 
                                     <div class="text-center">
-                                        <a href="#">{% trans "I forgot my password" %}</a>
+                                        <a hx-get="recover_password" hx-target="#content-div" hx-push-url="true" class="btn btn-link">{% trans "I forgot my password" %}</a>
                                     </div>
 
                                 </div>
@@ -49,14 +51,29 @@
 
                     </form>
                     <!--FIM DO FORM-->
-                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a id="register" class="btn btn-link" data-toggle="modal" data-target="#registrationModal">{% trans "Register" %}</a></p>
+                    <p class="text-center mt-5">{% trans "Not registered?" %}😯 <a hx-get="signup/" class="btn btn-link" hx-target="#content-div" hx-push-url="true">{% trans "Register" %}</a></p>
 
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %} {% block extra_css %}
-<link rel="stylesheet" href="{% static 'auth.css' %}"> {% endblock %} {% block extra_js %}
-<script src="{% static 'auth.js' %}"></script>
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+        var response = evt.detail.xhr.response;
+        try {
+            var data = JSON.parse(response);
+            if (data.redirect) {
+                window.location.href = data.redirect;  // Faz o redirecionamento para a view 'logado'
+            }
+        } catch (e) {
+            // A resposta não era um JSON, então o redirecionamento não é necessário
+        }
+    });
+</script>
+{% endblock %} 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'auth.css' %}"> {% endblock %} 
+{% block extra_js %}
+    <script src="{% static 'auth.js' %}"></script>
 {% endblock %}

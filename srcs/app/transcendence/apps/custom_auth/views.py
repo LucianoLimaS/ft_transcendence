@@ -7,7 +7,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
+import re
+from django.contrib.auth.hashers import make_password
+from django.contrib.messages import constants
+from django.contrib import messages
+from django.utils.translation import gettext as getTranslated
+from django.http import JsonResponse
+from django.urls import reverse
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -18,83 +25,209 @@ def signup(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
+        confirm_password = request.POST.get('confirm_password')
         description = request.POST.get('description')
         profile_picture = request.POST.get('profile_picture')
 
-        # Valores padrão para teste
-        first_name = "mocado"
-        last_name = "mocado"
-        description = "mocado"
-        profile_picture = "mocado"
+        # Verificação de campos vazios
+        fields = {
+            'username': username,
+            'e-mail': email,
+            'password': password,
+            'confirm password': confirm_password,
+        }
+        are_empty, message = are_fields_empty(fields)
+        if are_empty:
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
 
+        if password != confirm_password:
+            messages.add_message(request, constants.ERROR, getTranslated("As senhas não conferem"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+        
+        # Verificação da força da senha
+        is_strong, message = is_password_strong(password)
+        if not is_strong:
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+        
         user = Users.objects.filter(username=username);
         if user:
-            return HttpResponse("Usuário já cadastrado")
+            messages.add_message(request, constants.ERROR, getTranslated("User already registered"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
         else:
             user = Users.objects.create_user(
                 username = username,
-                email= email,
-                password= password,
-                first_name= first_name,
-                last_name= last_name,
-                description= description,
-                profile_picture= profile_picture,
+                email = email,
+                password = password,
+                first_name = "",
+                last_name = "",
+                description = description,
+                profile_picture = profile_picture,
                 )
             user.save()
-            return redirect('/')
+            messages.add_message(request, constants.SUCCESS, getTranslated("User registered successfully"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
     else:
-        return render(request, 'signup.html')
+        if request.htmx:
+            return render(request, 'signup.html')
+        else:
+            return render(request, 'signup_full.html')
+
 
 # Função de login
 def signin(request):
-    if request.method == 'GET':
-        return render(request, 'signin.html')
-    else:
+    if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
+        # Verificação de campos vazios
+        fields = {
+            'username': username,
+            'password': password,
+        }
+        
+        are_empty, message = are_fields_empty(fields)
+        if are_empty:
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
         user = authenticate(username = username, password = password)
         if user:
             login(request, user)
-            return redirect('logado')
+            if request.headers.get('HX-Request'):
+                return JsonResponse({
+                    "redirect": reverse('profile')  # Usando a URL da view 'logado'
+                })
+            else:
+                # Full request (non-HTMX), redirect to main page
+                return redirect('logado')
         else:
-            return HttpResponse("Usuário inválido1")
-    
-    return render(request, 'signin.html', {'form': form})
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid username or password!"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+    else:
+        if request.htmx:
+            return render(request, 'signin.html')
+        else:
+            return render(request, 'signin_full.html')
+
 
 def signout(request):
     logout(request)
     return redirect('/')  # Redireciona para a página de login após logout
 
 def recoverPassword(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         email = request.POST.get('email')
-        user = Users.objects.get(email=email) 
+
+        # Verificação de campos vazios
+        fields = {
+            'e-mail': email,
+        }
+        are_empty, message = are_fields_empty(fields)
+        if are_empty:
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+        
+        try:
+            user = Users.objects.get(email=email)
+        except Users.DoesNotExist:
+            messages.add_message(request, constants.ERROR, getTranslated("E-mail not registered."))
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+
         if user:
             token = makeUniqueHash(user.email + getData())
             user.token = token
-            user.token_expires = datetime.now()
+            user.token_expires = datetime.now() + timedelta(minutes=15)
             user.save()
             send_mail(
                 'Recuperação de senha',
-                'o link para recuperação da sua senha é : localhost:8080/changePassword/' + token,
+                'o link para recuperação da sua senha é : localhost:8001/resetPassword/' + token,
                 settings.DEFAULT_FROM_EMAIL, [user.email], 
                 fail_silently=False, 
                 )
-            return HttpResponse("E-mail Enviado")
+            messages.add_message(request, constants.SUCCESS, getTranslated("E-mail sent successfully."))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
         else:
-            return HttpResponse("E-mail não cadastrado")
+            messages.add_message(request, constants.ERROR, getTranslated("E-mail not registered."))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
     else:
-        return render(request, 'recoverPassword.html')
+        if request.htmx:
+            return render(request, 'recoverPassword.html')
+        else:
+            return render(request, 'recoverPassword_full.html')
     
-def reset_password(request, token, email, password):
-    pass
+def resetPassword(request, token = None):
+    if not token:
+        messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+        return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
+
+    if request.method == 'GET':
+        user = Users.objects.filter(token=token);
+        if user.exists():
+            return render(request, 'resetPassword_full.html', {'token': token})
+        else:
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
+            
+    if request.method == 'POST':
+        if not token:
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
+        
+        try:
+            user = Users.objects.get(token=token);
+        except Users.DoesNotExist:
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
+
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        fields = {
+            'password': password,
+            'confirm password': confirm_password,
+        }
+        
+        are_empty, message = are_fields_empty(fields)
+        if are_empty:
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+        
+        if password != confirm_password:
+            messages.add_message(request, constants.ERROR, getTranslated("As senhas não conferem"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+        
+        # Verificação da força da senha
+        is_strong, message = is_password_strong(password)
+        if not is_strong:
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+
+        user.password = make_password(password)
+        user.token = None
+        user.token_expires = None
+        user.save()
+        response = JsonResponse({'location': '/'})
+        response['HX-Redirect'] = '/'
+        return response
+    return render(request, 'resetPassword_full.html')
 
 @login_required(login_url='/')
 def logado(request):
-    return HttpResponse('você está logado')
+    return render(request, 'logado.html')
 
 def makeUniqueHash(input_string):
     # Cria um objeto de hash SHA-256
@@ -114,3 +247,34 @@ def getData():
     data_hora_formatada = agora.strftime('%d/%m/%Y %H:%M:%S')
     
     return data_hora_formatada
+
+def is_password_strong(password):
+    # Verifica se a senha tem pelo menos 8 caracteres
+    if len(password) < 8:
+        return False, "The password must be at least 8 characters long."
+
+    # Verifica se a senha contém pelo menos uma letra maiúscula
+    if not re.search(r'[A-Z]', password):
+        return False, "The password must contain at least one uppercase letter."
+
+    # Verifica se a senha contém pelo menos uma letra minúscula
+    if not re.search(r'[a-z]', password):
+        return False, "The password must contain at least one lowercase letter."
+
+    # Verifica se a senha contém pelo menos um dígito
+    if not re.search(r'\d', password):
+        return False, "The password must contain at least one digit."
+
+    # Verifica se a senha contém pelo menos um caractere especial
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return False, "The password must contain at least one special character."
+    
+    return True, ""
+
+def are_fields_empty(fields):
+    for field_name, field_value in fields.items():
+        if field_value is None:
+            return True, f"The field {field_name} cannot be empty."
+        if not field_value.strip():
+            return True, f"The field {field_name} cannot be empty."
+    return False, ""

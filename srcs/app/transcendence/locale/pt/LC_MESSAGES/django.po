@@ -33,11 +33,14 @@ msgstr "Entrar"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:30
 msgid "Username:"
-msgstr "Nome de Usuário"
+msgstr "Nome de Usuário:"
+
+msgid "Name:"
+msgstr "Nome:"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:35
 msgid "Password:"
-msgstr "Senha"
+msgstr "Senha:"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:48
 msgid "I forgot my password"
@@ -50,3 +53,51 @@ msgstr "Não possui Cadastro?"
 #: ft_transcendence/apps/custom_auth/templates/signin.html:57
 msgid "Register"
 msgstr "Cadastrar"
+
+msgid "Already have an account? Login"
+msgstr "Já tem uma conta? Entrar"
+
+msgid "The field username cannot be empty."
+msgstr "O campo nome de usuário não pode ser vazio."
+
+msgid "The field e-mail cannot be empty."
+msgstr "O campo e-mail não pode ser vazio."
+
+msgid "The field password cannot be empty."
+msgstr "O campo senha não pode ser vazio."
+
+msgid "The field confirm password cannot be empty."
+msgstr "O campo confirmação de senha não pode ser vazio."
+
+msgid "Passwords do not match"
+msgstr "As senhas não conferem"
+
+msgid "User registered successfully"
+msgstr "Usuário cadastrado com sucesso"
+
+msgid "The password must be at least 8 characters long."
+msgstr "A senha deve ter pelo menos 8 caracteres."
+
+msgid "The password must contain at least one uppercase letter."
+msgstr "A senha deve conter pelo menos uma letra maiúscula."
+
+msgid "The password must contain at least one lowercase letter."
+msgstr "A senha deve conter pelo menos uma letra minúscula."
+
+msgid "The password must contain at least one digit."
+msgstr "A senha deve conter pelo menos um dígito."
+
+msgid "The password must contain at least one special character."
+msgstr "A senha deve conter pelo menos um caractere especial."
+
+msgid "E-mail not registered."
+msgstr "E-mail não cadastrado."
+
+msgid "E-mail sent successfully."
+msgstr "E-mail enviado com sucesso."
+
+msgid "Invalid token."
+msgstr "Token inválido."
+
+msgid "Reset password"
+msgstr "Redefinir senha"
