@@ -1,5 +1,7 @@
 name = ft_transcendence
 
+ENV_FILE = ./srcs/.env
+
 .DEFAULT_GOAL = all
 
 # Define variáveis para os diretórios dos certificados
@@ -10,6 +12,7 @@ CERT_CRT=$(CERT_DIR)/cert.pem
 all:
 	@printf "Launching ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
 info:
@@ -39,11 +42,13 @@ getin:
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose-dev.yml up --build
 
 win:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose-win.yml up --build
 
 build:
