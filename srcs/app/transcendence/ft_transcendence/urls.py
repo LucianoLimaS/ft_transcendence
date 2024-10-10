@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('apps.custom_auth.urls')),  # Rota de autenticação
     path('', include('django_prometheus.urls')),  # Monitoramento
     path('', include('apps.chat.urls')),  # Adicione isso para incluir as URLs do chat
+    path('', include('apps.users.urls')),  # Adicione isso para incluir as URLs do usuário
 ]

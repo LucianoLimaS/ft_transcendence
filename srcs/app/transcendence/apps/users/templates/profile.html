@@ -1,4 +1,4 @@
-{% extends 'boilerplate_base.html' %} {% load static %} {% load i18n %} {% block content %}
+{% load static %} {% load i18n %} {% block content %}
 
 <div class="container full-height d-flex justify-content-center align-items-center">
     <div class="card card-profile">
@@ -56,3 +56,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'users/user.css' %}"> {% endblock %} 
+{% block extra_js %}
+    <script src="{% static 'users/user.js' %}"></script>
+{% endblock %}

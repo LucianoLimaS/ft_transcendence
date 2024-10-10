@@ -13,6 +13,8 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.messages import constants
 from django.contrib import messages
 from django.utils.translation import gettext as getTranslated
+from django.http import JsonResponse
+from django.urls import reverse
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -24,53 +26,51 @@ def signup(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
         description = request.POST.get('description')
         profile_picture = request.POST.get('profile_picture')
 
         # Verificação de campos vazios
         fields = {
-            'nome do usuário': username,
-            'email': email,
+            'username': username,
+            'e-mail': email,
             'password': password,
-            'confirm_password': confirm_password,
+            'confirm password': confirm_password,
         }
         are_empty, message = are_fields_empty(fields)
         if are_empty:
-            messages.add_message(request, constants.ERROR, message)
+            messages.add_message(request, constants.ERROR, getTranslated(message))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
 
         if password != confirm_password:
-            messages.add_message(request, constants.ERROR, "As senhas não conferem")
+            messages.add_message(request, constants.ERROR, getTranslated("As senhas não conferem"))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         
         # Verificação da força da senha
         is_strong, message = is_password_strong(password)
         if not is_strong:
-            messages.add_message(request, constants.ERROR, message)
+            messages.add_message(request, constants.ERROR, getTranslated(message))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         
         user = Users.objects.filter(username=username);
         if user:
-            messages.add_message(request, constants.ERROR, "Usuário já cadastrado")
+            messages.add_message(request, constants.ERROR, getTranslated("User already registered"))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         else:
             user = Users.objects.create_user(
                 username = username,
-                email= email,
-                password= password,
-                first_name= first_name,
-                last_name= last_name,
-                description= description,
-                profile_picture= profile_picture,
+                email = email,
+                password = password,
+                first_name = "",
+                last_name = "",
+                description = description,
+                profile_picture = profile_picture,
                 )
             user.save()
-            messages.add_message(request, constants.SUCCESS, "Usuário cadastrado com sucesso")
+            messages.add_message(request, constants.SUCCESS, getTranslated("User registered successfully"))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
     else:
@@ -94,13 +94,19 @@ def signin(request):
         
         are_empty, message = are_fields_empty(fields)
         if are_empty:
-            messages.add_message(request, constants.ERROR, message)
+            messages.add_message(request, constants.ERROR, getTranslated(message))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         user = authenticate(username = username, password = password)
         if user:
             login(request, user)
-            return redirect('logado')
+            if request.headers.get('HX-Request'):
+                return JsonResponse({
+                    "redirect": reverse('profile')  # Usando a URL da view 'logado'
+                })
+            else:
+                # Full request (non-HTMX), redirect to main page
+                return redirect('logado')
         else:
             messages.add_message(request, constants.ERROR, getTranslated("Invalid username or password!"))
             # Passa o objeto messages para o template
@@ -122,18 +128,18 @@ def recoverPassword(request):
 
         # Verificação de campos vazios
         fields = {
-            'email': email,
+            'e-mail': email,
         }
         are_empty, message = are_fields_empty(fields)
         if are_empty:
-            messages.add_message(request, constants.ERROR, message)
+            messages.add_message(request, constants.ERROR, getTranslated(message))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         
         try:
             user = Users.objects.get(email=email)
         except Users.DoesNotExist:
-            messages.add_message(request, constants.ERROR, "E-mail não cadastrado")
+            messages.add_message(request, constants.ERROR, getTranslated("E-mail not registered."))
             return render(request, "response.html", {"messages": messages.get_messages(request)})
 
         if user:
@@ -147,11 +153,11 @@ def recoverPassword(request):
                 settings.DEFAULT_FROM_EMAIL, [user.email], 
                 fail_silently=False, 
                 )
-            messages.add_message(request, constants.SUCCESS, "E-mail enviado com sucesso")
+            messages.add_message(request, constants.SUCCESS, getTranslated("E-mail sent successfully."))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         else:
-            messages.add_message(request, constants.ERROR, "E-mail não cadastrado")
+            messages.add_message(request, constants.ERROR, getTranslated("E-mail not registered."))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
     else:
@@ -161,59 +167,67 @@ def recoverPassword(request):
             return render(request, 'recoverPassword_full.html')
     
 def resetPassword(request, token = None):
-
     if not token:
-        return HttpResponse('Token inválido 1')
+        messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+        return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
 
     if request.method == 'GET':
         user = Users.objects.filter(token=token);
         if user.exists():
-            pass
-            return HttpResponse(token)
+            return render(request, 'resetPassword_full.html', {'token': token})
         else:
-            pass
-            return HttpResponse('Token inválido 2')
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
             
     if request.method == 'POST':
         if not token:
-            return HttpResponse('Token inválido 3')
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
         
         try:
             user = Users.objects.get(token=token);
         except Users.DoesNotExist:
-            return HttpResponse('Token inválido 4')
+            messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
 
-        new_password = request.POST.get('new_password')
+        password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
         fields = {
-            'username': new_password,
-            'password': confirm_password,
+            'password': password,
+            'confirm password': confirm_password,
         }
         
         are_empty, message = are_fields_empty(fields)
         if are_empty:
-            return HttpResponse(message)
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
         
-        if new_password != confirm_password:
-            return render(request, 'reset_password.html', {'error': 'Senhas não conferem', 'token': token})
+        if password != confirm_password:
+            messages.add_message(request, constants.ERROR, getTranslated("As senhas não conferem"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
         
         # Verificação da força da senha
-        is_strong, message = is_password_strong(new_password)
+        is_strong, message = is_password_strong(password)
         if not is_strong:
-            return HttpResponse(message)
+            messages.add_message(request, constants.ERROR, getTranslated(message))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
 
-        user.password = make_password(new_password)
+        user.password = make_password(password)
         user.token = None
         user.token_expires = None
         user.save()
-        return redirect('/')
-    
-    return render(request, 'reset_password.html', {'token': token})
+        response = JsonResponse({'location': '/'})
+        response['HX-Redirect'] = '/'
+        return response
+    return render(request, 'resetPassword_full.html')
 
 @login_required(login_url='/')
 def logado(request):
-    return HttpResponse('você está logado')
+    return render(request, 'logado.html')
 
 def makeUniqueHash(input_string):
     # Cria um objeto de hash SHA-256
@@ -237,31 +251,30 @@ def getData():
 def is_password_strong(password):
     # Verifica se a senha tem pelo menos 8 caracteres
     if len(password) < 8:
-        return False, "A senha deve ter pelo menos 8 caracteres."
-    
+        return False, "The password must be at least 8 characters long."
+
     # Verifica se a senha contém pelo menos uma letra maiúscula
     if not re.search(r'[A-Z]', password):
-        return False, "A senha deve conter pelo menos uma letra maiúscula."
-    
+        return False, "The password must contain at least one uppercase letter."
+
     # Verifica se a senha contém pelo menos uma letra minúscula
     if not re.search(r'[a-z]', password):
-        return False, "A senha deve conter pelo menos uma letra minúscula."
-    
+        return False, "The password must contain at least one lowercase letter."
+
     # Verifica se a senha contém pelo menos um dígito
     if not re.search(r'\d', password):
-        return False, "A senha deve conter pelo menos um dígito."
-    
+        return False, "The password must contain at least one digit."
+
     # Verifica se a senha contém pelo menos um caractere especial
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        return False, "A senha deve conter pelo menos um caractere especial."
+        return False, "The password must contain at least one special character."
     
     return True, ""
 
 def are_fields_empty(fields):
     for field_name, field_value in fields.items():
-        print(field_name, field_value)
         if field_value is None:
-            return True, f"O campo {field_name} não pode ser vazio."
+            return True, f"The field {field_name} cannot be empty."
         if not field_value.strip():
-            return True, f"O campo {field_name} não pode estar vazio."
+            return True, f"The field {field_name} cannot be empty."
     return False, ""
