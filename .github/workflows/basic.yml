@@ -10,7 +10,7 @@ on:
 
 jobs:
   basic_job:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     name: basic
     steps:
     - uses: actions/checkout@v3
