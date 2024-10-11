@@ -18,6 +18,9 @@ all:
 info:
 	@bash ./info.sh
 
+env:
+	@bash ./create_env.sh
+
 sudoers:
 	@sudo echo -ne "Checking Sudo... " || exit 1 && echo OK!
 	@echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions
@@ -93,4 +96,4 @@ deepclean: down
 	@sudo rm -rf ~/data
 	@docker system prune --all
 
-.PHONY : all build down re clean cleandev cleanwin fclean dev info sudoers remove-sudoers certs win daph
+.PHONY : all build down re clean cleandev cleanwin fclean dev info sudoers remove-sudoers certs env win daph
