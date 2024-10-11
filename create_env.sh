@@ -1,3 +1,15 @@
+#!/bin/bash
+
+# Nome do arquivo .env
+ENV_FILE="srcs/.env"
+
+# Verifica se o arquivo já existe
+if [ -f "$ENV_FILE" ]; then
+    echo "🔴 .env file already exists."
+    exit 1
+fi
+
+cat <<EOL > "$ENV_FILE"
 SECRET_KEY="django-insecure-hy0f)6#-mkp1kq9+4o2dh!(uv=oa07yy&eaamu*y@6(di22rm("
 
 # 0 False, 1 True
@@ -32,3 +44,6 @@ EMAIL_PORT="587"
 EMAIL_USE_SSL="0"
 EMAIL_USE_TLS="1"
 DEFAULT_FROM_EMAIL="ft_transcendence@gmx.com"
+EOL
+
+echo "✅ .env file created successfully."

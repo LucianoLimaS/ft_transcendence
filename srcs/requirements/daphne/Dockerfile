@@ -4,7 +4,7 @@ FROM python:3.12.6-alpine3.20
 COPY . /ft_transcendence
 
 # Definindo o diretório de trabalho
-WORKDIR /ft_transcendence/srcs/app/transcendence
+WORKDIR /ft_transcendence/srcs/requirements/daphne
 
 # Expondo a porta que o Daphne vai utilizar
 EXPOSE 8001
@@ -23,4 +23,4 @@ ENV PYTHONPATH="${PYTHONPATH}:/ft_transcendence/srcs/app"
 WORKDIR /ft_transcendence/srcs/app/transcendence
 
 # Executa o script de inicialização do Daphne
-CMD ["sh", "/ft_transcendence/srcs/app/scripts/commands_daphne.sh"]
+CMD ["/bin/sh", "-c", "source /venv/bin/activate && exec /ft_transcendence/srcs/requirements/daphne/entrypoint.sh"]

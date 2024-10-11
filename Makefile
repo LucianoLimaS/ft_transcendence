@@ -1,5 +1,7 @@
 name = ft_transcendence
 
+ENV_FILE = ./srcs/.env
+
 .DEFAULT_GOAL = all
 
 # Define variáveis para os diretórios dos certificados
@@ -10,10 +12,14 @@ CERT_CRT=$(CERT_DIR)/cert.pem
 all:
 	@printf "Launching ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
 info:
 	@bash ./info.sh
+
+env:
+	@bash ./create_env.sh
 
 sudoers:
 	@sudo echo -ne "Checking Sudo... " || exit 1 && echo OK!
@@ -39,11 +45,13 @@ getin:
 dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose-dev.yml up --build
 
 win:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose-win.yml up --build
 
 build:
@@ -60,13 +68,25 @@ re: fclean
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
-clean: down
+clean: cleandev cleanwin
 	@printf "Cleaning  ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
-	@sudo rm -rf ~/data
+	@sudo rm -rf ~/data 
 
-fclean: down
-	@printf "Clean of all docker configs\n"
+cleandev:
+	@printf "Cleaning  ${name}...\n"
+	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
+	@sudo rm -rf ~/data
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles
+
+cleanwin:
+	@printf "Cleaning  ${name}...\n"
+	@docker compose -f ./srcs/docker-compose-win.yml down --volumes --rmi local
+	@sudo rm -rf ~/data
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles
+
+fclean: clean
+	@printf "Clean of all ${name} configs\n"
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
  
@@ -76,4 +96,4 @@ deepclean: down
 	@sudo rm -rf ~/data
 	@docker system prune --all
 
-.PHONY : all build down re clean fclean dev info sudoers remove-sudoers certs win daph
+.PHONY : all build down re clean cleandev cleanwin fclean dev info sudoers remove-sudoers certs env win daph

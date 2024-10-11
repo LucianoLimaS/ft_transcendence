@@ -1,17 +1,28 @@
-<!-- srcs/app/transcendence/apps/chat/templates/chat/index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste WebSocket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #status {
+            margin: 20px 0;
+            white-space: pre-line;  /* Permite que quebras de linha sejam respeitadas */
+        }
+    </style>
 </head>
 <body>
     <h1>Teste de Conexão WebSocket</h1>
     <div id="status">Conectando...</div>
     
+    <input type="text" id="messageInput" placeholder="Digite sua mensagem">
+    <button id="sendMessage">Enviar</button>
+
     <script>
-        const socket = new WebSocket('wss://localhost/ws/chat/');
+        const socket = new WebSocket('ws://localhost:8001/ws/chat/'); // Ajuste o URL conforme necessário
 
         socket.onopen = function(e) {
             document.getElementById('status').innerText = 'Conexão estabelecida com sucesso!';
@@ -31,6 +42,25 @@
         socket.onclose = function(e) {
             document.getElementById('status').innerText = 'Conexão WebSocket fechada.';
         };
+
+        // Função para enviar a mensagem
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            if (message.trim() !== '') {  // Verifica se a mensagem não está vazia
+                socket.send(JSON.stringify({'message': message}));
+                messageInput.value = '';  // Limpa o campo de entrada
+            }
+        }
+
+        document.getElementById('sendMessage').onclick = sendMessage;
+
+        // Adiciona o evento keypress para o campo de entrada
+        document.getElementById('messageInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
     </script>
 </body>
 </html>
