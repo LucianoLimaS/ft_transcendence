@@ -46,14 +46,16 @@ dev:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@docker compose -f ./srcs/docker-compose-dev.yml up --build
+	@docker compose -f ./srcs/docker-compose-win.yml up --build -d
+	@docker compose -f ./srcs/docker-compose-win.yml logs -f app
 
 win:
 	@printf "Launching development ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@docker compose -f ./srcs/docker-compose-win.yml up --build
-
+	@docker compose -f ./srcs/docker-compose-win.yml up --build -d
+	@docker compose -f ./srcs/docker-compose-win.yml logs -f app
+	
 build:
 	@printf "Building  ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
