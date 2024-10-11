@@ -17,7 +17,7 @@ python manage.py compilemessages --verbosity=0
 python manage.py collectstatic --noinput
 
 # Ajusta as permissões para o diretório de arquivos estáticos
-echo "Ajustando permissões para o diretório de arquivos estáticos..."
+echo "🔧 Ajustando permissões para o diretório de arquivos estáticos..."
 chown -R 1000:1000 ./staticfiles
 
 # Verifica se DEBUG está definido como False
