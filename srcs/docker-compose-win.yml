@@ -35,17 +35,18 @@ services:
     restart: always
 
   postgres-exporter:
-      image: wrouesnel/postgres_exporter:latest
-      container_name: postgres-exporter
-      env_file:
-      - ./.env
-      ports:
-        - "9187:9187"
-      networks:
-        - transcendence
-      depends_on:
-        - postgres
-      restart: always
+    image: wrouesnel/postgres_exporter:latest
+    container_name: postgres-exporter
+    env_file:
+    - ./.env
+    ports:
+      - "9187:9187"
+    networks:
+      - transcendence
+    depends_on:
+      - postgres
+    restart: always
+    attach: false
 
   pgadmin:
     image: dpage/pgadmin4
@@ -61,6 +62,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
   
   grafana:
     image: grafana/grafana
@@ -76,6 +78,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
 
   prometheus:
     image: prom/prometheus
@@ -90,6 +93,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
 
   minio:
     image: minio/minio
@@ -106,6 +110,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
   
   selenium:
     image: selenium/standalone-chrome
@@ -120,6 +125,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
 
   nginx:
     image: nginx
@@ -140,18 +146,20 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
 
   nginx-exporter:
-      image: nginx/nginx-prometheus-exporter:latest
-      container_name: nginx-exporter
-      command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
-      ports:
-        - "9113:9113"
-      networks:
-        - transcendence
-      depends_on:
-        - nginx
-      restart: always
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
+    ports:
+      - "9113:9113"
+    networks:
+      - transcendence
+    depends_on:
+      - nginx
+    restart: always
+    attach: false
 
   daphne:
     image: daphne
@@ -169,6 +177,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
 
   portainer:
     image: portainer/portainer-ce
@@ -183,6 +192,7 @@ services:
     depends_on:
       - app
     restart: always
+    attach: false
 
 volumes:
   daphne_vol:
