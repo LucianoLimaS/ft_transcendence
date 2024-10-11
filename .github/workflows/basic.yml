@@ -18,7 +18,3 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y build-essential
       - name: Build application
         run: make env && make certs && make
-      - name: Build application (dev)
-        run: make clean && make dev
-      - name: Build application (win)
-        run: make clean && make win
