@@ -19,6 +19,6 @@ jobs:
       - name: Build application
         run: make env && make certs && make
       - name: Build application (dev)
-        run: make env && make certs && make dev
+        run: make clean && make dev
       - name: Build application (win)
-        run: make env && make certs && make win
+        run: make clean && make win
