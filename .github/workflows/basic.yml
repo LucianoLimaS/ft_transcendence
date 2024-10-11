@@ -1,0 +1,24 @@
+name: basic
+
+on:
+  # push:
+  #   branches:
+  #   - developer
+  pull_request:
+    branches:
+    - developer
+
+jobs:
+  basic_job:
+    runs-on: debian-latest
+    name: basic
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up environment
+      run: sudo apt-get update && sudo apt-get install -y build-essential
+    - name: Build application
+      run: make
+    - name: Build application (dev)
+      run: make dev
+    - name: Build application (win)
+      run: make win
