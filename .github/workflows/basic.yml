@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     name: basic
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up environment
-      run: sudo apt-get update && sudo apt-get install -y build-essential
-    - name: Build application
-      run: make env && make certs && make
-    - name: Build application (dev)
-      run: make env && make certs && make dev
-    - name: Build application (win)
-      run: make env && make certs && make win
+      - uses: actions/checkout@v3
+      - name: Set up environment
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+      - name: Build application
+        run: make env && make certs && make
+      - name: Build application (dev)
+        run: make env && make certs && make dev
+      - name: Build application (win)
+        run: make env && make certs && make win
