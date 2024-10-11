@@ -68,3 +68,7 @@ coverage.xml
 
 # Docker
 data/
+
+#Certs
+cert.pem
+key.pem
