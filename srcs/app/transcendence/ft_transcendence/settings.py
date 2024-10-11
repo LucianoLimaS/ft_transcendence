@@ -82,6 +82,13 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    }
+}
+
 ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'ft_transcendence.urls'

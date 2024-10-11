@@ -18,14 +18,14 @@ DEBUG="1"
 # Comma Separated values
 ALLOWED_HOSTS="transcendence, 127.0.0.1, localhost"
 
-DB_ENGINE="django.db.backends.postgresql"
+DB_ENGINE="django_prometheus.db.backends.postgresql"
 POSTGRES_DB="transcendence"
 POSTGRES_USER="transcendence"
 POSTGRES_PASSWORD="transcendence"
 POSTGRES_HOST="postgres"
 PG_HOST="postgres"
 POSTGRES_PORT="5432"
-DATA_SOURCE_NAME="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${PG_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
+DATA_SOURCE_NAME="postgresql://:@:/?sslmode=disable"
 TZ="America/Sao_Paulo"
 
 PGADMIN_DEFAULT_EMAIL="admin@admin.com"
