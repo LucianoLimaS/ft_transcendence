@@ -97,7 +97,6 @@ services:
     env_file:
       - ./.env
     ports:
-      - "9000:9000"
       - "9001:9001"
     command: server /data --console-address ":9001"
     volumes:
@@ -116,7 +115,6 @@ services:
     volumes:
       - /dev/shm:/dev/shm
       - /home/${USER}/data/selenium:/var/log/selenium
-      # - chrome_profiles:/tmp/chrome
     networks:
       - transcendence
     depends_on:
@@ -166,6 +164,20 @@ services:
     volumes:
       - /home/${USER}/data/staticfiles:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
       - daphne_vol:/ft_transcendence
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Permite ao Portainer acessar o Docker host
+      - /home/${USER}/data/portainer:/data 
     networks:
       - transcendence
     depends_on:

@@ -55,3 +55,6 @@ echo -e "\n ##### grafana #####"
 echo -e "   - URL:      http://localhost:3000"
 echo -e "   - Username: ${GF_SECURITY_ADMIN_USER}"
 echo -e "   - Password: ${GF_SECURITY_ADMIN_PASSWORD}"
+
+echo -e "\n ##### portainer #####"
+echo -e "   - URL:      http://localhost:9000\n"
