@@ -1,66 +1,96 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste WebSocket</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        #status {
-            margin: 20px 0;
-            white-space: pre-line;  /* Permite que quebras de linha sejam respeitadas */
-        }
-    </style>
-</head>
-<body>
-    <h1>Teste de Conexão WebSocket</h1>
-    <div id="status">Conectando...</div>
-    
-    <input type="text" id="messageInput" placeholder="Digite sua mensagem">
-    <button id="sendMessage">Enviar</button>
+{% extends "boilerplate_base.html" %}
+{% load static %}
+{% load i18n %}
 
-    <script>
-        const socket = new WebSocket('ws://localhost:8001/ws/chat/'); // Ajuste o URL conforme necessário
+{% block content %}
+<div class="chat-container">
+    <div class="user-list">
+        <h3>Usuários Conectados</h3>
+        <ul>
+            <!-- Exemplo de usuários, substitua por conteúdo dinâmico -->
+            <li>User1</li>
+            <li>User2</li>
+            <li>User3</li>
+        </ul>
+    </div>
+    <div class="chat-area">
+        <div id="chat-messages" style="background-color: #e9ecef; padding: 10px; border: 1px solid #ccc; overflow-y: auto; height: 80vh;">
+            <!-- As mensagens do chat aparecerão aqui -->
+        </div>
+        <form id="chat-form">
+            <div class="form-group">
+                <input id="message" name="message" type="text" class="form-control" placeholder="Digite sua mensagem aqui..." required />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-        socket.onopen = function(e) {
-            document.getElementById('status').innerText = 'Conexão estabelecida com sucesso!';
-            socket.send(JSON.stringify({'message': 'Olá, servidor!'}));
-        };
+<style>
+    .chat-container {
+        display: flex;
+        height: 100vh;
+    }
+    .user-list {
+        width: 20%;
+        border-right: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f8f9fa;
+    }
+    .chat-area {
+        width: 80%;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        background-color: #ffffff;
+    }
+    #chat-messages {
+        flex-grow: 1;
+        border: 1px solid #ccc;
+        padding: 10px;
+        overflow-y: auto;
+        background-color: #e9ecef;
+    }
+    #chat-form {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
 
-        socket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            document.getElementById('status').innerText += '\n' + data.message;
-        };
+<script>
+    const username = '{{ user.username }}';  // Nome do usuário autenticado
+    const chatSocket = new WebSocket('ws://localhost:8001/ws/chat/');
 
-        socket.onerror = function(e) {
-            document.getElementById('status').innerText = 'Erro na conexão WebSocket.';
-            console.error('Erro na conexão WebSocket: ', e);
-        };
+    chatSocket.onopen = function(e) {
+        console.log('Conexão estabelecida com sucesso!');
+    };
 
-        socket.onclose = function(e) {
-            document.getElementById('status').innerText = 'Conexão WebSocket fechada.';
-        };
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Mensagem recebida:', data.message); // Log de depuração
+        const chatMessages = document.getElementById('chat-messages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${data.username}: ${data.message}`; // Exibe o nome do usuário
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Rolagem automática
+    };
 
-        // Função para enviar a mensagem
-        function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value;
-            if (message.trim() !== '') {  // Verifica se a mensagem não está vazia
-                socket.send(JSON.stringify({'message': message}));
-                messageInput.value = '';  // Limpa o campo de entrada
-            }
-        }
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket fechado inesperadamente');
+    };
 
-        document.getElementById('sendMessage').onclick = sendMessage;
-
-        // Adiciona o evento keypress para o campo de entrada
-        document.getElementById('messageInput').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        });
-    </script>
-</body>
-</html>
+    document.getElementById('chat-form').onsubmit = function(e) {
+        e.preventDefault();
+        const messageInput = document.getElementById('message');
+        const message = messageInput.value;
+        console.log('Enviando mensagem:', message); // Log de depuração
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'username': username // Incluindo o nome do usuário na mensagem
+        }));
+        messageInput.value = '';
+    };
+</script>
+{% endblock %}

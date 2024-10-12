@@ -1,4 +1,6 @@
-{% load static %} {% load i18n %} {% block content %}
+{% load static %} 
+{% load i18n %} 
+{% block content %}
 
 <div class="container full-height d-flex justify-content-center align-items-center">
     <div class="card card-profile">
@@ -6,10 +8,13 @@
             <!-- Botão de edição -->
             <button type="button" class="btn btn-warning edit-btn" id="editButton">Editar</button>
 
+            <!-- Botão para ir para o chat -->
+            <a href="{% url 'chat_view' %}" class="btn btn-primary" id="chatButton">Ir para o Chat</a> <https://localhost/chat>
+
             <!-- Área de imagem do perfil -->
             <div class="profile-img" id="profileImg">
                 <!-- Imagem de perfil -->
-                <img src="assets/profileDefault.png" class="rounded-circle" height="150" alt="User Photo">
+                <img src="{% static 'assets/profileDefault.png' %}" class="rounded-circle" height="150" alt="User Photo">
             </div>
 
             <!-- Botão para carregar nova imagem -->
@@ -58,7 +63,8 @@
 </div>
 {% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'users/user.css' %}"> {% endblock %} 
+    <link rel="stylesheet" href="{% static 'users/user.css' %}"> 
+{% endblock %} 
 {% block extra_js %}
     <script src="{% static 'users/user.js' %}"></script>
 {% endblock %}

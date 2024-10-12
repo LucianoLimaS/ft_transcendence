@@ -44,6 +44,9 @@ EMAIL_PORT="587"
 EMAIL_USE_SSL="0"
 EMAIL_USE_TLS="1"
 DEFAULT_FROM_EMAIL="ft_transcendence@gmx.com"
+
+REDIS_HOST="redis"
+REDIS_PORT="6379"
 EOL
 
 echo "✅ .env file created successfully."

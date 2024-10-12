@@ -52,6 +52,7 @@ ASGI_APPLICATION = 'ft_transcendence.asgi.application'
 
 INSTALLED_APPS = [
     'channels',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
@@ -237,3 +239,32 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
     constants.ERROR: 'alert-danger',
 }
+
+# Verifica se está em ambiente de produção ou desenvolvimento
+IS_PRODUCTION = os.getenv('DEBUG', '0') == '1'
+
+if IS_PRODUCTION:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('redis', 6379)],  # O nome do serviço e a porta do Redis
+            },
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Para desenvolvimento
+        },
+    }
+
+
+LOGIN_URL = '/'  # Já que o login é na URL base
+LOGIN_REDIRECT_URL = '/'  # Ou o nome da URL do chat
+
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost/chat",  # URL de exemplo
+    "https://localhost/chat",  # Adicione suas URLs permitidas aqui
+    "https://localhost/chat_view",  # Adicione suas URLs permitidas aqui
+]

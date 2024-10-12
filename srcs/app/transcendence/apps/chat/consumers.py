@@ -1,26 +1,57 @@
+# srcs/app/transcendence/apps/chat/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.http import AsyncHttpConsumer
+import logging
+
+# Configure o logger
+logging.basicConfig(level=logging.INFO)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        await self.accept()  # Aceita a conexão
+        try:
+            logging.info("Conectando...")
+            self.room_group_name = 'chat_room'
+            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            await self.accept()
+            print("Conexão aceita.")
+        except Exception as e:
+            logging.error(f"Erro na conexão: {e}")
 
     async def disconnect(self, close_code):
-        # Aqui você pode lidar com a desconexão, se necessário
-        pass
+        logging.info("Desconectando... Código: {close_code}")
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def receive(self, text_data):
-        data = json.loads(text_data)  # Decodifica a mensagem recebida
-        message = data.get('message', '')
+        try:
+            logging.info(f"Mensagem recebida: {text_data}")  
+            text_data_json = json.loads(text_data)
+            message = text_data_json['message']
+            username = text_data_json['username']
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'username': username
+                }
+            )
+        except json.JSONDecodeError as e:
+            logging.error(f"Erro ao decodificar JSON: {e}")
+        except KeyError as e:
+            logging.error(f"Erro de chave faltando: {e}")
+        except Exception as e:
+            logging.error(f"Erro inesperado: {e}")
 
-        # Envia uma resposta ao cliente
+
+    async def chat_message(self, event):
+        message = event['message']
+        username = event['username']
         await self.send(text_data=json.dumps({
-            'message': f'Mensagem recebida: {message}'
+            'message': message,
+            'username': username
         }))
 
-
-# srcs/app/transcendence/apps/chat/consumers.py
-from channels.generic.http import AsyncHttpConsumer
 
 class MyAsyncHttpConsumer(AsyncHttpConsumer):
     async def handle(self, body):
