@@ -6,15 +6,15 @@ from apps.users.models import Users
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
-import hashlib
 from datetime import datetime, timedelta
-import re
 from django.contrib.auth.hashers import make_password
 from django.contrib.messages import constants
 from django.contrib import messages
 from django.utils.translation import gettext as getTranslated
 from django.http import JsonResponse
 from django.urls import reverse
+from apps.util.utils import makeUniqueHash, getData, is_password_strong, are_fields_empty  # Importe a função global
+
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -28,6 +28,11 @@ def signup(request):
         confirm_password = request.POST.get('confirm_password')
         description = request.POST.get('description')
         profile_picture = request.POST.get('profile_picture')
+
+        # Esses campos não estão sendo usados no formulário de cadastro
+        # Se necessário, adicione-os ao formulário
+        description = ""
+        profile_picture = ""
 
         # Verificação de campos vazios
         fields = {
@@ -72,7 +77,9 @@ def signup(request):
             user.save()
             messages.add_message(request, constants.SUCCESS, getTranslated("User registered successfully"))
             # Passa o objeto messages para o template
-            return render(request, "response.html", {"messages": messages.get_messages(request)})
+            return JsonResponse({
+                    "redirect": reverse('signin')  # Usando a URL da view 'logado'
+            })
     else:
         if request.htmx:
             return render(request, 'signup.html')
@@ -106,7 +113,9 @@ def signin(request):
                 })
             else:
                 # Full request (non-HTMX), redirect to main page
-                return redirect('logado')
+                return JsonResponse({
+                    "redirect": reverse('profile')  # Usando a URL da view 'logado'
+                })
         else:
             messages.add_message(request, constants.ERROR, getTranslated("Invalid username or password!"))
             # Passa o objeto messages para o template
@@ -190,6 +199,10 @@ def resetPassword(request, token = None):
             messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
             return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
 
+        if user.token_expires < datetime.now():
+            messages.add_message(request, constants.ERROR, getTranslated("Token expired."))
+            return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
+        
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
@@ -228,53 +241,3 @@ def resetPassword(request, token = None):
 @login_required(login_url='/')
 def logado(request):
     return render(request, 'logado.html')
-
-def makeUniqueHash(input_string):
-    # Cria um objeto de hash SHA-256
-    sha256 = hashlib.sha256()
-    
-    # Atualiza o objeto de hash com a string de entrada codificada
-    sha256.update(input_string.encode('utf-8'))
-    
-    # Retorna o hash hexadecimal gerado
-    return sha256.hexdigest()
-
-def getData():
-    # Obter a data e hora atuais
-    agora = datetime.now()
-    
-    # Formatar a data e hora no formato desejado
-    data_hora_formatada = agora.strftime('%d/%m/%Y %H:%M:%S')
-    
-    return data_hora_formatada
-
-def is_password_strong(password):
-    # Verifica se a senha tem pelo menos 8 caracteres
-    if len(password) < 8:
-        return False, "The password must be at least 8 characters long."
-
-    # Verifica se a senha contém pelo menos uma letra maiúscula
-    if not re.search(r'[A-Z]', password):
-        return False, "The password must contain at least one uppercase letter."
-
-    # Verifica se a senha contém pelo menos uma letra minúscula
-    if not re.search(r'[a-z]', password):
-        return False, "The password must contain at least one lowercase letter."
-
-    # Verifica se a senha contém pelo menos um dígito
-    if not re.search(r'\d', password):
-        return False, "The password must contain at least one digit."
-
-    # Verifica se a senha contém pelo menos um caractere especial
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        return False, "The password must contain at least one special character."
-    
-    return True, ""
-
-def are_fields_empty(fields):
-    for field_name, field_value in fields.items():
-        if field_value is None:
-            return True, f"The field {field_name} cannot be empty."
-        if not field_value.strip():
-            return True, f"The field {field_name} cannot be empty."
-    return False, ""

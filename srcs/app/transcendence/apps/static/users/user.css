@@ -1,4 +1,5 @@
     /* Aumentar o tamanho da letra da navbar */
+    
     .card-profile {
         max-width: 800px;
         margin: auto;
@@ -6,15 +7,15 @@
         box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
         transition: box-shadow 0.3s ease;
     }
-
+    
     .card-profile:hover {
         box-shadow: 0 0 35px rgba(255, 255, 255, 1);
     }
-
+    
     .card-body {
         padding: 2rem;
     }
-
+    
     .profile-img {
         width: 150px;
         height: 150px;
@@ -25,12 +26,12 @@
         margin-left: auto;
         margin-right: auto;
     }
-
+    
     .form-control[readonly] {
         background-color: #f8f9fa;
         opacity: 1;
     }
-
+    
     .edit-btn {
         position: absolute;
         top: 10px;
@@ -39,7 +40,6 @@
         padding: 5px 10px;
         width: 100px;
     }
-
-    #uploadImage {
+    /* #uploadImage {
         display: none;
-    }
+    } */

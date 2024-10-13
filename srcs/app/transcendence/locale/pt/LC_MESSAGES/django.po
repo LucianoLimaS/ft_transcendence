@@ -101,3 +101,12 @@ msgstr "Token inválido."
 
 msgid "Reset password"
 msgstr "Redefinir senha"
+
+msgid "Description:"
+msgstr "Descrição"
+
+msgid "Profile picture:"
+msgstr "Imagem de perfil:"
+
+msgid "Save"
+msgstr "Salvar"
