@@ -36,6 +36,7 @@ GF_SECURITY_ADMIN_PASSWORD="5432"
 
 MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="87654321"
+MINIO_BUCKET="transcendence"
 
 EMAIL_HOST="smtp.gmx.com"
 EMAIL_HOST_USER="ft_transcendence@gmx.com"
