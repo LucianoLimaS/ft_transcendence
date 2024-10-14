@@ -8,6 +8,10 @@ channels>=4.0.0,<5.0.0
 # Servidor ASGI
 daphne==4.0.0
 
+# Banco de dados
+psycopg==3.2.1
+psycopg-binary==3.2.1
+
 # Utilitários para Django e suporte
 sqlparse==0.5.1
 tzdata==2024.1

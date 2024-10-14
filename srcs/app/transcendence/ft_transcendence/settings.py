@@ -130,12 +130,12 @@ AUTHENTICATION_BACKENDS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
-        'USER': os.getenv('POSTGRES_USER', ''),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('POSTGRES_HOST', ''),
-        'PORT': os.getenv('POSTGRES_PORT', ''),
+        'ENGINE': os.getenv('DB_ENGINE', 'django_prometheus.db.backends.postgresql'),
+        'NAME': os.getenv('POSTGRES_DB', 'transcendence'),
+        'USER': os.getenv('POSTGRES_USER', 'transcendence'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'transcendence'),
+        'HOST': os.getenv('POSTGRES_HOST', 'postgres'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
 
