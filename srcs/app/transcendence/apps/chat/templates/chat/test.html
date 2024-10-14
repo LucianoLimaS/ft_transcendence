@@ -22,11 +22,28 @@
     <button id="sendMessage">Enviar</button>
 
     <script>
-        const socket = new WebSocket('ws://localhost:8001/ws/chat/'); // Ajuste o URL conforme necessário
-
+        // Função para obter o valor de um cookie específico
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        const username = '{{ user.username }}';  // Nome do usuário autenticado
+        const socket = new WebSocket('ws://localhost:8001/ws/chat/');  // Ajuste a rota se necessário
+        
         socket.onopen = function(e) {
             document.getElementById('status').innerText = 'Conexão estabelecida com sucesso!';
-            socket.send(JSON.stringify({'message': 'Olá, servidor!'}));
+            socket.send(JSON.stringify({'message': 'Olá, servidor!', 'username': username}));  // Envia uma mensagem inicial
         };
 
         socket.onmessage = function(e) {
@@ -43,16 +60,15 @@
             document.getElementById('status').innerText = 'Conexão WebSocket fechada.';
         };
 
-        // Aqui é onde você deve adicionar a função sendMessage
+        // Função para enviar mensagem
         function sendMessage() {
             const messageInput = document.getElementById('messageInput');
-            const username = 'SeuNome';  // Você pode modificar essa linha para capturar o nome do usuário dinamicamente, se necessário
             const message = messageInput.value;
             
             if (message.trim() !== '') {  // Verifica se a mensagem não está vazia
                 const data = {
                     'message': message,
-                    'username': username
+                    'username': username  // Use o username do usuário autenticado
                 };
                 socket.send(JSON.stringify(data));
                 messageInput.value = '';  // Limpa o campo de entrada

@@ -10,11 +10,11 @@ logging.basicConfig(level=logging.INFO)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         try:
-            logging.info("Conectando...")
+            logging.info("Conectando ao WebSocket...")
             self.room_group_name = 'chat_room'
             await self.channel_layer.group_add(self.room_group_name, self.channel_name)
             await self.accept()
-            print("Conexão aceita.")
+            logging.info(f"Conexão aceita. Room Group: {self.room_group_name}, Channel Name: {self.channel_name}")
         except Exception as e:
             logging.error(f"Erro na conexão: {e}")
 

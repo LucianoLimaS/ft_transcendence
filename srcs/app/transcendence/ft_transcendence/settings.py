@@ -263,8 +263,14 @@ else:
 LOGIN_URL = '/'  # Já que o login é na URL base
 LOGIN_REDIRECT_URL = '/'  # Ou o nome da URL do chat
 
-CORS_ALLOWED_ORIGINS = [
-    "https://localhost/chat",  # URL de exemplo
-    "https://localhost/chat",  # Adicione suas URLs permitidas aqui
-    "https://localhost/chat_view",  # Adicione suas URLs permitidas aqui
-]
+# Mudança efetuada para que pudese funcionar o websocket no firefox
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost",
+#     "https://localhost",
+#     "http://localhost:8000",
+#     "https://localhost:8000",
+#     "http://localhost:8001",
+#     "https://localhost:8001",
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True  # Se você estiver utilizando cookies para autenticação
