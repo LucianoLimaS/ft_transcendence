@@ -60,25 +60,9 @@
 </style>
 
 <script>
-    // Função para obter o valor de um cookie específico
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 
     const username = '{{ user.username }}';  // Nome do usuário autenticado
     const chatSocket = new WebSocket('ws://localhost:8001/ws/chat/');
-    const csrfToken = getCookie('csrftoken');  // Obtém o token CSRF usando a função getCookie
 
     chatSocket.onopen = function(e) {
         console.log('Conexão estabelecida com sucesso!');
