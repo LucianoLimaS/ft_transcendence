@@ -152,28 +152,35 @@ getin:
 clean: cleandev cleanwin
 	@printf "🔧 Cleaning ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
+	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete
 	@sudo rm -rf ~/data 
 
 cleandev:
 	@printf "🔧 Cleaning development for ${name}...\n"
 	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
 	@sudo rm -rf ~/data
+	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles
 
 cleanwin:
 	@printf "🔧 Cleaning Windows development for ${name}...\n"
 	@docker compose -f ./srcs/docker-compose-win.yml down --volumes --rmi local
 	@sudo rm -rf ~/data
+	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles
 
 fclean: clean
 	@printf "🔧 Full cleaning of ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
+	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles
 
 deepclean: down
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
 	@sudo rm -rf ~/data
+	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles
 	@printf "\n💀 Removing all Docker configurations...\n"
 	@docker system prune --all
 
