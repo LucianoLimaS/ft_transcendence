@@ -5,8 +5,8 @@ ENV_FILE="srcs/.env"
 
 # Verifica se o arquivo já existe
 if [ -f "$ENV_FILE" ]; then
-    echo "🔴 .env file already exists."
-    exit 1
+    echo "🟡 .env file already exists."
+    exit 0
 fi
 
 cat <<EOL > "$ENV_FILE"

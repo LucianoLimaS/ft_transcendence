@@ -16,6 +16,7 @@ services:
       - transcendence
     depends_on:
       - postgres
+      - redis
     restart: always
 
   postgres:
@@ -33,7 +34,6 @@ services:
     networks:
       - transcendence
     restart: always
-    attach: false
 
   postgres-exporter:
     image: wrouesnel/postgres_exporter:latest
@@ -47,7 +47,6 @@ services:
     depends_on:
       - postgres
     restart: always
-    attach: false
 
   pgadmin:
     image: dpage/pgadmin4
@@ -63,7 +62,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
   
   grafana:
     image: grafana/grafana
@@ -79,7 +77,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
 
   prometheus:
     image: prom/prometheus
@@ -94,7 +91,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
 
   minio:
     image: minio/minio
@@ -111,7 +107,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
   
   selenium:
     image: selenium/standalone-chrome
@@ -127,7 +122,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
 
   nginx:
     image: nginx
@@ -148,7 +142,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
 
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
@@ -161,7 +154,6 @@ services:
     depends_on:
       - nginx
     restart: always
-    attach: false
 
   daphne:
     image: daphne
@@ -180,6 +172,17 @@ services:
       - app
     restart: always
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_vol:/data
+    networks:
+      - transcendence
+    restart: always
+  
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
@@ -187,7 +190,7 @@ services:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Permite ao Portainer acessar o Docker host
-      - /home/${USER}/data/portainer:/data 
+      - portainer_vol:/data 
     networks:
       - transcendence
     depends_on:
@@ -271,6 +274,13 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/portainer
+
+  redis_vol:
+    name: redis_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/redis
 
 networks:
     transcendence:
