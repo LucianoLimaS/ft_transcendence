@@ -52,6 +52,7 @@ ASGI_APPLICATION = 'ft_transcendence.asgi.application'
 
 INSTALLED_APPS = [
     'channels',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
@@ -128,12 +130,12 @@ AUTHENTICATION_BACKENDS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
-        'USER': os.getenv('POSTGRES_USER', ''),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('POSTGRES_HOST', ''),
-        'PORT': os.getenv('POSTGRES_PORT', ''),
+        'ENGINE': os.getenv('DB_ENGINE', 'django_prometheus.db.backends.postgresql'),
+        'NAME': os.getenv('POSTGRES_DB', 'transcendence'),
+        'USER': os.getenv('POSTGRES_USER', 'transcendence'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'transcendence'),
+        'HOST': os.getenv('POSTGRES_HOST', 'postgres'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -181,23 +183,9 @@ LOCALE_PATHS = [
 
 CSRF_TRUSTED_ORIGINS = ['https://localhost', 'http://127.0.0.1:8000']
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 
-# # Diretório para arquivos estáticos comuns (CSS, JS globais, etc.)
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'apps' / 'static',                 # Static base para todos os apps
-#     BASE_DIR / 'apps' / 'chat' / 'static',         # Static do chat
-#     BASE_DIR / 'apps' / 'badges' / 'static',         # Static do badges
-#     BASE_DIR / 'apps' / 'custom_auth' / 'static',  # Static do custom_auth
-#     BASE_DIR / 'apps' / 'match' / 'static',        # Static do match
-#     BASE_DIR / 'apps' / 'tournaments' / 'static',  # Static do tournaments
-#     BASE_DIR / 'apps' / 'users' / 'static',        # Static do users
-# ]
-
 # # Diretório para arquivos estáticos após o collectstatic
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Certifique-se que esse caminho existe
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'apps/custom_auth/custom_static'),  # Caminho correto para custom_auth
@@ -237,3 +225,25 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
     constants.ERROR: 'alert-danger',
 }
+
+# Verifica se está em ambiente de produção ou desenvolvimento
+IS_PRODUCTION = os.getenv('DEBUG', '0') == '1'
+
+if IS_PRODUCTION:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('redis', 6379)],  # O nome do serviço e a porta do Redis
+            },
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Para desenvolvimento
+        },
+    }
+
+LOGIN_URL = '/'  # Já que o login é na URL base
+LOGIN_REDIRECT_URL = '/'  # Ou o nome da URL do chat

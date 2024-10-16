@@ -20,6 +20,9 @@ sqlparse==0.5.1
 tzdata==2024.1
 pillow==10.4.0
 django-htmx==1.19.0
+django-cleanup
+django-allauth
+django-cors-headers
 typing_extensions==4.12.2
 
 # Monitoramento e métricas

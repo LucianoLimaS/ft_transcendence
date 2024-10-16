@@ -6,6 +6,7 @@ from django.urls import path
 from django.core.asgi import get_asgi_application
 from transcendence.apps.chat.routing import websocket_urlpatterns
 from transcendence.apps.chat.consumers import MyAsyncHttpConsumer  # Importa o novo consumidor
+from channels.security.websocket import AllowedHostsOriginValidator
 
 # Configuração do ambiente para o Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ft_transcendence.settings')
@@ -21,10 +22,10 @@ http_urlpatterns = [
 
 # Definindo a aplicação ASGI
 application = ProtocolTypeRouter({
-    "http": URLRouter(http_urlpatterns),  # Usando URLRouter para as rotas HTTP
-    "websocket": AuthMiddlewareStack(
-        URLRouter(
-            websocket_urlpatterns  # Usando o roteamento definido para WebSocket
+    "http": URLRouter(http_urlpatterns),  # Usando URLRouter para rotas HTTP
+    "websocket": AllowedHostsOriginValidator(  # Proteção contra ataques
+        AuthMiddlewareStack(
+            URLRouter(websocket_urlpatterns)  # Usando URLRouter para WebSocket
         )
     ),
 })
