@@ -8,15 +8,14 @@ from django.views import View
 
 @login_required
 def chat_index(request):
-    return render(request, 'chat/index.html')
+    if request.htmx:
+        return render(request, 'chat/chat.html')
+    else:
+        return render(request, 'chat/chat_full.html')
 
 def chat_test(request):
+    print ("Aqui chat test")
     return render(request, 'chat/test.html')
-
-class ChatView(View):
-    def get(self, request):
-        # Lógica para renderizar a página de chat
-        return render(request, 'chat/index.html')
 
 @csrf_exempt
 def send_message(request):

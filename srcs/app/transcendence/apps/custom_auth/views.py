@@ -109,12 +109,12 @@ def signin(request):
             login(request, user)
             if request.headers.get('HX-Request'):
                 return JsonResponse({
-                    "redirect": reverse('profile')  # Usando a URL da view 'logado'
+                    "redirect": reverse('chat')  # Usando a URL da view 'logado'
                 })
             else:
                 # Full request (non-HTMX), redirect to main page
                 return JsonResponse({
-                    "redirect": reverse('profile')  # Usando a URL da view 'logado'
+                    "redirect": reverse('chat')  # Usando a URL da view 'logado'
                 })
         else:
             messages.add_message(request, constants.ERROR, getTranslated("Invalid username or password!"))
