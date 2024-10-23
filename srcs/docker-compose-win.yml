@@ -16,6 +16,7 @@ services:
       - transcendence
     depends_on:
       - postgres
+      - redis
     restart: always
 
   postgres:
@@ -188,6 +189,18 @@ services:
       - transcendence
     depends_on:
       - app
+    restart: always
+    attach: false
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/${USER}/data/redis:/data
+    networks:
+      - transcendence
     restart: always
     attach: false
 

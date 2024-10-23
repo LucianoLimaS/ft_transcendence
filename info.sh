@@ -26,6 +26,9 @@ echo -e "   - HTTP:       http://localhost:8001"
 echo -e "   - Test Endpoint: http://localhost:8001/test/"
 echo -e
 echo -e "ASGI App (WebSocket):"
+echo -e "   - WebSocket:  http://localhost/test"
+echo -e "   - WebSocket (HTTPS): https://localhost/test/"
+
 echo -e "   - WebSocket:  http://localhost/chat"
 echo -e "   - WebSocket (HTTPS): https://localhost/chat/"
 

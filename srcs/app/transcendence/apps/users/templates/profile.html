@@ -1,4 +1,6 @@
-{% load static %} {% load i18n %} {% block content %}
+{% load static %} 
+{% load i18n %} 
+{% block content %}
 
 <div class="container full-height d-flex justify-content-center align-items-center">
     {% if messages %} {% for message in messages %}
@@ -15,6 +17,7 @@
                 {% if user.profile_picture %}
                 <img src="{{ user.profile_picture.url }}" class="rounded-circle" height="150" alt="User Photo"> {% else %}
                 <img src="{% static 'assets/profileDefault.png' %}" class="rounded-circle" height="150" alt="User Photo"> {% endif %}
+
             </div>
 
             <!-- Campos read-only -->
