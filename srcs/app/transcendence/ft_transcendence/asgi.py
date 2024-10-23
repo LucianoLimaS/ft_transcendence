@@ -12,7 +12,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ft_transcendence.settings')
 
 # Inicializa a aplicação ASGI do Django
-django_asgi_app = get_asgi_application()
+application = get_asgi_application()
 
 # Adicionando as rotas HTTP
 http_urlpatterns = [
