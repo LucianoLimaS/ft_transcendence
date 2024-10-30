@@ -158,7 +158,7 @@ def recoverPassword(request):
             user.save()
             send_mail(
                 'Recuperação de senha',
-                'o link para recuperação da sua senha é : localhost:8001/resetPassword/' + token,
+                'o link para recuperação da sua senha é : localhost:8001/reset_password/' + token,
                 settings.DEFAULT_FROM_EMAIL, [user.email], 
                 fail_silently=False, 
                 )
