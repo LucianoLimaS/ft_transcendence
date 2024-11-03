@@ -15,7 +15,7 @@
             <div class="profile-img" id="profileImg">
                 <!-- Imagem de perfil -->
                 {% if user.profile_picture %}
-                <img src="{{ user.profile_picture }}" class="rounded-circle" height="150" alt="User Photo"> {% else %}
+                <img src="{{ MINIO_EXTERNAL_ENDPOINT }}/{{ MINIO_BUCKET_NAME }}/{{ user.profile_picture }}" class="rounded-circle" height="150" alt="User Photo"> {% else %}
                 <img src="{% static 'assets/profileDefault.png' %}" class="rounded-circle" height="150" alt="User Photo"> {% endif %}
 
             </div>

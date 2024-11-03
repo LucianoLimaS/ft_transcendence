@@ -71,7 +71,7 @@ def profile(request):
                     length=profile_picture.size,
                     content_type=profile_picture.content_type
                 )
-                user.profile_picture = f"{settings.MINIO_EXTERNAL_ENDPOINT}/{settings.MINIO_BUCKET_NAME}/{file_name}"  # Salva o caminho da imagem no MinIO
+                user.profile_picture = f"{file_name}"  # Salva o caminho da imagem no MinIO
             except S3Error as e:
                 messages.error(request, f"Erro ao enviar a imagem: {e}")
         else:

@@ -1,26 +1,34 @@
 let chatSocket = null;
 
 function initializeChat(username) {
-    if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-        chatSocket = new WebSocket('ws://localhost:8001/ws/chat/');
 
-        chatSocket.onopen = function (e) {
-            console.log('Conexão estabelecida com sucesso!');
-        };
-
-        chatSocket.onclose = function (e) {
-            console.error('Chat socket fechado inesperadamente');
-        };
+    if (!window.location.pathname.includes('chat')) {
+        return; // Sai se não estiver na página do chat
     }
 
+    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        return; // Sai se o socket já estiver aberto
+    }
+
+    chatSocket = new WebSocket('ws://localhost:8001/ws/chat/');
+
+    chatSocket.onopen = (e) => {
+        console.log('Conexão WebSocket estabelecida.');
+    };
+
+    chatSocket.onclose = (e) => {
+        console.error('Conexão WebSocket fechada.', e);
+        chatSocket = null;
+    };
+    
     chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        console.log('Mensagem recebida:', data.message); // Log de depuração
+        console.log('Mensagem recebida:', data.message);
         const chatMessages = document.getElementById('chat-messages');
         const messageElement = document.createElement('div');
-        messageElement.textContent = `${data.username}: ${data.message}`; // Exibe o nome do usuário
+        messageElement.textContent = `${data.username}: ${data.message}`;
         chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Rolagem automática
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     };
 
     document.getElementById('chat-form').onsubmit = function (e) {
@@ -28,29 +36,35 @@ function initializeChat(username) {
         const messageInput = document.getElementById('message');
         const message = messageInput.value;
 
-        if (chatSocket.readyState === WebSocket.OPEN) {
-            console.log('Enviando mensagem:', message); // Log de depuração
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) { // Verifica se o socket existe e está aberto
+            console.log('Enviando mensagem:', message);
             chatSocket.send(JSON.stringify({
                 'message': message,
-                'username': username // Incluindo o nome do usuário na mensagem
+                'username': username
             }));
             messageInput.value = '';
         } else {
-            console.error('WebSocket não está aberto. Estado atual:', chatSocket.readyState);
+            console.error('WebSocket não está aberto ou não existe. Estado atual:', chatSocket ? chatSocket.readyState : 'null');
         }
     };
 }
 
-// Inicialize o chat quando a página for carregada
-document.addEventListener('DOMContentLoaded', function () {
-    const username = document.getElementById('username').textContent;
-    initializeChat(username);
+document.body.addEventListener('htmx:afterSettle', (event) => {  // Use htmx:afterSettle
+    if (window.location.pathname.includes('chat')) {
+        const username = document.getElementById('username').value;
+        initializeChat(username);
+    }
 });
 
-// Reexecutar a função após o conteúdo ser carregado com HTMX
-document.body.addEventListener('htmx:afterSwap', function (event) {
-    if (event.detail.target.id === 'chat-container') {
-        const username = document.getElementById('username').textContent;
-        initializeChat(username);
+document.addEventListener('DOMContentLoaded', function () {
+    const username = document.getElementById('username').value;
+    initializeChat(username);
+    });
+
+document.body.addEventListener('htmx:beforeRequest', (event) => {
+    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        console.log('Fechando conexão WebSocket.');
+        chatSocket.close();
+        chatSocket = null;
     }
 });
