@@ -3,11 +3,20 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import random
 
 class PongConsumer(AsyncWebsocketConsumer):
+    # async def connect(self):
+    #     await self.accept()
+    #     self.game_id = None  # Inicialmente, nenhum jogo atribuído
+    #     self.player_num = None
+    #     await self.channel_layer.group_add("pong_lobby", self.channel_name) # Adiciona o consumer ao grupo de lobby
     async def connect(self):
-        await self.accept()
-        self.game_id = None  # Inicialmente, nenhum jogo atribuído
-        self.player_num = None
-        await self.channel_layer.group_add("pong_lobby", self.channel_name) # Adiciona o consumer ao grupo de lobby
+        try:
+            await self.accept()
+            self.game_id = None
+            self.player_num = None
+            await self.channel_layer.group_add("pong_lobby", self.channel_name)
+            print(f"Connected: {self.channel_name}")  # Log de depuração
+        except Exception as e:
+            print(f"Error in connect: {e}")  # Log de erro
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -104,14 +113,14 @@ class PongConsumer(AsyncWebsocketConsumer):
             ball_x = canvas_width / 2
             ball_y = random.randint(ball_radius, canvas_height - ball_radius)  # Posição Y aleatória ao reiniciar
             ball_speed_x = -5
-            ball_speed_y = (random.random() > 0.5 ? 1 : -1) * 5
+            ball_speed_y = 5 if random.random() > 0.5 else -5
 
         elif ball_x - ball_radius < 0:
             right_score += 1
             ball_x = canvas_width / 2
             ball_y = random.randint(ball_radius, canvas_height - ball_radius) # Posição Y aleatória ao reiniciar
             ball_speed_x = 5
-            ball_speed_y = (random.random() > 0.5 ? 1 : -1) * 5
+            ball_speed_y = 5 if random.random() > 0.5 else -5
 
         # Atualiza o estado do jogo
         game_state["ball_x"] = ball_x
