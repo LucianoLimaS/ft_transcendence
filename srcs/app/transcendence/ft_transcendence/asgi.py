@@ -4,10 +4,10 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 from django.urls import path
-from transcendence.apps.match.routing import websocket_urlpatterns as match_websocket
-from transcendence.apps.chat.routing import websocket_urlpatterns as chat_websocket
-from transcendence.apps.chat.consumers import MyAsyncHttpConsumer  # Importa o consumidor HTTP
-from transcendence.apps.match.consumers import PongConsumer  # Importa o consumidor do pong
+from apps.match.routing import websocket_urlpatterns as match_websocket
+from apps.chat.routing import websocket_urlpatterns as chat_websocket
+from apps.chat.consumers import MyAsyncHttpConsumer  # Importa o consumidor HTTP
+from apps.match.consumers import PongConsumer  # Importa o consumidor do pong
 from channels.security.websocket import AllowedHostsOriginValidator
 
 # Configuração do ambiente para o Django
