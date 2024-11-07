@@ -146,12 +146,6 @@ dev:
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
 	@docker compose -f ./srcs/docker-compose-dev.yml up --build
 
-win:
-	@printf "🔧 Launching development for Windows: ${name}...\n"
-	@bash srcs/requirements/tools/make_db_dirs.sh
-	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@docker compose -f ./srcs/docker-compose-win.yml up --build
-
 down:
 	@printf "🔧 Stopping ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down
@@ -174,7 +168,7 @@ getin:
 # Cleaning
 # ======================
 
-clean: cleandev cleanwin
+clean: cleandev 
 	@printf "🔧 Cleaning ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
 	@$(MAKE) clean-host
@@ -182,11 +176,6 @@ clean: cleandev cleanwin
 cleandev:
 	@printf "🔧 Cleaning development for ${name}...\n"
 	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
-	@$(MAKE) clean-host
-
-cleanwin:
-	@printf "🔧 Cleaning Windows development for ${name}...\n"
-	@docker compose -f ./srcs/docker-compose-win.yml down --volumes --rmi local
 	@$(MAKE) clean-host
 
 fclean: clean
@@ -223,7 +212,7 @@ re: fclean
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./srcs/docker-compose.yml up -d --build
 
-.PHONY : all build down re clean cleandev cleanwin fclean dev info sudoers remove-sudoers \
-	certs env win redisconf remove-redisconf setup remove-setup docker remove-env \
+.PHONY : all build down re clean cleandev fclean dev info sudoers remove-sudoers \
+	certs env redisconf remove-redisconf setup remove-setup docker remove-env \
 	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles stop-redis
 	restart
