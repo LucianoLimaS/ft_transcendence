@@ -199,6 +199,7 @@ clean-migrations:
 
 clean-staticfiles:
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles > /dev/null 2>&1
+	@sudo rm -rf ./srcs/app/transcendence/app > /dev/null 2>&1
 
 stop-redis:
 	@sudo systemctl stop redis

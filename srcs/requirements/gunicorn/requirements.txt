@@ -1,0 +1,34 @@
+bash
+
+# Pacotes essenciais para Django e Channels
+asgiref==3.8.1
+Django==5.1.1
+channels>=4.0.0,<5.0.0
+
+# Servidor WSGI
+gunicorn
+
+# Banco de dados
+psycopg==3.2.1
+psycopg-binary==3.2.1
+
+# Utilitários para Django e suporte
+sqlparse==0.5.1
+tzdata==2024.1
+pillow==10.4.0
+django-htmx==1.19.0
+django-cleanup
+django-allauth
+django-cors-headers
+typing_extensions==4.12.2
+minio==7.2.10
+
+# Monitoramento e métricas
+django-prometheus==2.3.1
+prometheus_client==0.20.0
+
+# Redis para backend do Channels
+channels_redis
+
+# WebSockets
+websockets

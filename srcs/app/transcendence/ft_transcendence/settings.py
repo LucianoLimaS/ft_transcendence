@@ -84,6 +84,9 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
+# Definindo as rotas para expor as métricas
+PROMETHEUS_METRICS_EXPORT_ENDPOINT = '/metrics'
+
 CACHES = {
     'default': {
         'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',

@@ -7,8 +7,6 @@ services:
     build:
       context: ../ #raiz do projeto
       dockerfile: srcs/app/Dockerfile
-    ports:
-      - "8000:8000" # gunicorn (web)
     volumes:
       - app_vol:/ft_transcendence
       - static_vol:/ft_transcendence/staticfiles
@@ -17,6 +15,24 @@ services:
     depends_on:
       - postgres
       - redis
+      - daphne
+    restart: always
+
+  gunicorn:
+    image: gunicorn
+    container_name: gunicorn
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/gunicorn/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
+      - app_vol:/ft_transcendence
+    networks:
+      - transcendence
+    depends_on:
+      - app
     restart: always
 
   postgres:
@@ -85,7 +101,7 @@ services:
       - "9090:9090"
     volumes:
       - prometheus_vol:/prometheus
-      - ./requirements/prometheus/:/etc/prometheus/
+      - ./requirements/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - transcendence
     depends_on:
@@ -108,7 +124,6 @@ services:
     depends_on:
       - app
     restart: always
-    attach: false
     entrypoint: >
       /bin/sh -c '
         isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }    # check if Minio is alive
@@ -179,11 +194,9 @@ services:
       - "8001:8001"
     volumes:
       - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-      - daphne_vol:/ft_transcendence
+      - app_vol:/ft_transcendence
     networks:
       - transcendence
-    depends_on:
-      - app
     restart: always
 
   redis:
@@ -196,7 +209,7 @@ services:
     networks:
       - transcendence
     restart: always
-  
+
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
@@ -281,14 +294,14 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/staticfiles
-
+  
   portainer_vol:
     name: portainer_vol
     driver_opts:
       o: bind
       type: none
       device: /home/${USER}/data/portainer
-
+  
   redis_vol:
     name: redis_vol
     driver_opts:
