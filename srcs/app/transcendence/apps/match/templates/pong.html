@@ -1,0 +1,364 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pong Clássico</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #gameCanvas {
+            border: 2px solid #fff;
+        }
+
+        #countdown {
+            position: absolute;
+            color: #fff;
+            font-size: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .players {
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            width: 800px;
+            margin-bottom: 20px;
+        }
+
+        #winner {
+            position: absolute;
+            color: #fff;
+            font-size: 32px;
+            text-align: center;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="players">
+        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
+        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+    </div>
+    <div id="countdown"></div>
+    <div id="winner"></div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <script>
+        let playerNum = null; // Inicialize playerNum como null
+        let websocket = new WebSocket('ws://localhost:8001/ws/pong/');
+
+        let ballSpeedMultiplier = 1;
+        let resetCountdown = 3;
+        let isResetting = false;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const countdownElement = document.getElementById('countdown');
+        const winnerElement = document.getElementById('winner');
+        const p1LivesElement = document.getElementById('p1Lives');
+        const p2LivesElement = document.getElementById('p2Lives');
+
+        let gameStarted = false;
+        let gameEnded = false;
+        let countdown = 3;
+
+        const maxScore = 3;
+
+        let leftScore = 0;
+        let rightScore = 0;
+
+        // Game objects
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speedX: 5,
+            speedY: 5
+        };
+
+        const paddleHeight = 100;
+        const paddleWidth = 10;
+
+        const leftPaddle = {
+            x: 0,
+            y: canvas.height / 2 - paddleHeight / 2
+        };
+
+        const rightPaddle = {
+            x: canvas.width - paddleWidth,
+            y: canvas.height / 2 - paddleHeight / 2
+        };
+
+        // Controle de teclado (apenas para o paddle deste cliente)
+        const keys = {};
+
+        document.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+
+        websocket.onmessage = function (event) {
+            let data = JSON.parse(event.data);
+
+            if (data.type === "game_state_update") {
+                ball.x = data.ball_x;
+                ball.y = data.ball_y;
+                leftPaddle.y = data.left_paddle_y;
+                rightPaddle.y = data.right_paddle_y;
+                leftScore = data.left_score;
+                rightScore = data.right_score;
+
+                updateLives(); // Atualiza a exibição das vidas
+                checkWinner(); // Verifica se há um vencedor
+
+            } else if (data.type == "game_start") {
+                startCountdown();
+                // Define o número do jogador quando o jogo começa (você pode receber isso do servidor também)
+                if (playerNum === null) { // Garante que o playerNum seja definido apenas uma vez
+                    // Verificar como determinar o playerNum baseado na lógica do servidor ou no estado inicial do jogo.
+                    // Pode ser necessário adicionar um campo 'player_num' na mensagem game_start do servidor.
+                    // Exemplo (assumindo que o servidor envia o playerNum): playerNum = data.playerNum;
+                    // Por enquanto, definindo arbitrariamente com base no tempo de conexão (primeiro a conectar é player 1)
+
+                    // Se game_start chegar primeiro, assumimos que este é o player 1
+                    if (playerNum === null) {
+                        playerNum = 1;
+                    } else {
+                        playerNum = 2; // Senão, é o player 2 (conexão posterior)
+                    }
+                }
+
+            }
+        };
+
+        function startCountdown() {
+            countdownElement.textContent = countdown;
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.style.display = 'none';
+                    gameStarted = true;
+                    gameLoop();
+                } else {
+                    countdownElement.textContent = countdown;
+                }
+            }, 1000);
+        }
+
+        function updateLives() {
+            const remainingLivesP1 = '🐄'.repeat(maxScore - rightScore);
+            const remainingLivesP2 = '🐄'.repeat(maxScore - leftScore);
+            p1LivesElement.textContent = remainingLivesP1;
+            p2LivesElement.textContent = remainingLivesP2;
+        }
+
+        function checkWinner() {
+            if (leftScore >= maxScore) {
+                gameEnded = true;
+                winnerElement.style.display = 'block';
+                winnerElement.textContent = 'Player 1 Venceu! 🏆';
+                return true;
+            } else if (rightScore >= maxScore) {
+                gameEnded = true;
+                winnerElement.style.display = 'block';
+                winnerElement.textContent = 'Player 2 Venceu! 🏆';
+                return true;
+            }
+            return false;
+        }
+
+        function movePaddles() {
+            if (playerNum === 1) {
+                if (keys['KeyW'] && leftPaddle.y > 0) {
+                    leftPaddle.y -= 5;
+                }
+                if (keys['KeyS'] && leftPaddle.y < canvas.height - paddleHeight) {
+                    leftPaddle.y += 5;
+                }
+            } else if (playerNum === 2) {
+                if (keys['ArrowUp'] && rightPaddle.y > 0) {
+                    rightPaddle.y -= 5;
+                }
+                if (keys['ArrowDown'] && rightPaddle.y < canvas.height - paddleHeight) {
+                    rightPaddle.y += 5;
+                }
+            }
+
+
+        }
+
+        function moveBall() {
+            if (!gameStarted || isResetting) return; // Pausa a bola durante o reset
+
+            if (!gameStarted) return;
+
+            ball.x += ball.speedX * ballSpeedMultiplier; // Aplica o multiplicador à velocidade
+            ball.y += ball.speedY * ballSpeedMultiplier;
+
+            // Top and bottom collision
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.speedY = -ball.speedY;
+            }
+
+            // Paddle collision
+            if (
+                (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) ||
+                (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight)
+            ) {
+                ball.speedX = -ball.speedX;
+            }
+
+            // Score
+            if (ball.x + ball.radius > canvas.width) {
+                leftScore++;
+                if (ballSpeedMultiplier <= 3) {
+                    ballSpeedMultiplier += 0.25; // aumenta a velocidade ao marcar ponto
+                }
+                resetBall();
+            } else if (ball.x - ball.radius < 0) {
+                rightScore++;
+                if (ballSpeedMultiplier <= 3) {
+                    ballSpeedMultiplier += 0.25; // aumenta a velocidade ao marcar ponto
+                }
+                resetBall();
+            }
+            console.log(ballSpeedMultiplier);
+        }
+
+        function resetBall() {
+            isResetting = true; // Inicia o reset
+            countdownElement.textContent = resetCountdown;
+            if (leftScore < maxScore && !rightScore < maxScore) {
+                countdownElement.style.display = 'flex'; // Mostra a contagem regressiva
+            }
+            countdown = resetCountdown;
+
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.style.display = 'none';
+                    isResetting = false;
+                    gameStarted = true;
+
+                    ball.x = canvas.width / 2;
+                    ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius; // Posição Y aleatória
+                    ball.speedX = (Math.random() > 0.5 ? 1 : -1) * 5 * ballSpeedMultiplier;
+
+
+                    let minimumSpeedY = 1;
+                    let calculatedSpeedY = ballSpeedMultiplier;
+                    ball.speedY = (Math.random() > 0.5 ? 1 : -1) * Math.max(minimumSpeedY, calculatedSpeedY);
+
+
+                }
+
+            }, 1000);
+
+
+            updateLives();
+            if (checkWinner()) {
+                gameStarted = false; // Para o jogo se houver um vencedor
+            }
+
+        }
+
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw paddles
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+            ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
+
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw center line
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+        }
+
+        websocket.onopen = function (event) {
+            console.log("Conexão WebSocket aberta.");
+            websocket.send(JSON.stringify({ "action": "join_game" })); // Envie join_game no onopen
+        };
+
+        websocket.onmessage = function (event) {
+            let data = JSON.parse(event.data);
+
+            if (data.type == "game_state_update") {
+                ball.x = data.ball_x;
+                ball.y = data.ball_y;
+                leftPaddle.y = data.left_paddle_y;
+                rightPaddle.y = data.right_paddle_y;
+                leftScore = data.left_score;
+                rightScore = data.right_score;
+                updateLives();
+            }
+        };
+
+        function gameLoop() {
+            if (gameStarted && !gameEnded && playerNum !== null) {
+                movePaddles();
+                draw();
+
+                // Envia a posição do paddle correspondente ao jogador
+                let message = {
+                    "action": "update_game_state"
+                };
+                if (playerNum === 1) {
+                    message.left_paddle_y = leftPaddle.y;
+                } else if (playerNum === 2) {
+                    message.right_paddle_y = rightPaddle.y;
+                }
+
+                websocket.send(JSON.stringify(message));
+
+
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+
+        window.addEventListener('beforeunload', function () {
+            websocket.send(JSON.stringify({ "action": "leave_game" }));
+        });
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</body>
+
+</html>

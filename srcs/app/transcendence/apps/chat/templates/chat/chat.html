@@ -1,9 +1,9 @@
-{% extends "boilerplate_base.html" %}
 {% load static %}
 {% load i18n %}
 
 {% block content %}
 <div class="chat-container">
+    <input type="hidden" id="username" name="username" value="{{ user.username }}">
     <div class="user-list">
         <h3>Usuários Conectados</h3>
         <ul>
@@ -58,40 +58,4 @@
         flex-direction: column;
     }
 </style>
-
-<script>
-
-    const username = '{{ user.username }}';  // Nome do usuário autenticado
-    const chatSocket = new WebSocket('ws://localhost:8001/ws/chat/');
-
-    chatSocket.onopen = function(e) {
-        console.log('Conexão estabelecida com sucesso!');
-    };
-
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        console.log('Mensagem recebida:', data.message); // Log de depuração
-        const chatMessages = document.getElementById('chat-messages');
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `${data.username}: ${data.message}`; // Exibe o nome do usuário
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Rolagem automática
-    };
-
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket fechado inesperadamente');
-    };
-
-    document.getElementById('chat-form').onsubmit = function(e) {
-        e.preventDefault();
-        const messageInput = document.getElementById('message');
-        const message = messageInput.value;
-        console.log('Enviando mensagem:', message); // Log de depuração
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'username': username // Incluindo o nome do usuário na mensagem
-        }));
-        messageInput.value = '';
-    };
-</script>
 {% endblock %}

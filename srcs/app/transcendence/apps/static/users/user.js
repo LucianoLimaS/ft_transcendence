@@ -1,5 +1,5 @@
-function initializeUserEdit() {
-    $('#editButton').on('click', function (event) {
+/* $(document).ready(function() {
+    $('#editButton').on('click', function(event) {
         event.preventDefault();
 
         if ($(this).text() === 'Editar') {
@@ -15,11 +15,9 @@ function initializeUserEdit() {
         } else {
             if ($('#passwordField').val() !== $('#confirmPasswordField').val()) {
                 alert('As senhas não conferem.');
-            }
-            else if ($('#userNameField').val() === '') {
+            } else if ($('#userNameField').val() === '') {
                 alert('O nome não pode ser vazio.');
-            }
-            else {
+            } else {
                 $(this).removeClass('btn-success').addClass('btn-warning').text('Editar');
                 $('#uploadImage').css('display', 'none');
                 $('#userNameField').prop('readonly', true);
@@ -34,12 +32,4 @@ function initializeUserEdit() {
             }
         }
     });
-}
-
-// Inicialize o script quando o conteúdo for inserido pela HTMX
-document.body.addEventListener('htmx:afterSwap', function (event) {
-    console.log("aqui")
-    if (event.detail.target.id === 'content-div') {
-        initializeUserEdit();
-    }
-});
+}); */

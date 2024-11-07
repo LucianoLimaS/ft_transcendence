@@ -5,18 +5,24 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.decorators import login_required
 from django.views import View
+from apps.users.models import Users
+from apps.chat.models import ChatUser, Chat
 
 @login_required
 def chat_index(request):
-    return render(request, 'chat/index.html')
+    user = request.user
+    try:
+        chat_user = ChatUser.objects.get(chat_id=1, user=user)
+    except ChatUser.DoesNotExist:
+        chat = Chat.objects.get(id=1)
+        ChatUser.objects.create(chat=chat, user=user)
+    if request.htmx:
+        return render(request, 'chat/chat.html')
+    else:
+        return render(request, 'chat/chat_full.html')
 
 def chat_test(request):
     return render(request, 'chat/test.html')
-
-class ChatView(View):
-    def get(self, request):
-        # Lógica para renderizar a página de chat
-        return render(request, 'chat/index.html')
 
 @csrf_exempt
 def send_message(request):

@@ -17,6 +17,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - daphne
     restart: always
 
   postgres:
@@ -34,6 +35,7 @@ services:
     networks:
       - transcendence
     restart: always
+    attach: false
 
   postgres-exporter:
     image: wrouesnel/postgres_exporter:latest
@@ -124,6 +126,7 @@ services:
         while isAlive; do sleep 0.1; done                                  # wait until Minio is stopped
         exec minio $0 "$@"                                                 # start Minio in the foreground
       '
+    attach: false
   
   selenium:
     image: selenium/standalone-chrome
@@ -185,13 +188,12 @@ services:
       - "8001:8001"
     volumes:
       - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-      - daphne_vol:/ft_transcendence
+      - ./app/transcendence:/ft_transcendence
     networks:
       - transcendence
-    depends_on:
-      - app
+    # depends_on:
+    #   - app
     restart: always
-    attach: false
 
   redis:
     image: redis:latest

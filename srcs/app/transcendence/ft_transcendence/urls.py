@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('django_prometheus.urls')),  # Monitoramento
     path('', include('apps.chat.urls')),  # Adicione isso para incluir as URLs do chat
     path('', include('apps.users.urls')),  # Adicione isso para incluir as URLs do usuário
+    path('', include('apps.match.urls')),  # Adicione isso para incluir as URLs do jogo
 ]

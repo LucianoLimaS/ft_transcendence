@@ -164,6 +164,9 @@ service:
 	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local $(name) 
 	@docker compose -f ./srcs/docker-compose.yml up -d --build $(name)
 
+restart:
+	@docker compose -f ./srcs/docker-compose.yml restart $(name)
+
 getin:
 	@docker compose -f ./srcs/docker-compose.yml exec -it $(name) sh 
 
@@ -197,7 +200,7 @@ deepclean: down
 	@printf "\n💀 Removing all Docker configurations...\n"
 	@docker system prune --all
 
-clean-host: clean-dirs clean-migrations clean-staticfiles
+clean-host: clean-dirs clean-migrations clean-staticfiles stop-redis
 
 clean-dirs:
 	@sudo rm -rf ~/data > /dev/null 2>&1
@@ -207,6 +210,9 @@ clean-migrations:
 
 clean-staticfiles:
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles > /dev/null 2>&1
+
+stop-redis:
+	@sudo systemctl stop redis
 
 # ======================
 # Auxiliary Commands
@@ -219,4 +225,5 @@ re: fclean
 
 .PHONY : all build down re clean cleandev cleanwin fclean dev info sudoers remove-sudoers \
 	certs env win redisconf remove-redisconf setup remove-setup docker remove-env \
-	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles
+	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles stop-redis
+	restart

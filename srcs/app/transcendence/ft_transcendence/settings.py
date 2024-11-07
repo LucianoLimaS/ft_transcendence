@@ -114,6 +114,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.users.context_processors.minio_settings',
             ],
         },
     },
@@ -247,3 +248,9 @@ else:
 
 LOGIN_URL = '/'  # Já que o login é na URL base
 LOGIN_REDIRECT_URL = '/'  # Ou o nome da URL do chat
+
+MINIO_ACCESS_KEY = os.getenv("MINIO_ROOT_USER", "access-key")
+MINIO_SECRET_KEY = os.getenv("MINIO_ROOT_PASSWORD", "secret-key")
+MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET", "my-local-bucket")
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "my-local-bucket")
+MINIO_EXTERNAL_ENDPOINT = os.getenv("MINIO_EXTERNAL_ENDPOINT", "http://localhost:9002")
