@@ -1,274 +1,318 @@
-<html><head><base href="https://websimcreation.com/pong/">
-<meta charset="UTF-8">
-<title>Pong Clássico</title>
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #000;
-        font-family: 'Press Start 2P', cursive;
-    }
-    #gameCanvas {
-        border: 2px solid #fff;
-    }
-    #countdown {
-        position: absolute;
-        color: #fff;
-        font-size: 48px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .players {
-        color: #fff;
-        display: flex;
-        justify-content: space-between;
-        width: 800px;
-        margin-bottom: 20px;
-    }
-    #winner {
-        position: absolute;
-        color: #fff;
-        font-size: 32px;
-        text-align: center;
-        display: none;
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border: 2px solid #fff;
-    }
-    #pointCountdown {
-        position: absolute;
-        color: #fff;
-        font-size: 48px;
-        display: none;
-        justify-content: center;
-        align-items: center;
-    }
-</style>
+<html>
+
+<head>
+    <base href="https://websimcreation.com/pong/">
+    <meta charset="UTF-8">
+    <title>Pong Clássico</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #gameCanvas {
+            border: 2px solid #fff;
+        }
+
+        #countdown {
+            position: absolute;
+            color: #fff;
+            font-size: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .players {
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            width: 800px;
+            margin-bottom: 20px;
+        }
+
+        #winner {
+            position: absolute;
+            color: #fff;
+            font-size: 32px;
+            text-align: center;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #fff;
+        }
+
+        #pointCountdown {
+            position: absolute;
+            color: #fff;
+            font-size: 48px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
+
 <body>
-<div class="players">
-    <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
-    <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
-</div>
-<div id="countdown"></div>
-<div id="pointCountdown"></div>
-<div id="winner"></div>
-<canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div class="players">
+        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
+        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+    </div>
+    <div id="countdown"></div>
+    <div id="pointCountdown"></div>
+    <div id="winner"></div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
 
-<script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const countdownElement = document.getElementById('countdown');
-    const pointCountdownElement = document.getElementById('pointCountdown');
-    const winnerElement = document.getElementById('winner');
-    const p1LivesElement = document.getElementById('p1Lives');
-    const p2LivesElement = document.getElementById('p2Lives');
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const countdownElement = document.getElementById('countdown');
+        const pointCountdownElement = document.getElementById('pointCountdown');
+        const winnerElement = document.getElementById('winner');
+        const p1LivesElement = document.getElementById('p1Lives');
+        const p2LivesElement = document.getElementById('p2Lives');
 
-    let gameStarted = false;
-    let gameEnded = false;
-    let countdown = 3;
-    let pointCountdown = 3;
-    let isPointCountdownActive = false;
-    let ballSpeedMultiplier = 1;
+        let gameStarted = false;
+        let gameEnded = false;
+        let countdown = 3;
+        let pointCountdown = 3;
+        let isPointCountdownActive = false;
+        let ballSpeedMultiplier = 1;
+        let singlePlayer = false; // Variável para controlar o modo single player
 
-    const maxScore = 3;
-    const initialBallSpeed = 5;
+        const maxScore = 3;
+        const initialBallSpeed = 4;
+        // Define uma velocidade máxima para a raquete da IA
+        const maxAISpeed = 3.5; // Ajuste este valor para controlar a dificuldade
 
-    let leftScore = 0;
-    let rightScore = 0;
+        let leftScore = 0;
+        let rightScore = 0;
 
-    const ball = {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        radius: 10,
-        speedX: initialBallSpeed,
-        speedY: initialBallSpeed
-    };
+        // Função para definir o modo single player
+        function setSinglePlayer(enabled) {
+            singlePlayer = enabled;
+        }
 
-    const paddleHeight = 100;
-    const paddleWidth = 10;
-    const initialPaddlePositions = {
-        left: canvas.height / 2 - paddleHeight / 2,
-        right: canvas.height / 2 - paddleHeight / 2
-    };
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speedX: initialBallSpeed,
+            speedY: initialBallSpeed
+        };
 
-    const leftPaddle = {
-        x: 0,
-        y: initialPaddlePositions.left
-    };
+        const paddleHeight = 100;
+        const paddleWidth = 10;
+        const initialPaddlePositions = {
+            left: canvas.height / 2 - paddleHeight / 2,
+            right: canvas.height / 2 - paddleHeight / 2
+        };
 
-    const rightPaddle = {
-        x: canvas.width - paddleWidth,
-        y: initialPaddlePositions.right
-    };
+        const leftPaddle = {
+            x: 0,
+            y: initialPaddlePositions.left
+        };
 
-    const keys = {};
+        const rightPaddle = {
+            x: canvas.width - paddleWidth,
+            y: initialPaddlePositions.right
+        };
 
-    document.addEventListener('keydown', (e) => {
-        keys[e.code] = true;
-    });
+        const keys = {};
 
-    document.addEventListener('keyup', (e) => {
-        keys[e.code] = false;
-    });
+        document.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+        });
 
-    function startCountdown() {
-        countdownElement.textContent = countdown;
+        document.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
 
-        const countdownInterval = setInterval(() => {
-            countdown--;
+        function startCountdown() {
+            countdownElement.textContent = countdown;
 
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                countdownElement.style.display = 'none';
-                gameStarted = true;
-                gameLoop();
-            } else {
-                countdownElement.textContent = countdown;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.style.display = 'none';
+                    gameStarted = true;
+                    gameLoop();
+                } else {
+                    countdownElement.textContent = countdown;
+                }
+            }, 1000);
+        }
+
+        function updateLives() {
+            const remainingLivesP1 = '🐄'.repeat(maxScore - rightScore);
+            const remainingLivesP2 = '🐄'.repeat(maxScore - leftScore);
+            p1LivesElement.textContent = remainingLivesP1;
+            p2LivesElement.textContent = remainingLivesP2;
+        }
+
+        function checkWinner() {
+            if (rightScore >= maxScore) {
+                gameEnded = true;
+                winnerElement.style.display = 'block';
+                winnerElement.textContent = 'Player 1 Venceu! 🏆';
+                return true;
+            } else if (leftScore >= maxScore) {
+                gameEnded = true;
+                winnerElement.style.display = 'block';
+                winnerElement.textContent = 'Player 2 Venceu! 🏆';
+                return true;
             }
-        }, 1000);
-    }
-
-    function updateLives() {
-        const remainingLivesP1 = '🐄'.repeat(maxScore - rightScore);
-        const remainingLivesP2 = '🐄'.repeat(maxScore - leftScore);
-        p1LivesElement.textContent = remainingLivesP1;
-        p2LivesElement.textContent = remainingLivesP2;
-    }
-
-    function checkWinner() {
-        if (rightScore >= maxScore) {
-            gameEnded = true;
-            winnerElement.style.display = 'block';
-            winnerElement.textContent = 'Player 1 Venceu! 🏆';
-            return true;
-        } else if (leftScore >= maxScore) {
-            gameEnded = true;
-            winnerElement.style.display = 'block';
-            winnerElement.textContent = 'Player 2 Venceu! 🏆';
-            return true;
-        }
-        return false;
-    }
-
-    function movePaddles() {
-        if (keys['KeyW'] && leftPaddle.y > 0) {
-            leftPaddle.y -= 5;
-        }
-        if (keys['KeyS'] && leftPaddle.y < canvas.height - paddleHeight) {
-            leftPaddle.y += 5;
-        }
-        if (keys['ArrowUp'] && rightPaddle.y > 0) {
-            rightPaddle.y -= 5;
-        }
-        if (keys['ArrowDown'] && rightPaddle.y < canvas.height - paddleHeight) {
-            rightPaddle.y += 5;
-        }
-    }
-
-    function moveBall() {
-        if (!gameStarted) return;
-
-        ball.x += ball.speedX;
-        ball.y += ball.speedY;
-
-        if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-            ball.speedY = -ball.speedY;
+            return false;
         }
 
-        if (
-            (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) ||
-            (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight)
-        ) {
+        function movePaddles() {
+            if (keys['KeyW'] && leftPaddle.y > 0) {
+                leftPaddle.y -= 5;
+            }
+            if (keys['KeyS'] && leftPaddle.y < canvas.height - paddleHeight) {
+                leftPaddle.y += 5;
+            }
+
+            if (!singlePlayer) { // Modo multiplayer
+                if (keys['ArrowUp'] && rightPaddle.y > 0) {
+                    rightPaddle.y -= 5;
+                }
+                if (keys['ArrowDown'] && rightPaddle.y < canvas.height - paddleHeight) {
+                    rightPaddle.y += 5;
+                }
+            } else { // Modo single player (IA)
+                let targetY = ball.y - paddleHeight / 2; // Posição ideal da raquete
+
+                // Calcula a diferença entre a posição atual da raquete e a posição alvo
+                let dy = targetY - rightPaddle.y;
+
+                // Limita a velocidade da raquete
+                if (dy > maxAISpeed) {
+                    dy = maxAISpeed;
+                } else if (dy < -maxAISpeed) {
+                    dy = -maxAISpeed;
+                }
+
+                rightPaddle.y += dy;
+
+                // Limita a raquete dentro da tela
+                if (rightPaddle.y < 0) {
+                    rightPaddle.y = 0;
+                } else if (rightPaddle.y > canvas.height - paddleHeight) {
+                    rightPaddle.y = canvas.height - paddleHeight;
+                }
+            }
+        }
+        function moveBall() {
+            if (!gameStarted) return;
+
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.speedY = -ball.speedY;
+            }
+
+            if (
+                (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) ||
+                (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight)
+            ) {
+                ball.speedX = -ball.speedX;
+            }
+
+            if (ball.x + ball.radius > canvas.width) {
+                leftScore++;
+                resetBall();
+            } else if (ball.x - ball.radius < 0) {
+                rightScore++;
+                resetBall();
+            }
+        }
+
+        function startPointCountdown() {
+            isPointCountdownActive = true;
+            pointCountdown = 3;
+            pointCountdownElement.style.display = 'flex';
+            pointCountdownElement.textContent = pointCountdown;
+
+            const pointCountdownInterval = setInterval(() => {
+                pointCountdown--;
+
+                if (pointCountdown <= 0) {
+                    clearInterval(pointCountdownInterval);
+                    pointCountdownElement.style.display = 'none';
+                    isPointCountdownActive = false;
+                    gameStarted = true;
+                } else {
+                    pointCountdownElement.textContent = pointCountdown;
+                }
+            }, 1000);
+        }
+
+        function resetBall() {
+            ballSpeedMultiplier += 0.2;
+            ball.x = canvas.width / 2;
+
+            // Define a posição Y inicial da bola aleatoriamente
+            ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;  // Mantém a bola dentro dos limites da tela
+
             ball.speedX = -ball.speedX;
-        }
+            ball.speedY = (Math.random() > 0.5 ? initialBallSpeed : -initialBallSpeed) * ballSpeedMultiplier;
+            ball.speedX = Math.sign(ball.speedX) * initialBallSpeed * ballSpeedMultiplier;
 
-        if (ball.x + ball.radius > canvas.width) {
-            leftScore++;
-            resetBall();
-        } else if (ball.x - ball.radius < 0) {
-            rightScore++;
-            resetBall();
-        }
-    }
+            leftPaddle.y = initialPaddlePositions.left;
+            rightPaddle.y = initialPaddlePositions.right;
 
-    function startPointCountdown() {
-        isPointCountdownActive = true;
-        pointCountdown = 3;
-        pointCountdownElement.style.display = 'flex';
-        pointCountdownElement.textContent = pointCountdown;
-
-        const pointCountdownInterval = setInterval(() => {
-            pointCountdown--;
-
-            if (pointCountdown <= 0) {
-                clearInterval(pointCountdownInterval);
-                pointCountdownElement.style.display = 'none';
-                isPointCountdownActive = false;
-                gameStarted = true;
-            } else {
-                pointCountdownElement.textContent = pointCountdown;
+            updateLives();
+            if (!checkWinner()) {
+                gameStarted = false;
+                startPointCountdown();
             }
-        }, 1000);
-    }
-
-    function resetBall() {
-        ballSpeedMultiplier += 0.2;
-        ball.x = canvas.width / 2;
-        ball.y = canvas.height / 2;
-        ball.speedX = -ball.speedX;
-        ball.speedY = (Math.random() > 0.5 ? initialBallSpeed : -initialBallSpeed) * ballSpeedMultiplier;
-        ball.speedX = Math.sign(ball.speedX) * initialBallSpeed * ballSpeedMultiplier;
-        
-        leftPaddle.y = initialPaddlePositions.left;
-        rightPaddle.y = initialPaddlePositions.right;
-        
-        updateLives();
-        if (!checkWinner()) {
-            gameStarted = false;
-            startPointCountdown();
         }
-    }
 
-    function draw() {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
-        ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+            ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
 
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fill();
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
 
-        ctx.setLineDash([10, 10]);
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, 0);
-        ctx.lineTo(canvas.width / 2, canvas.height);
-        ctx.stroke();
-    }
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+        }
 
-    function gameLoop() {
-        if (!gameEnded) {
-            if (!isPointCountdownActive) {
-                movePaddles();
-                moveBall();
+        function gameLoop() {
+            if (!gameEnded) {
+                if (!isPointCountdownActive) {
+                    movePaddles();
+                    moveBall();
+                }
+                draw();
+                requestAnimationFrame(gameLoop);
             }
-            draw();
-            requestAnimationFrame(gameLoop);
         }
-    }
+        setSinglePlayer(true); // true para single player, false para multiplayer
+        startCountdown();
+    </script>
 
-    startCountdown();
-</script>
-
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </body>
+
 </html>
