@@ -14,6 +14,7 @@ from django.utils.translation import gettext as getTranslated
 from django.http import JsonResponse
 from django.urls import reverse
 from apps.util.utils import makeUniqueHash, getData, is_password_strong, are_fields_empty  # Importe a função global
+from django.utils import timezone
 
 
 class CustomLoginView(LoginView):
@@ -150,11 +151,11 @@ def recoverPassword(request):
         except Users.DoesNotExist:
             messages.add_message(request, constants.ERROR, getTranslated("E-mail not registered."))
             return render(request, "response.html", {"messages": messages.get_messages(request)})
-
+        
         if user:
             token = makeUniqueHash(user.email + getData())
             user.token = token
-            user.token_expires = datetime.now() + timedelta(minutes=15)
+            user.token_expires = timezone.now() + timedelta(minutes=15)
             user.save()
             send_mail(
                 'Recuperação de senha',

@@ -68,7 +68,7 @@
     <div id="countdown"></div>
     <div id="pointCountdown"></div>
     <div id="winner"></div>
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <canvas id="gameCanvas" width="1400" height="700"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -120,10 +120,54 @@
             y: initialPaddlePositions.left
         };
 
-        const rightPaddle = {
+        let rightPaddle = {
             x: canvas.width - paddleWidth,
-            y: initialPaddlePositions.right
+            y: initialPaddlePositions.right,
+            speed: 6, // Velocidade da raquete da IA
+            state: 'WAITING', // Estados da IA: WAITING, REASONING, ACTING
+            targetY: canvas.height / 2 - paddleHeight / 2, // Alvo da raquete
+            reactionDistance: canvas.width / 3, // Distância para reagir à bola
+            uncertainty: paddleHeight / 4, // Incerteza na posição da raquete
+            randomMoveInterval: 1000, // Intervalo para movimentos aleatórios
+            lastRandomMove: 0
         };
+
+        const difficultyLevels = {
+            easy: {
+                speed: 2,
+                uncertainty: paddleHeight, // Incerteza máxima
+                reactionDistance: canvas.width / 8, // Reage muito tarde
+                randomMoveInterval: 2000, // Movimentos aleatórios frequentes
+                predictionIterations: 100, // Poucas iterações de previsão
+            },
+            medium: {
+                speed: 8, // Velocidade alta
+                uncertainty: paddleHeight / 16, // Mínima incerteza
+                reactionDistance: canvas.width * 0.75, // Reage bem cedo
+                randomMoveInterval: 500, // Movimentos aleatórios menos frequentes
+                predictionIterations: 5000, // Muitas iterações de previsão
+                time: 1000
+            },
+            hard: {
+                speed: 8, // Velocidade alta
+                uncertainty: paddleHeight / 16, // Mínima incerteza
+                reactionDistance: canvas.width * 0.75, // Reage bem cedo
+                randomMoveInterval: 500, // Movimentos aleatórios menos frequentes
+                predictionIterations: 5000, // Muitas iterações de previsão
+                time: 1
+            },
+        };
+
+        let currentDifficulty = 'easy'; // Define a dificuldade inicial
+
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            const settings = difficultyLevels[level];
+            rightPaddle.speed = settings.speed;
+            rightPaddle.uncertainty = settings.uncertainty;
+            rightPaddle.reactionDistance = settings.reactionDistance;
+            rightPaddle.randomMoveInterval = settings.randomMoveInterval;
+        }
 
         const keys = {};
 
@@ -163,15 +207,73 @@
             if (rightScore >= maxScore) {
                 gameEnded = true;
                 winnerElement.style.display = 'block';
-                winnerElement.textContent = 'Player 1 Venceu! 🏆';
+                winnerElement.textContent = 'Player 2 Venceu! 🏆';
                 return true;
             } else if (leftScore >= maxScore) {
                 gameEnded = true;
                 winnerElement.style.display = 'block';
-                winnerElement.textContent = 'Player 2 Venceu! 🏆';
+                winnerElement.textContent = 'Player 1 Venceu! 🏆';
                 return true;
             }
             return false;
+        }
+
+        let lastAIUpdate = 0; // Variável para armazenar o tempo da última atualização da IA
+
+        function aiMovePaddle() {
+            const currentTime = Date.now();
+            let time = difficultyLevels[currentDifficulty].time;
+
+            // Verifica se passou 1 segundo desde a última atualização
+            if (currentTime - lastAIUpdate >= time) {
+                const settings = difficultyLevels[currentDifficulty];
+
+                if (ball.speedX > 0 && ball.x > rightPaddle.reactionDistance) {
+                    rightPaddle.targetY = predictBallPosition(settings.predictionIterations, 0.01);
+
+                    // Adiciona incerteza APENAS no modo easy e medium
+                    if (currentDifficulty !== 'hard') {
+                        rightPaddle.targetY += (Math.random() - 0.5) * 2 * rightPaddle.uncertainty;
+                    }
+                } else {
+                    // Movimentos aleatórios enquanto espera
+                    if (Date.now() - rightPaddle.lastRandomMove > rightPaddle.randomMoveInterval) {
+                        rightPaddle.targetY = Math.random() * (canvas.height - paddleHeight);
+                        rightPaddle.lastRandomMove = Date.now();
+                    }
+                }
+                lastAIUpdate = currentTime; // Atualiza o tempo da última atualização
+            }
+
+
+            // Move a raquete em direção ao alvo (esta parte permanece fora da condição de tempo)
+            let dy = rightPaddle.targetY - rightPaddle.y;
+            let moveSpeed = Math.min(Math.abs(dy), rightPaddle.speed);
+            rightPaddle.y += Math.sign(dy) * moveSpeed;
+
+            rightPaddle.y = Math.max(0, Math.min(rightPaddle.y, canvas.height - paddleHeight));
+        }
+
+        function predictBallPosition(iterations, step) {
+            let position = { x: ball.x, y: ball.y };
+            let velocity = { x: ball.speedX, y: ball.speedY };
+
+            for (let i = 0; i < iterations; i++) {
+                position.x += velocity.x * step;
+                position.y += velocity.y * step;
+
+                if (position.y + ball.radius > canvas.height || position.y - ball.radius < 0) {
+                    velocity.y *= -1;
+                }
+
+                if (position.x + ball.radius > canvas.width - paddleWidth) {
+                    // Colisão com a raquete direita
+                    return position.y - paddleHeight / 2; // Retorna diretamente a posição Y de colisão
+                }
+            }
+
+            // Retorna a posição Y atual se não houver colisão prevista dentro das iterações
+            return position.y - paddleHeight / 2;
         }
 
         function movePaddles() {
@@ -190,28 +292,11 @@
                     rightPaddle.y += 5;
                 }
             } else { // Modo single player (IA)
-                let targetY = ball.y - paddleHeight / 2; // Posição ideal da raquete
-
-                // Calcula a diferença entre a posição atual da raquete e a posição alvo
-                let dy = targetY - rightPaddle.y;
-
-                // Limita a velocidade da raquete
-                if (dy > maxAISpeed) {
-                    dy = maxAISpeed;
-                } else if (dy < -maxAISpeed) {
-                    dy = -maxAISpeed;
-                }
-
-                rightPaddle.y += dy;
-
-                // Limita a raquete dentro da tela
-                if (rightPaddle.y < 0) {
-                    rightPaddle.y = 0;
-                } else if (rightPaddle.y > canvas.height - paddleHeight) {
-                    rightPaddle.y = canvas.height - paddleHeight;
-                }
+                aiMovePaddle();
             }
         }
+
+
         function moveBall() {
             if (!gameStarted) return;
 
@@ -222,11 +307,25 @@
                 ball.speedY = -ball.speedY;
             }
 
-            if (
-                (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) ||
-                (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight)
-            ) {
+            let paddleHit = null; // Para rastrear qual raquete foi atingida
+
+            if (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) {
+                paddleHit = leftPaddle;
+            } else if (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight) {
+                paddleHit = rightPaddle;
+            }
+
+            if (paddleHit) {
                 ball.speedX = -ball.speedX;
+
+                // Aumenta a velocidade a cada batida
+                let speedIncrement = 1.5; // Valor do incremento de velocidade
+                let currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY);
+                let newSpeed = currentSpeed + speedIncrement;
+
+                // Mantém a direção, mas altera a magnitude da velocidade
+                ball.speedX = (ball.speedX / currentSpeed) * newSpeed;
+                ball.speedY = (ball.speedY / currentSpeed) * newSpeed;
             }
 
             if (ball.x + ball.radius > canvas.width) {
@@ -259,7 +358,7 @@
         }
 
         function resetBall() {
-            ballSpeedMultiplier += 0.2;
+            ballSpeedMultiplier += 0.4;
             ball.x = canvas.width / 2;
 
             // Define a posição Y inicial da bola aleatoriamente
@@ -285,6 +384,7 @@
 
             ctx.fillStyle = '#fff';
             ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+
             ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
 
             ctx.beginPath();
@@ -308,6 +408,7 @@
                 requestAnimationFrame(gameLoop);
             }
         }
+        setDifficulty('medium'); // Define a dificuldade como média
         setSinglePlayer(true); // true para single player, false para multiplayer
         startCountdown();
     </script>
