@@ -1,7 +1,6 @@
 <html>
 
 <head>
-    <base href="https://websimcreation.com/pong/">
     <meta charset="UTF-8">
     <title>Pong Clássico</title>
     <style>
@@ -57,17 +56,71 @@
             justify-content: center;
             align-items: center;
         }
+
+        #menu {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #fff;
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+            /* Itens do menu na vertical */
+            z-index: 1;
+            /* Garante que o menu fica por cima do canvas */
+            max-width: 400px;
+        }
+
+        #difficulty {
+            display: none;
+            /* Esconde as opções de dificuldade inicialmente */
+            margin-top: 10px;
+            /* Espaçamento entre o modo de jogo e as dificuldades */
+        }
+
+        .menu-button {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px 0;
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+        }
+
+        span {
+            font-size: 12px;
+            text-align: justify;
+        }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
+    <div id="menu">
+        <button class="menu-button" id="singleplayerBtn">Single Player</button>
+        <button class="menu-button" id="multiplayerBtn">Multiplayer</button>
+        <div id="difficulty">
+            <button class="menu-button" id="easyBtn">Fácil</button>
+            <button class="menu-button" id="mediumBtn">Médio</button>
+            <button class="menu-button" id="hardBtn">Difícil</button>
+            <br>
+            <br>
+            <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais divertido o jogo.</span>
+        </div>
+    </div>
     <div class="players">
         <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
         <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
     </div>
     <div id="countdown"></div>
     <div id="pointCountdown"></div>
-    <div id="winner"></div>
+    <div id="winner">
+        <p id="winnerText"></p>
+        <button id="restartBtn">Reiniciar</button>
+        <button id="menuBtn">Menu</button>
+    </div>
     <canvas id="gameCanvas" width="1400" height="700"></canvas>
 
     <script>
@@ -78,6 +131,16 @@
         const winnerElement = document.getElementById('winner');
         const p1LivesElement = document.getElementById('p1Lives');
         const p2LivesElement = document.getElementById('p2Lives');
+        const singleplayerBtn = document.getElementById('singleplayerBtn');
+        const multiplayerBtn = document.getElementById('multiplayerBtn');
+        const difficultyDiv = document.getElementById('difficulty');
+        const easyBtn = document.getElementById('easyBtn');
+        const mediumBtn = document.getElementById('mediumBtn');
+        const hardBtn = document.getElementById('hardBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const winnerText = document.getElementById('winnerText');
+        const menu = document.getElementById('menu');
 
         let gameStarted = false;
         let gameEnded = false;
@@ -94,6 +157,70 @@
 
         let leftScore = 0;
         let rightScore = 0;
+
+        singleplayerBtn.addEventListener('click', () => {
+            setSinglePlayer(true);
+            difficultyDiv.style.display = 'block'; // Mostra opções de dificuldade
+            // REMOVIDO: startCountdown();  Não chame aqui!
+        });
+
+        multiplayerBtn.addEventListener('click', () => {
+            setSinglePlayer(false);
+            menu.style.display = 'none';
+            startCountdown(); // OK chamar aqui para multiplayer
+        });
+
+        easyBtn.addEventListener('click', () => {
+            setDifficulty('easy');
+            startGameAfterDifficultySelection(); // Chama a nova função
+        });
+
+        mediumBtn.addEventListener('click', () => {
+            setDifficulty('medium');
+            startGameAfterDifficultySelection(); // Chama a nova função
+        });
+
+        hardBtn.addEventListener('click', () => {
+            setDifficulty('hard');
+            startGameAfterDifficultySelection(); // Chama a nova função
+        });
+
+        function resetGame() {
+            gameStarted = false;
+            gameEnded = false;
+            countdown = 3;
+            pointCountdown = 3;
+            isPointCountdownActive = false;
+            ballSpeedMultiplier = 1;
+            leftScore = 0;
+            rightScore = 0;
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speedX = initialBallSpeed;
+            ball.speedY = initialBallSpeed;
+            leftPaddle.y = initialPaddlePositions.left;
+            rightPaddle.y = initialPaddlePositions.right;
+            winnerElement.style.display = 'none';
+            p1LivesElement.textContent = '🐄'.repeat(maxScore);
+            p2LivesElement.textContent = '🐄'.repeat(maxScore);
+            if (singlePlayer) {
+                menu.style.display = 'none'; // Esconde o menu após reiniciar
+            }
+            countdownElement.style.display = 'flex';
+            startCountdown();
+
+        }
+
+        restartBtn.addEventListener('click', () => {
+            resetGame();
+        });
+
+        menuBtn.addEventListener('click', () => {
+            menu.style.display = 'flex';
+            difficultyDiv.style.display = 'none'; // Esconde as opções de dificuldade
+            winnerElement.style.display = 'none';
+            resetGame();
+        });
 
         // Função para definir o modo single player
         function setSinglePlayer(enabled) {
@@ -139,6 +266,7 @@
                 reactionDistance: canvas.width / 8, // Reage muito tarde
                 randomMoveInterval: 2000, // Movimentos aleatórios frequentes
                 predictionIterations: 100, // Poucas iterações de previsão
+                time: 1000
             },
             medium: {
                 speed: 8, // Velocidade alta
@@ -196,6 +324,11 @@
             }, 1000);
         }
 
+        function startGameAfterDifficultySelection() {  // <-- Nova função
+            menu.style.display = 'none';             // <-- Esconde o menu principal
+            startCountdown();                            // <-- Inicia a contagem regressiva
+        }
+
         function updateLives() {
             const remainingLivesP1 = '🐄'.repeat(maxScore - rightScore);
             const remainingLivesP2 = '🐄'.repeat(maxScore - leftScore);
@@ -207,12 +340,13 @@
             if (rightScore >= maxScore) {
                 gameEnded = true;
                 winnerElement.style.display = 'block';
-                winnerElement.textContent = 'Player 2 Venceu! 🏆';
+                winnerText.textContent = 'Player 2 Venceu! 🏆'; // Define o texto dentro do parágrafo
                 return true;
             } else if (leftScore >= maxScore) {
                 gameEnded = true;
                 winnerElement.style.display = 'block';
-                winnerElement.textContent = 'Player 1 Venceu! 🏆';
+                winnerText.textContent = 'Player 1 Venceu! 🏆'; // Define o texto dentro do parágrafo
+
                 return true;
             }
             return false;
@@ -278,10 +412,10 @@
 
         function movePaddles() {
             if (keys['KeyW'] && leftPaddle.y > 0) {
-                leftPaddle.y -= 5;
+                leftPaddle.y -= 7;
             }
             if (keys['KeyS'] && leftPaddle.y < canvas.height - paddleHeight) {
-                leftPaddle.y += 5;
+                leftPaddle.y += 7;
             }
 
             if (!singlePlayer) { // Modo multiplayer
@@ -295,7 +429,6 @@
                 aiMovePaddle();
             }
         }
-
 
         function moveBall() {
             if (!gameStarted) return;
@@ -408,9 +541,9 @@
                 requestAnimationFrame(gameLoop);
             }
         }
-        setDifficulty('medium'); // Define a dificuldade como média
-        setSinglePlayer(true); // true para single player, false para multiplayer
-        startCountdown();
+        /* setDifficulty('hard'); // Define a dificuldade como média
+        setSinglePlayer(false); // true para single player, false para multiplayer 
+        startCountdown();*/
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
