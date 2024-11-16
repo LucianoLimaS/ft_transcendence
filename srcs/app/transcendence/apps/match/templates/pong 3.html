@@ -107,7 +107,8 @@
             <button class="menu-button" id="hardBtn">Difícil</button>
             <br>
             <br>
-            <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais divertido o jogo.</span>
+            <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
+                divertido o jogo.</span>
         </div>
     </div>
     <div class="players">
@@ -121,10 +122,33 @@
         <button id="restartBtn">Reiniciar</button>
         <button id="menuBtn">Menu</button>
     </div>
-    <canvas id="gameCanvas" width="1400" height="700"></canvas>
+    <canvas id="gameCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
+
+        function resizeCanvas() {
+            const aspectRatio = 2 / 1; // Proporção 2:1
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            let canvasWidth, canvasHeight;
+
+            if (windowWidth / windowHeight > aspectRatio) {
+                canvasHeight = windowHeight * 0.8; // 80% da altura da janela
+                canvasWidth = canvasHeight * aspectRatio;
+            } else {
+                canvasWidth = windowWidth * 0.8; // 80% da largura da janela
+                canvasHeight = canvasWidth / aspectRatio;
+            }
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+        }
+        // Chama a função para redimensionar o canvas inicialmente e quando a janela for redimensionada
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Chama inicialmente para configurar o tamanho
+
         const ctx = canvas.getContext('2d');
         const countdownElement = document.getElementById('countdown');
         const pointCountdownElement = document.getElementById('pointCountdown');
@@ -161,7 +185,7 @@
         singleplayerBtn.addEventListener('click', () => {
             setSinglePlayer(true);
             difficultyDiv.style.display = 'block'; // Mostra opções de dificuldade
-            // REMOVIDO: startCountdown();  Não chame aqui!
+            singleplayerBtn.style.backgroundColor = 'red'; // Define a cor de fundo como vermelho
         });
 
         multiplayerBtn.addEventListener('click', () => {
@@ -285,8 +309,6 @@
                 time: 1
             },
         };
-
-        let currentDifficulty = 'easy'; // Define a dificuldade inicial
 
         function setDifficulty(level) {
             currentDifficulty = level;
@@ -532,7 +554,9 @@
         }
 
         function gameLoop() {
+
             if (!gameEnded) {
+
                 if (!isPointCountdownActive) {
                     movePaddles();
                     moveBall();
@@ -541,9 +565,7 @@
                 requestAnimationFrame(gameLoop);
             }
         }
-        /* setDifficulty('hard'); // Define a dificuldade como média
-        setSinglePlayer(false); // true para single player, false para multiplayer 
-        startCountdown();*/
+
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
