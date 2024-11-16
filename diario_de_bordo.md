@@ -336,6 +336,93 @@ Obs².: para finalizar o setup do front será realizado o uso de arquivos chave 
 
 ---
 
+## Uso de HTMX no Frontend
+
+Para dinamizar a interface do usuário e reduzir a necessidade de recarregamento completo de páginas, o projeto utiliza a biblioteca HTMX. O HTMX permite que você acesse funcionalidades AJAX diretamente em seu HTML, simplificando o desenvolvimento e melhorando a experiência do usuário.
+
+### Integração com Django
+
+A integração do HTMX com o Django é simples e direta.  Basta incluir a biblioteca HTMX em seus templates e começar a usar seus atributos. A biblioteca HTMX foi adicionada ao projeto via CDN para facilitar o desenvolvimento e evitar a necessidade de gerenciamento de dependências adicionais.
+
+```html
+<script src="https://unpkg.com/htmx.org@1.9.6"></script>
+```
+
+### Exemplos de Uso
+
+Aqui estão alguns exemplos de como o HTMX está sendo utilizado no projeto:
+
+* **Atualização Parcial de Conteúdo:**  Para atualizar apenas uma parte da página sem recarregá-la completamente, podemos usar o atributo `hx-get`.
+
+```html
+<div id="my-div" hx-get="/my-url" hx-trigger="click">
+    Clique aqui para atualizar o conteúdo desta div.
+</div>
+```
+
+Neste exemplo, quando o usuário clica na div, o HTMX faz uma requisição GET para `/my-url` e substitui o conteúdo da div com a resposta.
+
+* **Submissão de Formulários:** O HTMX facilita o envio de formulários via AJAX usando o atributo `hx-post`.
+
+```html
+<form hx-post="/submit-url" hx-target="#response-div">
+    {% csrf_token %}
+    <input type="text" name="my-input">
+    <button type="submit">Enviar</button>
+</form>
+<div id="response-div"></div>
+```
+
+Neste caso, o formulário é submetido via POST para `/submit-url` sem recarregar a página, e a resposta é inserida na div `#response-div`.
+
+* **Eventos Personalizados:**  O HTMX permite que você acione requisições com base em diferentes eventos, como mudanças em inputs, usando o atributo `hx-trigger`.
+
+```html
+<input type="text" name="search" hx-get="/search" hx-trigger="keyup changed delay:500ms" hx-target="#search-results">
+<div id="search-results"></div>
+
+```
+
+Este exemplo faz uma requisição GET para `/search` cada vez que o usuário digita algo no campo de busca, com um atraso de 500ms para evitar muitas requisições.
+
+
+* **Indicadores de Carregamento (Boosting):** Para melhorar a experiência do usuário, podemos adicionar indicadores de carregamento usando o atributo `hx-indicator`.
+
+```html
+<button hx-get="/my-url" hx-indicator="#loading">
+    Carregar
+</button>
+<div id="loading" style="display:none;">Carregando...</div>
+```
+
+Enquanto a requisição estiver em andamento, a div `#loading` será exibida.
+
+* **Histórico do Navegador (Boosting):**  O HTMX pode ser configurado para manter o histórico do navegador usando o atributo `hx-boost="true"` em links ou formulários. Isso permite que o usuário utilize os botões de voltar e avançar do navegador normalmente.
+
+```html
+<a href="/my-url" hx-boost="true" hx-get>Meu link</a>
+```
+
+
+### Benefícios do HTMX
+
+A utilização do HTMX traz diversos benefícios para o projeto:
+
+* **Melhor Experiência do Usuário:**  Páginas mais dinâmicas e responsivas, sem recarregamentos completos.
+* **Simplificação do Desenvolvimento:**  Menos código JavaScript necessário para implementar interações AJAX.
+* **Integração com Django:**  Funciona perfeitamente com os templates e views do Django.
+* **Tamanho Reduzido:**  Biblioteca leve que não impacta significativamente o desempenho.
+
+
+Lembre-se de instalar o htmx no seu ambiente virtual:
+
+```bash
+pip install django-htmx
+```
+
+E adicionar `django-htmx` aos seus `INSTALLED_APPS` no arquivo `settings.py`.
+
+
 ## Setup do banco de dados
 
 Para realizar o setup do banco de dados no Django, é necessário adicionar no settings.py os bancos que serão conectados e os dados de acesso.
@@ -850,3 +937,143 @@ make getin name=<service name>
    - nginx
    - nginx-exporter
    - daphne
+
+
+## Explicação do Código do Jogo Pong
+
+Este código implementa um jogo de Pong com JavaScript puro, utilizando o elemento `<canvas>` para renderização. Ele oferece modos single-player (contra IA) e multiplayer, com diferentes níveis de dificuldade para a IA.
+
+### Estrutura do Código
+
+O código pode ser dividido nas seguintes seções principais:
+
+1. **Configuração Inicial:**
+    - **`resizeCanvas()`:**  Ajusta dinamicamente o tamanho do canvas para manter uma proporção 2:1, ocupando 80% da janela.
+    - **Contexto do Canvas:** `ctx = canvas.getContext('2d')` obtém o contexto 2D para desenhar no canvas.
+    - **Elementos do DOM:**  Variáveis armazenam referências a elementos HTML para manipulação (contagem regressiva, menu, etc.).
+    - **Variáveis de Jogo:**  Variáveis controlam o estado do jogo (pontuação, vidas, velocidade da bola, etc.).
+
+2. **Menu e Interação do Usuário:**
+    - **Eventos de Botão:**  Listeners nos botões do menu controlam a escolha de modo de jogo (single-player/multiplayer) e nível de dificuldade.
+    - **`setSinglePlayer()`:** Define o modo single-player.
+    - **`setDifficulty()`:** Configura a IA com base no nível de dificuldade escolhido, ajustando velocidade, incerteza e distância de reação.
+
+3. **Lógica do Jogo:**
+    - **Objetos do Jogo:**  Objetos `ball`, `leftPaddle` e `rightPaddle` representam os elementos do jogo com suas propriedades (posição, tamanho, velocidade, etc.).
+    - **`difficultyLevels`:**  Objeto que define os parâmetros da IA para cada nível de dificuldade.
+    - **`keys`:** Objeto para rastrear as teclas pressionadas, usado para controlar as raquetes.
+    - **`startCountdown()`:** Inicia a contagem regressiva antes do início da partida.
+    - **`updateLives()`:**  Atualiza a exibição das vidas dos jogadores na tela.
+    - **`checkWinner()`:** Verifica se algum jogador atingiu a pontuação máxima.
+    - **`aiMovePaddle()`:**  Lógica da IA para mover a raquete direita. Inclui previsão da posição da bola e incerteza para simular um jogador humano.
+    - **`predictBallPosition()`:**  Simula o movimento da bola para prever sua posição futura, usada pela IA.
+    - **`movePaddles()`:**  Atualiza a posição das raquetes com base no input do usuário (teclas) ou na IA.
+    - **`moveBall()`:**  Atualiza a posição da bola, verifica colisões com as paredes e raquetes, e calcula a nova velocidade.
+    - **`startPointCountdown()`:**  Inicia a contagem regressiva entre os pontos.
+    - **`resetBall()`:** Reposiciona a bola no centro após um ponto, inverte a direção e aumenta a velocidade.
+
+4. **Renderização (Desenho):**
+    - **`draw()`:**  Limpa o canvas e desenha todos os elementos do jogo (raquetes, bola, linha central).
+
+5. **Loop do Jogo:**
+    - **`gameLoop()`:** Função principal que chama `movePaddles()`, `moveBall()`, e `draw()` a cada frame, criando a animação. Usa `requestAnimationFrame()` para otimizar o desempenho.
+
+### Lógica de Chamadas de Função no Jogo Pong
+
+A sequência de chamadas de função que descreve o fluxo do jogo, desde o início até a finalização, pode ser resumida da seguinte forma:
+
+1. **Inicialização:**
+    - O código começa executando `resizeCanvas()` para configurar o tamanho inicial do canvas.
+    - Em seguida, define os listeners de eventos para os botões do menu (singleplayer, multiplayer, níveis de dificuldade).
+    - Define também os listeners para as teclas pressionadas e soltas, usadas para controlar as raquetes.
+
+2. **Início do Jogo (Singleplayer ou Multiplayer):**
+    - Clicar em "Multiplayer" chama `setSinglePlayer(false)` e depois `startCountdown()`.
+    - Clicar em "Singleplayer" chama `setSinglePlayer(true)`, mostra as opções de dificuldade, e aguarda a escolha do nível.
+    - A escolha da dificuldade chama `setDifficulty()` com o nível escolhido e, em seguida, `startGameAfterDifficultySelection()`, que, por sua vez, chama `startCountdown()`.
+
+3. **Contagem Regressiva Inicial (`startCountdown()`):**
+    - Exibe a contagem regressiva (3, 2, 1) no elemento `countdownElement`.
+    - A cada segundo, decrementa o contador.
+    - Quando o contador chega a zero, esconde o elemento `countdownElement`, define `gameStarted = true`, e chama `gameLoop()`.
+
+4. **Loop Principal do Jogo (`gameLoop()`):**
+    - Este é o coração do jogo, executado repetidamente usando `requestAnimationFrame()`.
+    - Verifica se `gameEnded` é falso (o jogo não terminou).
+    - Verifica se `isPointCountdownActive` é falso (não está em contagem regressiva entre pontos).
+    - Se ambas as condições forem verdadeiras, chama `movePaddles()` e `moveBall()`.
+    - Chama `draw()` para renderizar o estado atual do jogo no canvas.
+    - Chama `requestAnimationFrame(gameLoop)` para agendar a próxima execução do loop.
+
+5. **Movimento das Raquetes (`movePaddles()`):**
+    - Atualiza a posição da raquete esquerda com base nas teclas pressionadas (W/S).
+    - No modo multiplayer, atualiza a raquete direita com base nas teclas pressionadas (setas para cima/baixo).
+    - No modo singleplayer, chama `aiMovePaddle()` para controlar a raquete da IA.
+
+6. **Inteligência Artificial (`aiMovePaddle()`):**
+   - Calcula o tempo decorrido desde a última atualização da IA.
+   - Se o tempo for suficiente, prediz a posição da bola usando `predictBallPosition()`.
+   - Adiciona alguma incerteza à posição alvo da raquete para simular um comportamento mais humano.
+   - Move a raquete da IA em direção à posição alvo calculada.
+
+7. **Movimento da Bola (`moveBall()`):**
+    - Atualiza a posição da bola com base em sua velocidade.
+    - Verifica colisões com as paredes superior e inferior, invertendo `ball.speedY` se necessário.
+    - Verifica colisões com as raquetes. Se houver colisão, inverte `ball.speedX` e aumenta a velocidade da bola.
+    - Se a bola ultrapassar os limites laterais (esquerda ou direita), incrementa a pontuação do jogador correspondente, chama `resetBall()` e `updateLives()`.
+
+8. **Reinicialização da Bola (`resetBall()`):**
+    - Reposiciona a bola no centro do canvas.
+    - Define uma nova velocidade aleatória para a bola (mantendo a direção horizontal invertida).
+    - Reposiciona as raquetes em suas posições iniciais.
+    - Chama `updateLives()` para atualizar a exibição das vidas.
+    - Chama `checkWinner()` para verificar se há um vencedor.
+    - Se não houver vencedor, define `gameStarted = false` e chama `startPointCountdown()`.
+
+9. **Contagem Regressiva Entre Pontos (`startPointCountdown()`):**
+    - Exibe a contagem regressiva (3, 2, 1) no elemento `pointCountdownElement`.
+    - A cada segundo, decrementa o contador.
+    - Quando o contador chega a zero, esconde o elemento `pointCountdownElement`, define `isPointCountdownActive = false` e `gameStarted = true`, permitindo que o `gameLoop()` continue o jogo.
+
+10. **Verificação de Vencedor (`checkWinner()`):**
+    - Verifica se algum jogador atingiu a pontuação máxima (`maxScore`).
+    - Se houver um vencedor, define `gameEnded = true`, exibe o elemento `winnerElement` com a mensagem de vitória, e o loop do jogo (`gameLoop()`) para de executar, finalizando a partida.
+
+11. **Reiniciar ou Voltar ao Menu:**
+    - Os botões "Reiniciar" e "Menu" têm listeners que chamam `resetGame()` para reiniciar o estado do jogo ou voltam para a tela de menu, respectivamente.
+
+### Explicação da IA
+
+A IA do jogo Pong neste código é projetada para controlar a raquete direita e simular um oponente humano com diferentes níveis de dificuldade.  A lógica principal reside na função `aiMovePaddle()`, que é chamada a cada frame no `gameLoop()` quando o modo singleplayer está ativo.
+
+Aqui está um detalhamento do funcionamento da IA:
+
+1. **Controle de Tempo (`lastAIUpdate` e dificuldade):**
+    - A variável `lastAIUpdate` armazena o timestamp da última vez que a IA atualizou a posição da raquete. Isso é usado em conjunto com o parâmetro `time` dentro do objeto `difficultyLevels` para controlar a frequência de atualização da IA, simulando diferentes tempos de reação para cada dificuldade. Dificuldades mais fáceis terão tempos de atualização maiores, reagindo mais lentamente.
+
+2. **Distância de Reação (`rightPaddle.reactionDistance`):**
+    - A propriedade `rightPaddle.reactionDistance` define a distância horizontal a partir da qual a IA começa a reagir ao movimento da bola. Se a bola estiver mais longe do que essa distância, a IA entrará em um estado de "espera" e fará movimentos aleatórios.
+
+3. **Previsão da Posição da Bola (`predictBallPosition()`):**
+    - Quando a bola está se aproximando (dentro da `reactionDistance`) e se movendo em direção à raquete da IA (`ball.speedX > 0`), a IA chama a função `predictBallPosition()`.
+    - `predictBallPosition()` simula o movimento da bola por um determinado número de iterações, considerando as colisões com as paredes superior e inferior.  O objetivo é estimar onde a bola irá colidir com a parede direita.
+    - A função retorna a posição Y prevista da colisão.
+
+4. **Incerteza e Movimentos Aleatórios (`rightPaddle.uncertainty`):**
+   - Para tornar a IA menos perfeita e mais parecida com um jogador humano, a propriedade `rightPaddle.uncertainty` é usada.  Ela adiciona um deslocamento aleatório à posição Y alvo calculada pela `predictBallPosition()`, fazendo com que a raquete da IA erre algumas vezes, especialmente em níveis de dificuldade mais baixos.
+   - Quando a bola está longe, a IA executa movimentos aleatórios dentro dos limites do canvas para simular um comportamento de espera.  O intervalo entre esses movimentos aleatórios é controlado por `rightPaddle.randomMoveInterval`.
+
+5. **Movimento da Raquete:**
+   - A IA calcula a diferença (`dy`) entre a posição Y atual da raquete e a posição Y alvo (calculada com a previsão e a incerteza).
+   - A velocidade do movimento da raquete é limitada pela propriedade `rightPaddle.speed`, que é configurada de acordo com o nível de dificuldade.
+   - A raquete é movida verticalmente em direção ao alvo com a velocidade calculada, garantindo que ela permaneça dentro dos limites do canvas.
+
+
+**Níveis de Dificuldade:**
+
+- **Fácil:**  Velocidade baixa, alta incerteza, reação tardia, movimentos aleatórios frequentes.
+- **Médio:** Velocidade alta, incerteza mínima, reação antecipada, movimentos aleatórios menos frequentes.
+- **Difícil:**  Semelhante ao médio, mas com tempo de atualização muito mais rápido, tornando a IA muito mais precisa e difícil de vencer.
+
+
+Em resumo, a IA funciona prevendo a trajetória da bola, adicionando um elemento de incerteza para simular falhas humanas, e movendo a raquete para interceptar a bola. A dificuldade é controlada ajustando a velocidade da raquete, a incerteza na previsão e a distância de reação.
