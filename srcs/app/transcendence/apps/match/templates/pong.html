@@ -63,10 +63,6 @@
         let playerNum = null; // Inicialize playerNum como null
         let websocket = new WebSocket('ws://localhost:8001/ws/pong/');
 
-        let ballSpeedMultiplier = 1;
-        let resetCountdown = 3;
-        let isResetting = false;
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const countdownElement = document.getElementById('countdown');
@@ -126,7 +122,7 @@
         websocket.onmessage = function (event) {
 
             let data = JSON.parse(event.data);
-            //console.log("Mensagem recebida do servidor:", event.data);
+            console.log("Mensagem recebida do servidor:", event.data);
             if (data.type === "waiting_for_player") {
                 // A mensagem já foi adicionada ao HTML no onopen, então não faça nada aqui
             } else if (data.type === "player_joined") {
@@ -188,13 +184,6 @@
                     clearInterval(countdownInterval);
                     countdownElement.style.display = "none";
                     gameStarted = true; // Reinicia o jogo
-                    isResetting = false; // Permite movimentação
-
-                    // Reseta a bola para o centro
-                    ball.x = canvas.width / 2;
-                    ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
-                    ball.speedX = (Math.random() > 0.5 ? 1 : -1) * 5 * ballSpeedMultiplier;
-                    ball.speedY = (Math.random() > 0.5 ? 1 : -1) * Math.max(1, ballSpeedMultiplier);
 
                     if (checkWinner()) {
                         gameStarted = false; // Para o jogo se houver um vencedor
@@ -249,83 +238,6 @@
 
         }
 
-        function moveBall() {
-            if (!gameStarted || isResetting) return; // Pausa a bola durante o reset
-
-            if (!gameStarted) return;
-
-            ball.x += ball.speedX * ballSpeedMultiplier; // Aplica o multiplicador à velocidade
-            ball.y += ball.speedY * ballSpeedMultiplier;
-
-            // Top and bottom collision
-            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-                ball.speedY = -ball.speedY;
-            }
-
-            // Paddle collision
-            if (
-                (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) ||
-                (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight)
-            ) {
-                ball.speedX = -ball.speedX;
-            }
-
-            // Score
-            if (ball.x + ball.radius > canvas.width) {
-                leftScore++;
-                if (ballSpeedMultiplier <= 3) {
-                    ballSpeedMultiplier += 0.25; // aumenta a velocidade ao marcar ponto
-                }
-                resetBall();
-            } else if (ball.x - ball.radius < 0) {
-                rightScore++;
-                if (ballSpeedMultiplier <= 3) {
-                    ballSpeedMultiplier += 0.25; // aumenta a velocidade ao marcar ponto
-                }
-                resetBall();
-            }
-            console.log(ballSpeedMultiplier);
-        }
-
-        function resetBall() {
-            console.log("Resetando bola...");
-            isResetting = true; // Inicia o reset
-            gameStarted = false; // Para o jogo durante o reset
-            countdown = 3; // Reinicia a contagem regressiva
-
-            countdownElement.style.display = "flex"; // Mostra o elemento de contagem regressiva
-            countdownElement.textContent = countdown; // Define o texto inicial
-
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                countdownElement.textContent = countdown;
-
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    countdownElement.style.display = 'none';
-                    isResetting = false;
-                    gameStarted = true; // Reinicia o jogo após a contagem regressiva
-
-                    // Reseta posição da bola e sua velocidade
-                    ball.x = canvas.width / 2;
-                    ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
-                    ball.speedX = (Math.random() > 0.5 ? 1 : -1) * 5 * ballSpeedMultiplier;
-
-                    let minimumSpeedY = 1;
-                    let calculatedSpeedY = ballSpeedMultiplier;
-                    ball.speedY = (Math.random() > 0.5 ? 1 : -1) * Math.max(minimumSpeedY, calculatedSpeedY);
-
-                    if (checkWinner()) {
-                        gameStarted = false; // Para o jogo se houver um vencedor
-                    }
-                }
-            }, 1000);
-
-            updateLives();
-        }
-
-
-
         function draw() {
             // Clear canvas
             ctx.fillStyle = '#000';
@@ -356,7 +268,7 @@
 
         function gameLoop() {
             console.log("PlayerNum: ", playerNum);
-            if (gameStarted && !gameEnded && playerNum !== null && !isResetting) {
+            if (gameStarted && !gameEnded && playerNum !== null /* && !isResetting */) {
                 movePaddles();
                 draw();
 
