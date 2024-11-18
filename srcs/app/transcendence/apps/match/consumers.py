@@ -117,12 +117,32 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
             ball_speed_x = -5
             ball_speed_y = 5 if random.random() > 0.5 else -5
 
+            # Notifica os clientes para iniciar a contagem regressiva
+            await self.channel_layer.group_send(
+                f"game_{self.game_id}",
+                {
+                    "type": "start_countdown",  # Novo tipo de evento
+                    "left_score": left_score,
+                    "right_score": right_score
+                }
+            )
+
         elif ball_x - ball_radius < 0:
             right_score += 1
             ball_x = canvas_width / 2
             ball_y = random.randint(ball_radius, canvas_height - ball_radius) # Posição Y aleatória ao reiniciar
             ball_speed_x = 5
             ball_speed_y = 5 if random.random() > 0.5 else -5
+            
+            # Notifica os clientes para iniciar a contagem regressiva
+            await self.channel_layer.group_send(
+                f"game_{self.game_id}",
+                {
+                    "type": "start_countdown",  # Novo tipo de evento
+                    "left_score": left_score,
+                    "right_score": right_score
+                }
+            )
 
         game_state.update({
             "ball_x": ball_x,
@@ -168,3 +188,10 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.leave_game()
         await self.channel_layer.group_discard("pong_lobby", self.channel_name) # await diretamente
+
+    async def start_countdown(self, event):
+        await self.send_json({
+            "type": "start_countdown",
+            "left_score": event["left_score"],
+            "right_score": event["right_score"]
+        })

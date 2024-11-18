@@ -151,7 +151,6 @@
                     document.querySelector('.p1').textContent = data.player1_name;
                     document.querySelector('.p2').textContent = data.player2_name;
                 }
-
             } else if (data.type === "game_state_update") {
                 ball.x = data.ball_x;
                 ball.y = data.ball_y;
@@ -160,26 +159,53 @@
                 leftScore = data.left_score;
                 rightScore = data.right_score;
                 updateLives();
+            } else if (data.type === "start_countdown") {
+                leftScore = data.left_score;
+                rightScore = data.right_score;
+                updateLives(); // Atualiza a exibição das vidas
+
+                startCountdown(); // Inicia a contagem regressiva antes de reiniciar o jogo
             }
         };
 
         function startCountdown() {
+            console.log("Iniciando contagem regressiva...");
+            gameStarted = false; // Pausa o jogo
             countdown = 3;
+            countdownElement.style.display = "flex";
             countdownElement.textContent = countdown;
+
+            if (checkWinner()) {
+                countdownElement.style.display = "none";
+                return;
+            }
 
             const countdownInterval = setInterval(() => {
                 countdown--;
+                countdownElement.textContent = countdown;
 
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
-                    countdownElement.style.display = 'none';
-                    gameStarted = true;
-                    gameLoop();
-                } else {
-                    countdownElement.textContent = countdown;
+                    countdownElement.style.display = "none";
+                    gameStarted = true; // Reinicia o jogo
+                    isResetting = false; // Permite movimentação
+
+                    // Reseta a bola para o centro
+                    ball.x = canvas.width / 2;
+                    ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
+                    ball.speedX = (Math.random() > 0.5 ? 1 : -1) * 5 * ballSpeedMultiplier;
+                    ball.speedY = (Math.random() > 0.5 ? 1 : -1) * Math.max(1, ballSpeedMultiplier);
+
+                    if (checkWinner()) {
+                        gameStarted = false; // Para o jogo se houver um vencedor
+                    }
+                    if(gameStarted){
+                        gameLoop();
+                    }
                 }
             }, 1000);
         }
+
 
         function updateLives() {
             const remainingLivesP1 = '🐄'.repeat(maxScore - rightScore);
@@ -280,6 +306,7 @@
                     isResetting = false;
                     gameStarted = true; // Reinicia o jogo após a contagem regressiva
 
+                    // Reseta posição da bola e sua velocidade
                     ball.x = canvas.width / 2;
                     ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
                     ball.speedX = (Math.random() > 0.5 ? 1 : -1) * 5 * ballSpeedMultiplier;
@@ -288,7 +315,6 @@
                     let calculatedSpeedY = ballSpeedMultiplier;
                     ball.speedY = (Math.random() > 0.5 ? 1 : -1) * Math.max(minimumSpeedY, calculatedSpeedY);
 
-
                     if (checkWinner()) {
                         gameStarted = false; // Para o jogo se houver um vencedor
                     }
@@ -296,8 +322,8 @@
             }, 1000);
 
             updateLives();
-
         }
+
 
 
         function draw() {
