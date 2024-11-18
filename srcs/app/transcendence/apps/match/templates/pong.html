@@ -91,8 +91,6 @@
             x: canvas.width / 2,
             y: canvas.height / 2,
             radius: 10,
-            speedX: 5,
-            speedY: 5
         };
 
         const paddleHeight = 100;
@@ -147,14 +145,6 @@
                     document.querySelector('.p1').textContent = data.player1_name;
                     document.querySelector('.p2').textContent = data.player2_name;
                 }
-            } else if (data.type === "game_state_update") {
-                ball.x = data.ball_x;
-                ball.y = data.ball_y;
-                leftPaddle.y = data.left_paddle_y; // Atualiza a palheta esquerda
-                rightPaddle.y = data.right_paddle_y; // Atualiza a palheta direita
-                leftScore = data.left_score;
-                rightScore = data.right_score;
-                updateLives();
             } else if (data.type === "start_countdown") {
                 leftScore = data.left_score;
                 rightScore = data.right_score;
