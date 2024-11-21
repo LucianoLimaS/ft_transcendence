@@ -8,3 +8,9 @@ def pong(request):
         return render(request, 'pong.html')
     else:
         return render(request, 'pong.html')
+    
+def pongSinglePlayer(request):
+    if request.htmx:
+        return render(request, 'pong_3.html')
+    else:
+        return render(request, 'pong_3.html')
