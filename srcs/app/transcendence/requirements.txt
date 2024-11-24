@@ -35,3 +35,5 @@ channels_redis
 
 # WebSockets
 websockets
+
+sendgrid

@@ -7,7 +7,7 @@
  * 
  */
 
-$(document).ready(function () {
+/* $(document).ready(function () {
     // Evento de clique no botão
     $('#btSubmit').on('click', function (event) {
       event.preventDefault(); // Impede o envio do formulário
@@ -74,4 +74,4 @@ $(document).ready(function () {
               $('#alert-success').hide(); // Esconde o alerta
           }
       });
-  });
+  }); */

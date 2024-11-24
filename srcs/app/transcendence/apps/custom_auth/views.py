@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from apps.users.models import Users
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from django.conf import settings
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password
@@ -15,7 +14,9 @@ from django.http import JsonResponse
 from django.urls import reverse
 from apps.util.utils import makeUniqueHash, getData, is_password_strong, are_fields_empty  # Importe a função global
 from django.utils import timezone
-
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from django.utils import timezone
 
 class CustomLoginView(LoginView):
     template_name = 'signin.html'
@@ -108,6 +109,8 @@ def signin(request):
         user = authenticate(username = username, password = password)
         if user:
             login(request, user)
+            user.last_login = timezone.now()
+            user.save()
             if request.headers.get('HX-Request'):
                 return JsonResponse({
                     "redirect": reverse('chat')  # Usando a URL da view 'logado'
@@ -157,12 +160,19 @@ def recoverPassword(request):
             user.token = token
             user.token_expires = timezone.now() + timedelta(minutes=15)
             user.save()
-            send_mail(
-                'Recuperação de senha',
-                'o link para recuperação da sua senha é : localhost:8001/reset_password/' + token,
-                settings.DEFAULT_FROM_EMAIL, [user.email], 
-                fail_silently=False, 
-                )
+            message = Mail(
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to_emails=user.email,
+                subject='Recuperação de senha',
+                html_content='o link para recuperação da sua senha é : localhost:8001/reset_password/' + token)
+            try:
+                sg = SendGridAPIClient(settings.EMAIL_API_KEY)
+                response = sg.send(message)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+            except Exception as e:
+                print(e.message)
             messages.add_message(request, constants.SUCCESS, getTranslated("E-mail sent successfully."))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
@@ -200,7 +210,7 @@ def resetPassword(request, token = None):
             messages.add_message(request, constants.ERROR, getTranslated("Invalid token."))
             return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
 
-        if user.token_expires < datetime.now():
+        if user.token_expires < timezone.now():
             messages.add_message(request, constants.ERROR, getTranslated("Token expired."))
             return render(request, 'recoverPassword_full.html', {"messages": messages.get_messages(request)})
         
