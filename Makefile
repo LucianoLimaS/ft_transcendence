@@ -130,8 +130,8 @@ remove-certs:
 # ======================
 
 all:
-	@read -p "Do you want to run the setup? (Y/n): " choice; \
-	if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ] || [ "$$choice" = "" ]; then \
+	@read -p "Do you want to run the setup? (y/N): " choice; \
+	if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
 		$(MAKE) --no-print-directory setup; \
 	fi;
 	@printf "🔧 Launching ${name}...\n"
