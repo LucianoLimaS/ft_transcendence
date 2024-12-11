@@ -32,7 +32,7 @@ remove-env:
 
 setup: sudoers redisconf env certs docker
 
-remove-setup: remove-env remove-certs remove-redisconf remove-sudoers
+remove-setup: remove-certs remove-redisconf remove-env remove-sudoers
 
 sudoers:
 	@echo -ne "✅ Checking sudo... " && \
@@ -130,6 +130,10 @@ remove-certs:
 # ======================
 
 all:
+	@read -p "Do you want to run the setup? (Y/n): " choice; \
+	if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ] || [ "$$choice" = "" ]; then \
+		$(MAKE) --no-print-directory setup; \
+	fi;
 	@printf "🔧 Launching ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
@@ -144,7 +148,7 @@ dev:
 	@printf "🔧 Launching development for ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@docker compose -f ./srcs/docker-compose-dev.yml up --build
+	@docker compose -f ./srcs/docker-compose-dev.yml up
 
 down:
 	@printf "🔧 Stopping ${name}...\n"
@@ -168,24 +172,23 @@ getin:
 # Cleaning
 # ======================
 
-clean: cleandev 
+clean: 
 	@printf "🔧 Cleaning ${name}...\n"
-	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local
-	@$(MAKE) clean-host
+	@docker compose -f ./srcs/docker-compose.yml down --volumes
+	@$(MAKE) --no-print-directory clean-host
 
-cleandev:
+cleandev: clean
 	@printf "🔧 Cleaning development for ${name}...\n"
-	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
-	@$(MAKE) clean-host
+	@docker compose -f ./srcs/docker-compose-dev.yml down --rmi local
+	@docker compose -f ./srcs/docker-compose.yml down --rmi local
 
-fclean: clean
+fclean:
 	@printf "🔧 Full cleaning of ${name}...\n"
 	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
-	@$(MAKE) clean-host
-	
-deepclean: down
-	@docker compose -f ./srcs/docker-compose.yml down --rmi all --volumes --remove-orphans
-	@$(MAKE) clean-host
+	@docker compose -f ./srcs/docker-compose-dev.yml down --rmi all --volumes --remove-orphans
+	@$(MAKE) --no-print-directory remove-setup
+
+deepclean: fclean
 	@printf "\n💀 Removing all Docker configurations...\n"
 	@docker system prune --all
 
@@ -202,7 +205,10 @@ clean-staticfiles:
 	@sudo rm -rf ./srcs/app/transcendence/app > /dev/null 2>&1
 
 stop-redis:
-	@sudo systemctl stop redis
+	@if systemctl list-units --type=service --all | grep -q 'redis.service'; then \
+		sudo systemctl stop redis; \
+		echo "✅ Redis service stopped."; \
+	fi
 
 # ======================
 # Auxiliary Commands
