@@ -9,9 +9,12 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+from dotenv import load_dotenv
 import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,9 +86,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
 ]
-
-# Definindo as rotas para expor as métricas
-PROMETHEUS_METRICS_EXPORT_ENDPOINT = '/metrics'
 
 CACHES = {
     'default': {
@@ -204,7 +204,20 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-EMAIL_API_KEY = os.getenv('EMAIL_API_KEY', '')
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Email settings
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
+EMAIL_USE_SSL = bool(int(os.getenv('EMAIL_USE_SSL', 0)))
+EMAIL_USE_TLS = bool(int(os.getenv('EMAIL_USE_TLS', 0)))
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
 from django.contrib.messages import constants
@@ -225,7 +238,7 @@ if IS_PRODUCTION:
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                'hosts': [('redis', 6379)],  # O nome do serviço e a porta do Redis
+                'hosts': [('localhost', 6379)],  # O nome do serviço e a porta do Redis
             },
         },
     }

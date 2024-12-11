@@ -28,12 +28,7 @@ MINIO_BUCKET="transcendence"
 MINIO_ENDPOINT="minio:9000"
 MINIO_EXTERNAL_ENDPOINT="http://localhost:9002"
 
-EMAIL_HOST="smtp.gmx.com"
-EMAIL_HOST_USER="ft_transcendence@gmx.com"
-EMAIL_HOST_PASSWORD="ft_transcendence!"
-EMAIL_PORT="587"
-EMAIL_USE_SSL="0"
-EMAIL_USE_TLS="1"
+EMAIL_API_KEY="Pegar no discord"
 DEFAULT_FROM_EMAIL="ft_transcendence@gmx.com"
 
 REDIS_HOST="redis"

@@ -1,7 +1,6 @@
 let chatSocket = null;
 
 function initializeChat(username) {
-
     if (!window.location.pathname.includes('chat')) {
         return; // Sai se não estiver na página do chat
     }
@@ -20,7 +19,7 @@ function initializeChat(username) {
         console.error('Conexão WebSocket fechada.', e);
         chatSocket = null;
     };
-    
+
     chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         console.log('Mensagem recebida:', data.message);
@@ -48,23 +47,3 @@ function initializeChat(username) {
         }
     };
 }
-
-document.body.addEventListener('htmx:afterSettle', (event) => {  // Use htmx:afterSettle
-    if (window.location.pathname.includes('chat')) {
-        const username = document.getElementById('username').value;
-        initializeChat(username);
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const username = document.getElementById('username').value;
-    initializeChat(username);
-    });
-
-document.body.addEventListener('htmx:beforeRequest', (event) => {
-    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
-        console.log('Fechando conexão WebSocket.');
-        chatSocket.close();
-        chatSocket = null;
-    }
-});

@@ -1,74 +1,80 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 import random
 
-class PongConsumer(AsyncWebsocketConsumer):
-    # async def connect(self):
-    #     await self.accept()
-    #     self.game_id = None  # Inicialmente, nenhum jogo atribuído
-    #     self.player_num = None
-    #     await self.channel_layer.group_add("pong_lobby", self.channel_name) # Adiciona o consumer ao grupo de lobby
-    async def connect(self):
-        try:
-            await self.accept()
-            self.game_id = None
-            self.player_num = None
-            await self.channel_layer.group_add("pong_lobby", self.channel_name)
-            print(f"Connected: {self.channel_name}")  # Log de depuração
-        except Exception as e:
-            print(f"Error in connect: {e}")  # Log de erro
+active_games = {}  # Estrutura fora da classe para armazenar jogos ativos
+game_states = {}   # Dicionário para armazenar o estado de cada jogo
 
-    async def receive(self, text_data):
-        data = json.loads(text_data)
-        action = data.get("action")
+class PongConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        await self.accept()
+        self.game_id = None
+        self.player_num = None
+        await self.channel_layer.group_add("pong_lobby", self.channel_name)
+        print(f"{self.user.username} Connected: {self.channel_name}")
+        await self.send_json({"type": "waiting_for_player"}) # Envia a mensagem inicial
+
+    async def receive_json(self, content):
+        action = content.get("action")
 
         if action == "join_game":
             await self.join_game()
         elif action == "update_game_state":
-             # Certifica-se de que o jogador está em um jogo antes de atualizar
             if self.game_id and self.player_num is not None:
-                await self.update_game_state(data)
+                await self.update_game_state(content)
         elif action == "leave_game":
             await self.leave_game()
 
-
     async def join_game(self):
-        # Lógica simplificada para encontrar/criar um jogo (apenas cria um novo por enquanto)
-        # Em um cenário real, você precisaria de um sistema de matchmaking
-
-        # Procura por um jogo com apenas um jogador no grupo "pong_lobby"
-        for group_name in self.channel_layer.groups.keys():
-            if group_name.startswith("game_") and len(self.channel_layer.groups[group_name]) == 1:
-                self.game_id = group_name.split("_")[1]
+        for game_id, players in active_games.items():
+            if len(players) == 1:
+                self.game_id = game_id
                 self.player_num = 2
+                active_games[game_id].append(self) # Armazena a instância do Consumer
                 await self.channel_layer.group_add(f"game_{self.game_id}", self.channel_name)
-                await self.channel_layer.group_discard("pong_lobby", self.channel_name)  # Remove do lobby
-                # Notifica os jogadores que o jogo começou
+                await self.channel_layer.group_discard("pong_lobby", self.channel_name)
+
+                # Envia os nomes dos jogadores quando o segundo jogador entra
+                player1 = active_games[self.game_id][0]
+                player2 = self  # self é o segundo jogador
                 await self.channel_layer.group_send(
                     f"game_{self.game_id}",
                     {
                         "type": "game_start",
+                        "player1_name": player1.user.username,
+                        "player2_name": player2.user.username,
                     }
                 )
-
+                # Remove a mensagem "Aguardando jogador" para ambos os jogadores
+                await self.send_json({"type": "player_joined"})  # para o segundo jogador
+                await player1.send_json({"type": "player_joined"})  # para o primeiro jogador
                 return
 
-        # Se nenhum jogo encontrado, cria um novo
-        self.game_id = str(random.randint(1000, 9999))  # Gera um ID de jogo aleatório
+        self.game_id = str(random.randint(1000, 9999))
         self.player_num = 1
+        active_games[self.game_id] = [self] # Armazena a instância do Consumer
         await self.channel_layer.group_add(f"game_{self.game_id}", self.channel_name)
-        await self.channel_layer.group_discard("pong_lobby", self.channel_name) # Remove do lobby
-
+        await self.channel_layer.group_discard("pong_lobby", self.channel_name)
 
 
     async def update_game_state(self, data):
-        # Obtem o estado atual do jogo (se existir)
-        game_state = self.channel_layer.groups.get(f"game_{self.game_id}", {}).get("game_state", {})
+        if self.game_id not in game_states:
+            game_states[self.game_id] = {  # Inicializa o estado do jogo
+                "ball_x": 400,
+                "ball_y": 200,
+                "ball_speed_x": 2,
+                "ball_speed_y": 2,
+                "left_paddle_y": 150,
+                "right_paddle_y": 150,
+                "left_score": 0,
+                "right_score": 0,
+            }
 
-        # Define a posição das pás com base nos dados recebidos do cliente
+        game_state = game_states[self.game_id]  # Obtém o estado do jogo atual
+
         if self.player_num == 1:
             game_state["left_paddle_y"] = data["left_paddle_y"]
-
         elif self.player_num == 2:
             game_state["right_paddle_y"] = data["right_paddle_y"]
 
@@ -88,8 +94,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         canvas_width = 800
         canvas_height = 400
 
-
-
         ball_x += ball_speed_x
         ball_y += ball_speed_y
 
@@ -105,70 +109,89 @@ class PongConsumer(AsyncWebsocketConsumer):
         ):
             ball_speed_x = -ball_speed_x
 
-
-
         # Pontuação
         if ball_x + ball_radius > canvas_width:
             left_score += 1
             ball_x = canvas_width / 2
             ball_y = random.randint(ball_radius, canvas_height - ball_radius)  # Posição Y aleatória ao reiniciar
-            ball_speed_x = -5
-            ball_speed_y = 5 if random.random() > 0.5 else -5
+            ball_speed_x = -ball_speed_x * 1.01
+            ball_speed_y = ball_speed_y * 1.01
+
+            # Notifica os clientes para iniciar a contagem regressiva
+            await self.channel_layer.group_send(
+                f"game_{self.game_id}",
+                {
+                    "type": "start_countdown",  # Novo tipo de evento
+                    "left_score": left_score,
+                    "right_score": right_score
+                }
+            )
 
         elif ball_x - ball_radius < 0:
             right_score += 1
             ball_x = canvas_width / 2
             ball_y = random.randint(ball_radius, canvas_height - ball_radius) # Posição Y aleatória ao reiniciar
-            ball_speed_x = 5
-            ball_speed_y = 5 if random.random() > 0.5 else -5
+            ball_speed_x = -ball_speed_x * 1.01
+            ball_speed_y = ball_speed_y * 1.01
+            
+            # Notifica os clientes para iniciar a contagem regressiva
+            await self.channel_layer.group_send(
+                f"game_{self.game_id}",
+                {
+                    "type": "start_countdown",
+                    "left_score": left_score,
+                    "right_score": right_score
+                }
+            )
 
-        # Atualiza o estado do jogo
-        game_state["ball_x"] = ball_x
-        game_state["ball_y"] = ball_y
-        game_state["ball_speed_x"] = ball_speed_x
-        game_state["ball_speed_y"] = ball_speed_y
-        game_state["left_score"] = left_score
-        game_state["right_score"] = right_score
+        game_state.update({
+            "ball_x": ball_x,
+            "ball_y": ball_y,
+            "ball_speed_x": ball_speed_x,
+            "ball_speed_y": ball_speed_y,
+            "left_score": left_score,
+            "right_score": right_score,
+        })
+
+        # Atualiza game_states diretamente
+        game_states[self.game_id] = game_state
 
 
-        # Salva o estado do jogo no grupo
-        self.channel_layer.groups[f"game_{self.game_id}"]["game_state"] = game_state
-
-
-        # Envia o estado do jogo para ambos os jogadores
+        # Envia o estado *completo* do jogo
         await self.channel_layer.group_send(
             f"game_{self.game_id}",
             {
                 "type": "game_state_update",
-                "ball_x": ball_x,
-                "ball_y": ball_y,
-                "left_paddle_y": left_paddle_y,
-                "right_paddle_y": right_paddle_y,
-                "left_score": left_score,
-                "right_score": right_score,
+                **game_state, # Envia todo o game_state
             }
         )
 
-
-
     async def game_state_update(self, event):
-         # Envia o estado do jogo para o cliente
-        await self.send(text_data=json.dumps(event))
-
+        await self.send_json(event) # Envia o evento como JSON
 
     async def game_start(self, event):
-        await self.send(text_data=json.dumps({"type": "game_start"}))
-
-
+        await self.send(text_data=json.dumps(
+            {
+                "type": "game_start",
+                "player1_name": event["player1_name"],
+                "player2_name": event["player2_name"],
+                "player_num": self.player_num # Mantém o número do jogador para uso futuro
+            }
+        ))
 
     async def leave_game(self):
         if self.game_id:
-            await self.channel_layer.group_discard(f"game_{self.game_id}", self.channel_name)
+            await self.channel_layer.group_discard(f"game_{self.game_id}", self.channel_name) # await diretamente
             self.game_id = None
             self.player_num = None
 
-
     async def disconnect(self, close_code):
+        await self.leave_game()
+        await self.channel_layer.group_discard("pong_lobby", self.channel_name) # await diretamente
 
-        await self.leave_game() # Garante que o jogador saia do jogo ao desconectar
-        await self.channel_layer.group_discard("pong_lobby", self.channel_name) # Remove do lobby ao desconectar
+    async def start_countdown(self, event):
+        await self.send_json({
+            "type": "start_countdown",
+            "left_score": event["left_score"],
+            "right_score": event["right_score"]
+        })
