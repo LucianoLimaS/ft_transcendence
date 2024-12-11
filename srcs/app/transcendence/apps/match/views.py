@@ -9,8 +9,8 @@ def pong(request):
     else:
         return render(request, 'pong.html')
     
-def pongSinglePlayer(request):
+def pongLocal(request):
     if request.htmx:
-        return render(request, 'pong_3.html')
+        return render(request, 'pong_local.html')
     else:
-        return render(request, 'pong_3.html')
+        return render(request, 'pong_local_full.html')

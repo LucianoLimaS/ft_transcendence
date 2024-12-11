@@ -1,138 +1,44 @@
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <title>Pong Clássico</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #000;
-            font-family: 'Press Start 2P', cursive;
-        }
-
-        #gameCanvas {
-            border: 2px solid #fff;
-        }
-
-        #countdown {
-            position: absolute;
-            color: #fff;
-            font-size: 48px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .players {
-            color: #fff;
-            display: flex;
-            justify-content: space-between;
-            width: 800px;
-            margin-bottom: 20px;
-        }
-
-        #winner {
-            position: absolute;
-            color: #fff;
-            font-size: 32px;
-            text-align: center;
-            display: none;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border: 2px solid #fff;
-        }
-
-        #pointCountdown {
-            position: absolute;
-            color: #fff;
-            font-size: 48px;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #menu {
-            position: absolute;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border: 2px solid #fff;
-            color: #fff;
-            font-size: 20px;
-            display: flex;
-            flex-direction: column;
-            /* Itens do menu na vertical */
-            z-index: 1;
-            /* Garante que o menu fica por cima do canvas */
-            max-width: 400px;
-        }
-
-        #difficulty {
-            display: none;
-            /* Esconde as opções de dificuldade inicialmente */
-            margin-top: 10px;
-            /* Espaçamento entre o modo de jogo e as dificuldades */
-        }
-
-        .menu-button {
-            background-color: #fff;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px 0;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-        }
-
-        span {
-            font-size: 12px;
-            text-align: justify;
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-</head>
-
-<body>
-    <div id="menu">
-        <button class="menu-button" id="singleplayerBtn">Single Player</button>
-        <button class="menu-button" id="multiplayerBtn">Multiplayer</button>
-        <div id="difficulty">
-            <button class="menu-button" id="easyBtn">Fácil</button>
-            <button class="menu-button" id="mediumBtn">Médio</button>
-            <button class="menu-button" id="hardBtn">Difícil</button>
-            <br>
-            <br>
-            <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
-                divertido o jogo.</span>
+{% load static %}
+{% load i18n %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<div id="menu" class="d-flex flex-column align-items-center">
+    <button class="menu-button btn btn-light" id="singleplayerBtn">Single Player</button>
+    <button class="menu-button btn btn-light" id="multiplayerBtn">Multiplayer</button>
+    <div id="difficulty">
+        <div class="d-flex justify-content-between">
+            <button class="menu-button btn btn-light" id="easyBtn">Fácil</button>
+            <button class="menu-button btn btn-light" id="mediumBtn">Médio</button>
+            <button class="menu-button btn btn-light" id="hardBtn">Difícil</button>
         </div>
+        <br>
+        <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
+            divertido o jogo.</span>
     </div>
-    <div class="players">
-        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
-        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
-    </div>
-    <div id="countdown"></div>
-    <div id="pointCountdown"></div>
-    <div id="winner">
-        <p id="winnerText"></p>
-        <button id="restartBtn">Reiniciar</button>
-        <button id="menuBtn">Menu</button>
-    </div>
-    <canvas id="gameCanvas"></canvas>
+</div>
+<div class="players d-flex justify-content-between">
+    <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
+    <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+</div>
+<div id="countdown" class="d-flex justify-content-center align-items-center"></div>
+<div id="pointCountdown" class="d-flex justify-content-center align-items-center"></div>
+<div id="winner" class="d-flex flex-column align-items-center">
+    <p id="winnerText"></p>
+    <button id="restartBtn" class="btn btn-light">Reiniciar</button>
+    <button id="menuBtn" class="btn btn-light">Menu</button>
+</div>
+<canvas id="gameCanvas"></canvas>
 
-    <script>
+<script>
+    function initializePongLocal() {
         // Obtém o elemento canvas do DOM
-        const canvas = document.getElementById('gameCanvas');
+        let canvas = document.getElementById('gameCanvas');
 
         // Função para redimensionar o canvas com base na proporção 2:1
         function resizeCanvas() {
-            const aspectRatio = 2 / 1; // Proporção 2:1
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
+            let aspectRatio = 2 / 1; // Proporção 2:1
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
 
             let canvasWidth, canvasHeight;
 
@@ -156,37 +62,37 @@
         resizeCanvas(); // Chama inicialmente para configurar o tamanho
 
         // Obtém o contexto de renderização 2D do canvas
-        const ctx = canvas.getContext('2d');
+        let ctx = canvas.getContext('2d');
         // Elemento de contagem regressiva
-        const countdownElement = document.getElementById('countdown');
+        let countdownElement = document.getElementById('countdown');
         // Elemento de contagem regressiva para pontos
-        const pointCountdownElement = document.getElementById('pointCountdown');
+        let pointCountdownElement = document.getElementById('pointCountdown');
         // Elemento que exibe o vencedor
-        const winnerElement = document.getElementById('winner');
+        let winnerElement = document.getElementById('winner');
         // Elemento que exibe as vidas do Player 1
-        const p1LivesElement = document.getElementById('p1Lives');
+        let p1LivesElement = document.getElementById('p1Lives');
         // Elemento que exibe as vidas do Player 2
-        const p2LivesElement = document.getElementById('p2Lives');
+        let p2LivesElement = document.getElementById('p2Lives');
         // Botão para iniciar o modo single player
-        const singleplayerBtn = document.getElementById('singleplayerBtn');
+        let singleplayerBtn = document.getElementById('singleplayerBtn');
         // Botão para iniciar o modo multiplayer
-        const multiplayerBtn = document.getElementById('multiplayerBtn');
+        let multiplayerBtn = document.getElementById('multiplayerBtn');
         // Div que contém as opções de dificuldade
-        const difficultyDiv = document.getElementById('difficulty');
+        let difficultyDiv = document.getElementById('difficulty');
         // Botão para selecionar a dificuldade fácil
-        const easyBtn = document.getElementById('easyBtn');
+        let easyBtn = document.getElementById('easyBtn');
         // Botão para selecionar a dificuldade média
-        const mediumBtn = document.getElementById('mediumBtn');
+        let mediumBtn = document.getElementById('mediumBtn');
         // Botão para selecionar a dificuldade difícil
-        const hardBtn = document.getElementById('hardBtn');
+        let hardBtn = document.getElementById('hardBtn');
         // Botão para reiniciar o jogo
-        const restartBtn = document.getElementById('restartBtn');
+        let restartBtn = document.getElementById('restartBtn');
         // Botão para voltar ao menu
-        const menuBtn = document.getElementById('menuBtn');
+        let menuBtn = document.getElementById('menuBtn');
         // Elemento que exibe o texto do vencedor
-        const winnerText = document.getElementById('winnerText');
+        let winnerText = document.getElementById('winnerText');
         // Elemento do menu principal
-        const menu = document.getElementById('menu');
+        let menu = document.getElementById('menu');
 
         // Variável para controlar se o jogo começou
         let gameStarted = false;
@@ -204,11 +110,11 @@
         let singlePlayer = false;
 
         // Pontuação máxima para vencer o jogo
-        const maxScore = 3;
+        let maxScore = 3;
         // Velocidade inicial da bola
-        const initialBallSpeed = 4;
+        let initialBallSpeed = 4;
         // Define uma velocidade máxima para a raquete da IA
-        const maxAISpeed = 3.5;
+        let maxAISpeed = 3.5;
 
         // Pontuação do Player 1
         let leftScore = 0;
@@ -218,14 +124,14 @@
         // Evento para o botão de single player
         singleplayerBtn.addEventListener('click', () => {
             setSinglePlayer(true); // Define o modo single player
-            difficultyDiv.style.display = 'block'; // Mostra as opções de dificuldade
+            difficultyDiv.style.setProperty('display', 'block', 'important'); // Mostra as opções de dificuldade com !important // Mostra as opções de dificuldade
             singleplayerBtn.style.backgroundColor = 'red'; // Muda a cor do botão para indicar seleção
         });
 
         // Evento para o botão de multiplayer
         multiplayerBtn.addEventListener('click', () => {
             setSinglePlayer(false); // Define o modo multiplayer
-            menu.style.display = 'none'; // Esconde o menu
+            menu.style.setProperty('display', 'none', 'important'); // Esconde o menu
             startCountdown(); // Inicia a contagem regressiva para começar o jogo
         });
 
@@ -263,13 +169,13 @@
             ball.speedY = initialBallSpeed; // Define a velocidade inicial da bola no eixo Y
             leftPaddle.y = initialPaddlePositions.left; // Define a posição inicial da raquete esquerda
             rightPaddle.y = initialPaddlePositions.right; // Define a posição inicial da raquete direita
-            winnerElement.style.display = 'none'; // Esconde o elemento que exibe o vencedor
+            winnerElement.style.setProperty('display', 'none', 'important'); // Esconde o elemento que exibe o vencedor
             p1LivesElement.textContent = '🐄'.repeat(maxScore); // Reinicia as vidas do Player 1
             p2LivesElement.textContent = '🐄'.repeat(maxScore); // Reinicia as vidas do Player 2
             if (singlePlayer) {
-                menu.style.display = 'none'; // Esconde o menu se estiver no modo single player
+                menu.style.setProperty('display', 'none', 'important'); // Esconde o menu se estiver no modo single player
             }
-            countdownElement.style.display = 'flex'; // Mostra o elemento de contagem regressiva
+            countdownElement.style.setProperty('display', 'flex', 'important'); // Mostra o elemento de contagem regressiva
             startCountdown(); // Inicia a contagem regressiva
         }
 
@@ -280,9 +186,9 @@
 
         // Evento para o botão de voltar ao menu
         menuBtn.addEventListener('click', () => {
-            menu.style.display = 'flex'; // Mostra o menu
-            difficultyDiv.style.display = 'none'; // Esconde as opções de dificuldade
-            winnerElement.style.display = 'none'; // Esconde o elemento que exibe o vencedor
+            menu.style.setProperty('display', 'flex', 'important'); // Mostra o menu
+            difficultyDiv.style.setProperty('display', 'none', 'important'); // Esconde as opções de dificuldade
+            winnerElement.style.setProperty('display', 'none', 'important'); // Esconde o elemento que exibe o vencedor
             resetGame(); // Reinicia o jogo
         });
 
@@ -292,7 +198,7 @@
         }
 
         // Objeto que representa a bola
-        const ball = {
+        let ball = {
             x: canvas.width / 2, // Posição inicial X da bola
             y: canvas.height / 2, // Posição inicial Y da bola
             radius: 10, // Raio da bola
@@ -301,17 +207,17 @@
         };
 
         // Altura da raquete
-        const paddleHeight = 100;
+        let paddleHeight = 100;
         // Largura da raquete
-        const paddleWidth = 10;
+        let paddleWidth = 10;
         // Posições iniciais das raquetes
-        const initialPaddlePositions = {
+        let initialPaddlePositions = {
             left: canvas.height / 2 - paddleHeight / 2, // Posição inicial da raquete esquerda
             right: canvas.height / 2 - paddleHeight / 2 // Posição inicial da raquete direita
         };
 
         // Objeto que representa a raquete esquerda
-        const leftPaddle = {
+        let leftPaddle = {
             x: 0, // Posição X da raquete esquerda
             y: initialPaddlePositions.left // Posição Y inicial da raquete esquerda
         };
@@ -330,7 +236,7 @@
         };
 
         // Níveis de dificuldade para a IA
-        const difficultyLevels = {
+        let difficultyLevels = {
             easy: {
                 speed: 2, // Velocidade baixa da raquete
                 uncertainty: paddleHeight, // Incerteza máxima na posição da raquete
@@ -360,7 +266,7 @@
         // Função para definir a dificuldade do jogo
         function setDifficulty(level) {
             currentDifficulty = level; // Define a dificuldade atual
-            const settings = difficultyLevels[level]; // Obtém as configurações da dificuldade
+            let settings = difficultyLevels[level]; // Obtém as configurações da dificuldade
             rightPaddle.speed = settings.speed; // Define a velocidade da raquete da IA
             rightPaddle.uncertainty = settings.uncertainty; // Define a incerteza da posição da raquete da IA
             rightPaddle.reactionDistance = settings.reactionDistance; // Define a distância de reação da IA
@@ -368,7 +274,7 @@
         }
 
         // Objeto para armazenar o estado das teclas pressionadas
-        const keys = {};
+        let keys = {};
 
         // Evento para detectar quando uma tecla é pressionada
         document.addEventListener('keydown', (e) => {
@@ -384,12 +290,12 @@
         function startCountdown() {
             countdownElement.textContent = countdown; // Define o texto da contagem regressiva
 
-            const countdownInterval = setInterval(() => {
+            let countdownInterval = setInterval(() => {
                 countdown--; // Decrementa a contagem
 
                 if (countdown <= 0) {
                     clearInterval(countdownInterval); // Limpa o intervalo quando a contagem chega a zero
-                    countdownElement.style.display = 'none'; // Esconde o elemento de contagem regressiva
+                    countdownElement.style.setProperty('display', 'none', 'important'); // Esconde o elemento de contagem regressiva
                     gameStarted = true; // Define que o jogo começou
                     gameLoop(); // Inicia o loop do jogo
                 } else {
@@ -400,14 +306,14 @@
 
         // Função para iniciar o jogo após a seleção da dificuldade
         function startGameAfterDifficultySelection() {
-            menu.style.display = 'none'; // Esconde o menu principal
+            menu.style.setProperty('display', 'none', 'important'); // Esconde o menu principal
             startCountdown(); // Inicia a contagem regressiva
         }
 
         // Função para atualizar as vidas dos jogadores
         function updateLives() {
-            const remainingLivesP1 = '🐄'.repeat(maxScore - rightScore); // Calcula as vidas restantes do Player 1
-            const remainingLivesP2 = '🐄'.repeat(maxScore - leftScore); // Calcula as vidas restantes do Player 2
+            let remainingLivesP1 = '🐄'.repeat(maxScore - rightScore); // Calcula as vidas restantes do Player 1
+            let remainingLivesP2 = '🐄'.repeat(maxScore - leftScore); // Calcula as vidas restantes do Player 2
             p1LivesElement.textContent = remainingLivesP1; // Atualiza o elemento de vidas do Player 1
             p2LivesElement.textContent = remainingLivesP2; // Atualiza o elemento de vidas do Player 2
         }
@@ -416,12 +322,12 @@
         function checkWinner() {
             if (rightScore >= maxScore) { // Verifica se o Player 2 atingiu a pontuação máxima
                 gameEnded = true; // Define que o jogo terminou
-                winnerElement.style.display = 'block'; // Mostra o elemento que exibe o vencedor
+                winnerElement.style.setProperty('display', 'block', 'important'); // Mostra o elemento que exibe o vencedor
                 winnerText.textContent = 'Player 2 Venceu! 🏆'; // Define o texto dentro do parágrafo
                 return true; // Retorna verdadeiro indicando que há um vencedor
             } else if (leftScore >= maxScore) { // Verifica se o Player 1 atingiu a pontuação máxima
                 gameEnded = true; // Define que o jogo terminou
-                winnerElement.style.display = 'block'; // Mostra o elemento que exibe o vencedor
+                winnerElement.style.setProperty('display', 'block', 'important'); // Mostra o elemento que exibe o vencedor
                 winnerText.textContent = 'Player 1 Venceu! 🏆'; // Define o texto dentro do parágrafo
                 return true; // Retorna verdadeiro indicando que há um vencedor
             }
@@ -432,12 +338,12 @@
 
         // Função para mover a raquete da IA
         function aiMovePaddle() {
-            const currentTime = Date.now(); // Obtém o tempo atual
+            let currentTime = Date.now(); // Obtém o tempo atual
             let time = difficultyLevels[currentDifficulty].time; // Obtém o tempo de atualização da dificuldade atual
 
             // Verifica se passou o tempo necessário desde a última atualização
             if (currentTime - lastAIUpdate >= time) {
-                const settings = difficultyLevels[currentDifficulty]; // Obtém as configurações da dificuldade atual
+                let settings = difficultyLevels[currentDifficulty]; // Obtém as configurações da dificuldade atual
 
                 // Se a bola está se movendo em direção à raquete direita e está dentro da distância de reação
                 if (ball.speedX > 0 && ball.x > rightPaddle.reactionDistance) {
@@ -566,15 +472,15 @@
         function startPointCountdown() {
             isPointCountdownActive = true; // Define que a contagem regressiva de pontos está ativa
             pointCountdown = 3; // Reinicia a contagem regressiva entre pontos
-            pointCountdownElement.style.display = 'flex'; // Mostra o elemento de contagem regressiva de pontos
+            pointCountdownElement.style.setProperty('display', 'flex', 'important'); // Mostra o elemento de contagem regressiva de pontos
             pointCountdownElement.textContent = pointCountdown; // Define o texto da contagem regressiva de pontos
 
-            const pointCountdownInterval = setInterval(() => {
+            let pointCountdownInterval = setInterval(() => {
                 pointCountdown--; // Decrementa a contagem
 
                 if (pointCountdown <= 0) {
                     clearInterval(pointCountdownInterval); // Limpa o intervalo quando a contagem chega a zero
-                    pointCountdownElement.style.display = 'none'; // Esconde o elemento de contagem regressiva de pontos
+                    pointCountdownElement.style.setProperty('display', 'none', 'important'); // Esconde o elemento de contagem regressiva de pontos
                     isPointCountdownActive = false; // Define que a contagem regressiva de pontos não está ativa
                     gameStarted = true; // Define que o jogo começou
                 } else {
@@ -643,9 +549,153 @@
             }
         }
 
-    </script>
+        function closeGame() {
+            console.log('executando closeGame');
 
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-</body>
+            // Remove referências a elementos do DOM
+            canvas = null;
+            ctx = null;
+            countdownElement = null;
+            pointCountdownElement = null;
+            winnerElement = null;
+            p1LivesElement = null;
+            p2LivesElement = null;
+            singleplayerBtn = null;
+            multiplayerBtn = null;
+            difficultyDiv = null;
+            easyBtn = null;
+            mediumBtn = null;
+            hardBtn = null;
+            restartBtn = null;
+            menuBtn = null;
+            winnerText = null;
+            menu = null;
 
-</html>
+            // Esta parte é crucial para o htmx: Remove os elementos do DOM, para evitar a redeclaração.
+            let elementsToRemove = ['gameCanvas', 'countdown', 'pointCountdown', 'winner', 'p1Lives', 'p2Lives',
+                'singleplayerBtn', 'multiplayerBtn', 'difficulty', 'easyBtn', 'mediumBtn', 'hardBtn',
+                'restartBtn', 'menuBtn', 'winnerText', 'menu'];
+
+            elementsToRemove.forEach(id => {
+                let element = document.getElementById(id);
+                if (element) {
+                    element.remove();
+                }
+            });
+
+            // Limpa variáveis do jogo (pode ser necessário limpar mais variáveis)
+            gameStarted = null;
+            gameEnded = null;
+            countdown = null;
+            pointCountdown = null;
+            isPointCountdownActive = null;
+            ballSpeedMultiplier = null;
+            singlePlayer = null;
+            leftScore = null;
+            rightScore = null;
+            ball = null;
+            leftPaddle = null;
+            rightPaddle = null;
+            keys = null;
+            lastAIUpdate = null;
+            currentDifficulty = null;
+            console.log('terminando a execução do closeGame');
+        }
+    }
+</script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #000;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    #gameCanvas {
+        border: 2px solid #fff;
+    }
+
+    #countdown,
+    #pointCountdown {
+        position: absolute;
+        color: #fff;
+        font-size: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .players {
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        width: 800px;
+        margin-bottom: 20px;
+    }
+
+
+
+    #winner {
+        position: absolute;
+        color: #fff;
+        font-size: 32px;
+        text-align: center;
+        display: none !important;
+        background-color: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border: 2px solid #fff;
+    }
+
+    #menu {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border: 2px solid #fff;
+        color: #fff;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        z-index: 1;
+        max-width: 500px;
+    }
+
+    #difficulty {
+        display: none !important;
+        margin-top: 10px;
+    }
+
+    .menu-button {
+        background-color: #fff;
+        color: #000;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px 0;
+        font-family: 'Press Start 2P', cursive;
+        cursor: pointer;
+    }
+
+    span {
+        font-size: 11px;
+        text-align: justify;
+    }
+
+    @media (max-width: 800px) {
+        .players {
+            width: 100%;
+            margin-bottom: 0px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        #menu {
+            max-width: 90%;
+        }
+    }
+</style>
+
+{% endblock %}

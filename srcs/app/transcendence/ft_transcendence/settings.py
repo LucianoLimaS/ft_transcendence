@@ -201,7 +201,7 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-EMAIL_API_KEY = bool(int(os.getenv('EMAIL_API_KEY', 0)))
+EMAIL_API_KEY = os.getenv('EMAIL_API_KEY', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
 from django.contrib.messages import constants
