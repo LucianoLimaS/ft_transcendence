@@ -188,11 +188,11 @@ services:
       - "8001:8001"
     volumes:
       - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-      - daphne_vol:/ft_transcendence
+      - ./app/transcendence:/ft_transcendence
     networks:
       - transcendence
     restart: always
-    attach: false
+    # attach: false
 
   redis:
     image: redis:latest

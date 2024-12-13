@@ -40,16 +40,6 @@ WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
 
 ASGI_APPLICATION = 'ft_transcendence.asgi.application'
 
-# # Configurações Redis no Django
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [('127.0.0.1', 6379)],
-#         },
-#     },
-# }
-
 INSTALLED_APPS = [
     'channels',
     'corsheaders',

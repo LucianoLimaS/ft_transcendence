@@ -45,13 +45,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def chat_message(self, event):
+        from apps.users.models import Users
         message = event['message']
-        username = event['username']
+        if self.scope['user'].is_authenticated:
+            print(f"Usuário autenticado: {self.scope['user']}")
+            username = self.scope['user'].username  # Atributo serializável
+        else:
+            print("Usuário não autenticado (AnonymousUser).")
+            username = "Anonymous"  # Nome padrão para usuários não autenticados
+
         await self.send(text_data=json.dumps({
             'message': message,
             'username': username
         }))
-
 
 class MyAsyncHttpConsumer(AsyncHttpConsumer):
     async def handle(self, body):

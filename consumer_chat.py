@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.generic.http import AsyncHttpConsumer
 import logging
-from apps.users.models import User
+from apps.users.models import Users
 
 
 # Configure o logger
@@ -29,7 +29,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             logging.info(f"Mensagem recebida: {text_data}")  
             text_data_json = json.loads(text_data)
             message = text_data_json['message']
-            username = User.objects.get(username=username)
+            username = Users.objects.get(username=username)
             
             await self.channel_layer.group_send(
                 self.room_group_name,
