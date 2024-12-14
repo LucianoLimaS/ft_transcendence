@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'apps.users',
     'django_prometheus',
     'django_htmx',
+    'django_redis',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +78,19 @@ MIDDLEWARE = [
 # Definindo as rotas para expor as métricas
 PROMETHEUS_METRICS_EXPORT_ENDPOINT = '/metrics'
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
 CACHES = {
-    'default': {
-        'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",  # Substitua pelo endereço correto do seu Redis
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",  # Certifique-se de que esta classe está correta
+        }
     }
 }
+
 
 ALLOWED_HOSTS = ['*']
 

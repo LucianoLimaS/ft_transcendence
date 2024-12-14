@@ -195,7 +195,7 @@ services:
     # attach: false
 
   redis:
-    image: redis:latest
+    image: redis:bookworm
     container_name: redis
     ports:
       - "6379:6379"
