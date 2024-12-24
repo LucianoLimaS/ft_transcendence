@@ -1,0 +1,37 @@
+{% if message.author == user %}
+<li class="d-flex justify-content-end mb-4">
+    <div class="bg-success text-white rounded-start rounded-top p-3" style="max-width: 75%;">
+        <span>{{ message.body }}</span>
+    </div>
+    <div class="d-flex align-items-end ms-2">
+        <svg height="13" width="8">
+            <path fill="#d1e7dd" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z" />
+        </svg>
+    </div>
+</li>
+{% else %}
+<li>
+    <div class="d-flex justify-content-start">
+        <div class="d-flex align-items-end me-2">
+            <a hx-get="{% url 'profile' message.author.username %}" hx-target="#content-div" hx-push-url="true">
+                <div class="position-relative">
+                    <div id="user-{{ message.author.id }}"></div>
+                    <img class="rounded-circle" src="{{ message.author.profile.avatar }}" alt="Avatar" style="width: 32px; height: 32px; object-fit: cover;">
+                </div>
+            </a>
+        </div>
+        <div class="d-flex align-items-end">
+            <svg height="13" width="8">
+                <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+            </svg>
+        </div>
+        <div class="bg-white text-dark p-3 rounded-end rounded-top" style="max-width: 75%;">
+            <span>{{ message.body }}</span>
+        </div>
+    </div>
+    <div class="text-muted small py-1 ms-3">
+        <span class="fw-bold text-white">{{ message.author.profile.name }}</span>
+        <span class="text-secondary">@{{ message.author.username }}</span>
+    </div>
+</li>
+{% endif %}

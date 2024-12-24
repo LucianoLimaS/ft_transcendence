@@ -1,0 +1,124 @@
+{% extends 'layouts/blank.html' %}
+
+{% block content %} 
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 px-3">
+            {% if chat_group.groupchat_name %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>{{ chat_group.groupchat_name }}</h2>
+                {% if user == chat_group.admin %}
+                <a href="{% url 'edit-chatroom' chat_group.group_name %}">
+                    <div class="p-2 rounded-3 bg-light btn-edit">
+                        <svg class="edit-icon" width="16" height="16">
+                            <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div id="chat_window" class="bg-dark rounded-4 shadow-lg position-relative p-1" style="height: 720px;">
+                <!-- Chat Header -->
+                <div class="d-flex justify-content-center bg-dark p-2 text-success position-sticky top-0" style="z-index: 1030;">
+                    {% if other_user %}
+                    <div id="online-icon" class="gray-dot position-absolute top-0 start-0 m-2"></div>
+                    <a href="{% url 'profile' other_user.username %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center gap-2 p-4">
+                            <img class="rounded-circle object-fit-cover" src="{{ other_user.profile.avatar }}" 
+                                 style="width: 40px; height: 40px;" />
+                            <div>
+                                <span class="fw-bold text-white">{{ other_user.profile.name }}</span> 
+                                <span class="small fw-light text-secondary">@{{ other_user.username }}</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% elif chat_group.groupchat_name %}
+                    <ul id="groupchat-members" class="list-unstyled d-flex gap-4 mb-0">
+                        {% for member in chat_group.members.all %}
+                        <li>
+                            <a href="{% url 'profile' member.username %}" class="text-decoration-none d-flex flex-column align-items-center text-secondary" style="width: 5rem;">
+                                <img src="{{ member.profile.avatar }}" class="rounded-circle object-fit-cover mb-2"
+                                     style="width: 56px; height: 56px;" />
+                                {{ member.profile.name|slice:":10" }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div id="online-icon"></div>
+                    <span id="online-count" class="pe-1"></span>online
+                    {% endif %}
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chat_container" class="overflow-auto flex-grow-1">
+                    <ul id="chat_messages" class="list-unstyled d-flex flex-column gap-2 p-4 mb-0">
+                        {% for message in chat_messages reversed %}
+                        {% include 'a_rtchat/chat_message.html' %}
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="position-sticky bottom-0 p-2 bg-dark" style="z-index: 1030;">
+                    <div class="d-flex flex-column gap-3 rounded-3 px-2 py-2">
+                        <form id="chat_message_form" class="w-100"
+                            hx-ext="ws"
+                            ws-connect="/ws/chatroom/{{ chatroom_name }}"
+                            ws-send 
+                            _="on htmx:wsAfterSend reset() me">
+                            {% csrf_token %}
+                            {{ form }}
+                        </form>
+                        <form id="chat_file_form" enctype="multipart/form-data" class="d-flex align-items-center w-100" 
+                            hx-post="{% url 'chat-file-upload' chat_group.group_name %}"
+                            hx-target="#chat_messages"
+                            hx-swap="beforeend" 
+                            _="on htmx:beforeSend reset() me">
+                            {% csrf_token %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% if chat_group.members.exists %}
+            <a href="{% url 'chatroom-leave' chat_group.group_name %}">
+                {% include 'a_rtchat/partials/modal_chat_leave.html' %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+    function scrollToBottom(time=0) {
+        setTimeout(function() {
+            const container = document.getElementById('chat_container');
+            container.scrollTop = container.scrollHeight;
+        }, time);
+    }
+    scrollToBottom()
+</script>
+{% endblock %}
+
+<style>
+.btn-edit {
+    transition: background-color 0.3s;
+}
+.btn-edit:hover {
+    background-color: var(--bs-primary) !important;
+}
+.btn-edit:hover .edit-icon {
+    fill: white;
+}
+.edit-icon {
+    fill: var(--bs-gray-500);
+    transition: fill 0.3s;
+}
+</style>
