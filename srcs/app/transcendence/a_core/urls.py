@@ -28,6 +28,7 @@ urlpatterns = [
     path('profile/', include('a_users.urls')),
     path('@<username>/', profile_view, name="profile"),
     path('auth/', include('custom_auth.urls')),  # Inclua suas rotas de autenticação
+    path('', include('django_prometheus.urls')),  # Monitoramento
 
 ]
 

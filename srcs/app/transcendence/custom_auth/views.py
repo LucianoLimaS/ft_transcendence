@@ -28,13 +28,6 @@ def signup(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
-        description = request.POST.get('description')
-        profile_picture = request.POST.get('profile_picture')
-
-        # Esses campos não estão sendo usados no formulário de cadastro
-        # Se necessário, adicione-os ao formulário
-        description = ""
-        profile_picture = ""
 
         # Verificação de campos vazios
         fields = {
@@ -61,27 +54,31 @@ def signup(request):
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         
+        user = User.objects.filter(email=email);
+        if user:
+            messages.add_message(request, constants.ERROR, getTranslated("Email already registered"))
+            # Passa o objeto messages para o template
+            return render(request, "response.html", {"messages": messages.get_messages(request)})
+        
         user = User.objects.filter(username=username);
         if user:
             messages.add_message(request, constants.ERROR, getTranslated("User already registered"))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
-        else:
-            user = User.objects.create_user(
-                username = username,
-                email = email,
-                password = password,
-                first_name = "",
-                last_name = "",
-                description = description,
-                profile_picture = profile_picture,
-                )
-            user.save()
-            messages.add_message(request, constants.SUCCESS, getTranslated("User registered successfully"))
-            # Passa o objeto messages para o template
-            return JsonResponse({
-                    "redirect": reverse('signin')  # Usando a URL da view 'logado'
-            })
+
+        user = User.objects.create_user(
+            username = username,
+            email = email,
+            password = password,
+            first_name = "",
+            last_name = "",
+            )
+        user.save()
+        messages.add_message(request, constants.SUCCESS, getTranslated("User registered successfully"))
+        # Passa o objeto messages para o template
+        return JsonResponse({
+                "redirect": reverse('signin')  # Usando a URL da view 'logado'
+        })
     else:
         if request.htmx:
             return render(request, 'signup.html')

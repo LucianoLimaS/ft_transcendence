@@ -1,0 +1,17 @@
+body {
+  background-image: url('../assets/spaceship-wallpaper.jpg'); /* Caminho da imagem */
+  background-size: cover; /* Faz a imagem cobrir toda a área da página */
+  background-position: center; /* Centraliza a imagem */
+  background-attachment: fixed; /* Faz com que a imagem fique fixa no fundo */
+  background-repeat: no-repeat; /* Evita que a imagem se repita */
+}
+
+.full-height {
+  height: 100vh;
+}
+
+.body-bg-color {
+  background-color: #1a1919;
+}
+
+

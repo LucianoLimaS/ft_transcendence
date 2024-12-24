@@ -25,6 +25,8 @@ django-allauth
 django-cors-headers
 typing_extensions==4.12.2
 minio==7.2.10
+sendgrid
+
 
 # Monitoramento e métricas
 django-prometheus==2.3.1
@@ -35,5 +37,3 @@ channels_redis
 
 # WebSockets
 websockets
-
-sendgrid
