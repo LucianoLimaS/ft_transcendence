@@ -38,7 +38,7 @@
     function initializePongLocal() {
         // Obtém o elemento canvas do DOM
         let canvas = document.getElementById('gameCanvas');
-        
+
         // Função para redimensionar o canvas com base na proporção 2:1
         function resizeCanvas() {
             let aspectRatio = 2 / 1; // Proporção 2:1
@@ -98,6 +98,8 @@
         let winnerText = document.getElementById('winnerText');
         // Elemento do menu principal
         let menu = document.getElementById('menu');
+        // Variável para controlar o reset do jogo
+        let resetMenu = false;
 
         // Variável para controlar se o jogo começou
         let gameStarted = false;
@@ -137,25 +139,45 @@
         multiplayerBtn.addEventListener('click', () => {
             setSinglePlayer(false); // Define o modo multiplayer
             menu.style.setProperty('display', 'none', 'important'); // Esconde o menu
-            startCountdown(); // Inicia a contagem regressiva para começar o jogo
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startCountdown(); // Inicia a contagem regressiva para começar o jogo
+            }
         });
 
         // Evento para o botão de dificuldade fácil
         easyBtn.addEventListener('click', () => {
             setDifficulty('easy'); // Define a dificuldade como fácil
-            startGameAfterDifficultySelection(); // Inicia o jogo após a seleção da dificuldade
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startGameAfterDifficultySelection(); // Inicia o jogo após a seleção da dificuldade
+            }
         });
 
         // Evento para o botão de dificuldade média
         mediumBtn.addEventListener('click', () => {
             setDifficulty('medium'); // Define a dificuldade como média
-            startGameAfterDifficultySelection(); // Inicia o jogo após a seleção da dificuldade
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startGameAfterDifficultySelection(); // Inicia o jogo após a seleção da dificuldade
+            }
         });
 
         // Evento para o botão de dificuldade difícil
         hardBtn.addEventListener('click', () => {
             setDifficulty('hard'); // Define a dificuldade como difícil
-            startGameAfterDifficultySelection(); // Inicia o jogo após a seleção da dificuldade
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startGameAfterDifficultySelection(); // Inicia o jogo após a seleção da dificuldade
+            }
         });
 
         // Função para reiniciar o jogo
@@ -191,10 +213,11 @@
 
         // Evento para o botão de voltar ao menu
         menuBtn.addEventListener('click', () => {
+            resetMenu = true; // Define que o jogo deve ser reiniciado
+            singleplayerBtn.style.backgroundColor = 'white';
             menu.style.setProperty('display', 'flex', 'important'); // Mostra o menu
             difficultyDiv.style.setProperty('display', 'none', 'important'); // Esconde as opções de dificuldade
             winnerElement.style.setProperty('display', 'none', 'important'); // Esconde o elemento que exibe o vencedor
-            resetGame(); // Reinicia o jogo
         });
 
         // Função para definir o modo single player
@@ -294,8 +317,9 @@
         // Função para iniciar a contagem regressiva
         function startCountdown() {
             countdownElement.textContent = countdown; // Define o texto da contagem regressiva
-
+            
             let countdownInterval = setInterval(() => {
+            
                 countdown--; // Decrementa a contagem
 
                 if (countdown <= 0) {
@@ -519,10 +543,10 @@
         // Função para desenhar os elementos do jogo no canvas
         function draw() {
             // Limpa o canvas
-            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = 'rgba(0, 0, 0, 0.654)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        
+
             // Desenha a raquete esquerda
             ctx.fillStyle = '#fff';
             ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
@@ -556,8 +580,6 @@
         }
 
         function closeGame() {
-            console.log('executando closeGame');
-
             // Remove referências a elementos do DOM
             canvas = null;
             ctx = null;
@@ -605,7 +627,6 @@
             keys = null;
             lastAIUpdate = null;
             currentDifficulty = null;
-            console.log('terminando a execução do closeGame');
         }
     }
 </script>
@@ -624,7 +645,7 @@
 
     #gameCanvas {
         border: 2px solid #fff;
-        background-color: rgba(0, 0, 0, 0.654); /* Fundo semi-transparente opcional */
+        background-color: rgba(0, 0, 0, 0.654);
     }
 
     #countdown,
@@ -657,26 +678,28 @@
         font-size: 32px;
         text-align: center;
         display: none !important;
-        background-color: rgba(0, 0, 0, 0.654); /* Fundo semi-transparente opcional */
+        background-color: rgba(0, 0, 0, 0.654);
         padding: 20px;
         border: 2px solid #fff;
     }
 
     #menu {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.654); /* Fundo semi-transparente opcional */
-            padding: 20px;
-            border: 2px solid #fff;
-            color: #fff;
-            font-size: 20px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000; /* Certifique-se de que o menu está na frente de outros elementos */
-            max-width: 500px;
-        }
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.654);
+        /* Fundo semi-transparente opcional */
+        padding: 20px;
+        border: 2px solid #fff;
+        color: #fff;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        /* Certifique-se de que o menu está na frente de outros elementos */
+        max-width: 500px;
+    }
 
     #difficulty {
         display: none !important;
@@ -711,7 +734,8 @@
         }
     }
 
-    #gameContainer, #scoreboardContainer {
+    #gameContainer,
+    #scoreboardContainer {
         display: flex;
         justify-content: center;
         align-items: center;
