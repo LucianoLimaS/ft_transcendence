@@ -572,6 +572,7 @@
 
             // Desenha a linha tracejada no meio do campo
             ctx.setLineDash([10, 10]);
+            ctx.strokeStyle = 'white'; // Define a cor do traço para branco
             ctx.beginPath();
             ctx.moveTo(canvas.width / 2, 0);
             ctx.lineTo(canvas.width / 2, canvas.height);
