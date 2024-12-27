@@ -204,7 +204,6 @@ services:
     networks:
       - transcendence
     restart: always
-    attach: false
   
   portainer:
     image: portainer/portainer-ce

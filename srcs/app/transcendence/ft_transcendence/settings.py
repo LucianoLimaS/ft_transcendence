@@ -78,19 +78,19 @@ MIDDLEWARE = [
 # Definindo as rotas para expor as métricas
 PROMETHEUS_METRICS_EXPORT_ENDPOINT = '/metrics'
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_CACHE_ALIAS = 'default'
+# SESSION_COOKIE_NAME = 'sessionid'
+# # SESSION_COOKIE_AGE = 1209600
+# # SESSION_COOKIE_SECURE = True
+# # CSRF_COOKIE_SECURE = True
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/1",  # Substitua pelo endereço correto do seu Redis
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",  # Certifique-se de que esta classe está correta
-        }
-    }
-}
-
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://redis:6379/1",
+#     }
+# }
 
 ALLOWED_HOSTS = ['*']
 

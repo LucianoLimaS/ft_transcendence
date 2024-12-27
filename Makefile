@@ -148,7 +148,7 @@ dev:
 	@printf "🔧 Launching development for ${name}...\n"
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@docker compose -f ./srcs/docker-compose-dev.yml up
+	@docker compose -f ./srcs/docker-compose-dev.yml up --build
 
 down:
 	@printf "🔧 Stopping ${name}...\n"
