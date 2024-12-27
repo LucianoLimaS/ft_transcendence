@@ -317,9 +317,9 @@
         // Função para iniciar a contagem regressiva
         function startCountdown() {
             countdownElement.textContent = countdown; // Define o texto da contagem regressiva
-            
+
             let countdownInterval = setInterval(() => {
-            
+
                 countdown--; // Decrementa a contagem
 
                 if (countdown <= 0) {
@@ -453,47 +453,58 @@
         function moveBall() {
             if (!gameStarted) return; // Se o jogo não começou, não faz nada
 
-            // Atualiza a posição da bola com base na velocidade
-            ball.x += ball.speedX;
-            ball.y += ball.speedY;
+            // Número de passos para verificar colisões
+            const steps = 10;
+            const stepX = ball.speedX / steps;
+            const stepY = ball.speedY / steps;
 
-            // Verifica colisão com as bordas superior e inferior
-            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-                ball.speedY = -ball.speedY; // Inverte a direção da velocidade Y
-            }
+            for (let i = 0; i < steps; i++) {
+                // Atualiza a posição da bola em pequenos incrementos
+                ball.x += stepX;
+                ball.y += stepY;
 
-            let paddleHit = null; // Para rastrear qual raquete foi atingida
+                // Verifica colisão com as bordas superior e inferior
+                if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                    ball.speedY = -ball.speedY; // Inverte a direção da velocidade Y
+                    break;
+                }
 
-            // Verifica colisão com a raquete esquerda
-            if (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) {
-                paddleHit = leftPaddle;
+                let paddleHit = null; // Para rastrear qual raquete foi atingida
+
+                // Verifica colisão com a raquete esquerda
+                if (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.x - ball.radius > leftPaddle.x && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) {
+                    paddleHit = leftPaddle;
                 // Verifica colisão com a raquete direita
-            } else if (ball.x + ball.radius > rightPaddle.x && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight) {
-                paddleHit = rightPaddle;
-            }
+                } else if (ball.x + ball.radius > rightPaddle.x && ball.x + ball.radius < rightPaddle.x + paddleWidth && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight) {
+                    paddleHit = rightPaddle;
+                }
 
-            // Se a bola colidiu com uma raquete
-            if (paddleHit) {
-                ball.speedX = -ball.speedX; // Inverte a direção da velocidade X
+                // Se a bola colidiu com uma raquete
+                if (paddleHit) {
+                    ball.speedX = -ball.speedX; // Inverte a direção da velocidade X
 
-                // Aumenta a velocidade a cada batida
-                let speedIncrement = 1.5; // Valor do incremento de velocidade
-                let currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY); // Calcula a velocidade atual
-                let newSpeed = currentSpeed + speedIncrement; // Nova velocidade após o incremento
+                    // Aumenta a velocidade a cada batida
+                    let speedIncrement = 1.5; // Valor do incremento de velocidade
+                    let currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY); // Calcula a velocidade atual
+                    let newSpeed = currentSpeed + speedIncrement; // Nova velocidade após o incremento
 
-                // Mantém a direção, mas altera a magnitude da velocidade
-                ball.speedX = (ball.speedX / currentSpeed) * newSpeed;
-                ball.speedY = (ball.speedY / currentSpeed) * newSpeed;
-            }
+                    // Mantém a direção, mas altera a magnitude da velocidade
+                    ball.speedX = (ball.speedX / currentSpeed) * newSpeed;
+                    ball.speedY = (ball.speedY / currentSpeed) * newSpeed;
+                    break;
+                }
 
-            // Verifica se a bola passou pela borda direita
-            if (ball.x + ball.radius > canvas.width) {
-                leftScore++; // Incrementa a pontuação do Player 1
-                resetBall(); // Reinicia a posição da bola
-                // Verifica se a bola passou pela borda esquerda
-            } else if (ball.x - ball.radius < 0) {
-                rightScore++; // Incrementa a pontuação do Player 2
-                resetBall(); // Reinicia a posição da bola
+                // Verifica se a bola passou pela borda direita
+                if (ball.x + ball.radius > canvas.width) {
+                    leftScore++; // Incrementa a pontuação do Player 1
+                    resetBall(); // Reinicia a posição da bola
+                    break;
+                    // Verifica se a bola passou pela borda esquerda
+                } else if (ball.x - ball.radius < 0) {
+                    rightScore++; // Incrementa a pontuação do Player 2
+                    resetBall(); // Reinicia a posição da bola
+                    break;
+                }
             }
         }
 
