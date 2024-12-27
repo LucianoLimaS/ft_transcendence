@@ -16,9 +16,11 @@
             divertido o jogo.</span>
     </div>
 </div>
-<div class="players d-flex justify-content-between">
-    <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
-    <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+<div id="scoreboardContainer">
+    <div class="players d-flex justify-content-between">
+        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
+        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+    </div>
 </div>
 <div id="countdown" class="d-flex justify-content-center align-items-center"></div>
 <div id="pointCountdown" class="d-flex justify-content-center align-items-center"></div>
@@ -27,13 +29,16 @@
     <button id="restartBtn" class="btn btn-light">Reiniciar</button>
     <button id="menuBtn" class="btn btn-light">Menu</button>
 </div>
-<canvas id="gameCanvas"></canvas>
+<div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+</div>
 
 <script>
+    initializePongLocal();
     function initializePongLocal() {
         // Obtém o elemento canvas do DOM
         let canvas = document.getElementById('gameCanvas');
-
+        
         // Função para redimensionar o canvas com base na proporção 2:1
         function resizeCanvas() {
             let aspectRatio = 2 / 1; // Proporção 2:1
@@ -514,9 +519,10 @@
         // Função para desenhar os elementos do jogo no canvas
         function draw() {
             // Limpa o canvas
-            ctx.fillStyle = '#000';
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.654)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+                        
             // Desenha a raquete esquerda
             ctx.fillStyle = '#fff';
             ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
@@ -618,11 +624,15 @@
 
     #gameCanvas {
         border: 2px solid #fff;
+        background-color: rgba(0, 0, 0, 0.654); /* Fundo semi-transparente opcional */
     }
 
     #countdown,
     #pointCountdown {
         position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         color: #fff;
         font-size: 48px;
         display: flex;
@@ -640,27 +650,33 @@
 
     #winner {
         position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         color: #fff;
         font-size: 32px;
         text-align: center;
         display: none !important;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(0, 0, 0, 0.654); /* Fundo semi-transparente opcional */
         padding: 20px;
         border: 2px solid #fff;
     }
 
     #menu {
-        position: absolute;
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border: 2px solid #fff;
-        color: #fff;
-        font-size: 20px;
-        display: flex;
-        flex-direction: column;
-        z-index: 1;
-        max-width: 500px;
-    }
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.654); /* Fundo semi-transparente opcional */
+            padding: 20px;
+            border: 2px solid #fff;
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000; /* Certifique-se de que o menu está na frente de outros elementos */
+            max-width: 500px;
+        }
 
     #difficulty {
         display: none !important;
@@ -693,6 +709,17 @@
         #menu {
             max-width: 90%;
         }
+    }
+
+    #gameContainer, #scoreboardContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #gameCanvas {
+        border: 1px solid #fff;
+        /* Borda opcional para o canvas */
     }
 </style>
 
