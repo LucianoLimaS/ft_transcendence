@@ -29,7 +29,7 @@ urlpatterns = [
     path('@<username>/', profile_view, name="profile"),
     path('auth/', include('custom_auth.urls')),  # Inclua suas rotas de autenticação
     path('', include('django_prometheus.urls')),  # Monitoramento
-
+    path('', include('match.urls')),  # Adicione isso para incluir as URLs do jogo
 ]
 
 # Only used when DEBUG=True, whitenoise can serve files when DEBUG=False

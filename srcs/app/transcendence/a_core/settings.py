@@ -67,10 +67,10 @@ INSTALLED_APPS = [
     'a_home',
     'a_users',
     'a_rtchat',
-    'custom_auth'
+    'custom_auth',
     #'badges',
-    #'match',
-    #'tournaments',
+    'match',
+    'tournaments',
     #'django_prometheus',
 ]
 
