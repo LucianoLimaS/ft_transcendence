@@ -202,10 +202,9 @@ clean-migrations:
 
 clean-staticfiles:
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles/ > /dev/null 2>&1
-	@sudo rm -rf ./srcs/app/transcendence/app > /dev/null 2>&1
 
 stop-redis:
-	@if systemctl status redis | grep 'active'; then \
+	@if sudo systemctl status redis | grep 'active (running)' > /dev/null 2>&1; then \
 		sudo systemctl stop redis; \
 		echo "✅ Redis service stopped."; \
 	fi
