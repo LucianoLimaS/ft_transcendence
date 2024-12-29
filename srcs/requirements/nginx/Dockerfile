@@ -1,5 +1,5 @@
 # Usando a imagem oficial do Nginx como base
-FROM nginx:latest
+FROM nginx:stable-perl
 
 # Remova a configuração padrão do Nginx
 # RUN rm /etc/nginx/conf.d/default.conf

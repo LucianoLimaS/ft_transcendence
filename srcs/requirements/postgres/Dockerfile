@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:17.2
 
 # Copiar os certificados SSL para o container
 COPY ./srcs/requirements/certs/cert.pem /etc/ssl/certs/cert.pem

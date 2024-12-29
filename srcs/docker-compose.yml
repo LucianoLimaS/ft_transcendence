@@ -15,25 +15,7 @@ services:
     depends_on:
       - postgres
       - redis
-      # - daphne
     restart: always
-
-  # gunicorn:
-  #   image: gunicorn
-  #   container_name: gunicorn
-  #   build:
-  #     context: ../ #raiz do projeto
-  #     dockerfile: srcs/requirements/gunicorn/Dockerfile
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-  #     - app_vol:/ft_transcendence
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - app
-  #   restart: always
 
   postgres:
     image: postgres
@@ -52,7 +34,7 @@ services:
     restart: always
 
   postgres-exporter:
-    image: wrouesnel/postgres_exporter:latest
+    image: wrouesnel/postgres_exporter:v0.8.0
     container_name: postgres-exporter
     env_file:
     - ./.env
@@ -65,7 +47,7 @@ services:
     restart: always
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:8.14.0
     container_name: pgadmin
     env_file:
       - ./.env
@@ -80,7 +62,7 @@ services:
     restart: always
   
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:main-ubuntu
     container_name: grafana
     env_file:
       - ./.env
@@ -95,7 +77,7 @@ services:
     restart: always
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.1.0-rc.0
     container_name: prometheus
     ports:
       - "9090:9090"
@@ -109,7 +91,7 @@ services:
     restart: always
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z.fips
     container_name: minio
     env_file:
       - ./.env
@@ -138,7 +120,7 @@ services:
       '
   
   selenium:
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chrome:nightly
     container_name: selenium
     ports:
       - "4444:4444"
@@ -173,7 +155,7 @@ services:
     restart: always
 
   nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
+    image: nginx/nginx-prometheus-exporter:edge
     container_name: nginx-exporter
     command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
     ports:
@@ -185,7 +167,7 @@ services:
     restart: always
 
   redis:
-    image: redis:latest
+    image: redis:bookworm
     container_name: redis
     ports:
       - "6379:6379"
@@ -195,8 +177,21 @@ services:
       - transcendence
     restart: always
 
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.67.0
+    container_name: redis-exporter
+    env_file:
+    - ./.env
+    ports:
+      - "9121:9121"
+    networks:
+      - transcendence
+    depends_on:
+      - redis
+    restart: always
+
   portainer:
-    image: portainer/portainer-ce
+    image: portainer/portainer-ce:alpine-sts
     container_name: portainer
     ports:
       - "9000:9000"
