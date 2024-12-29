@@ -110,3 +110,18 @@ msgstr "Imagem de perfil:"
 
 msgid "Save"
 msgstr "Salvar"
+
+msgid "Confirm Password:"
+msgstr "Confirmar Senha:"
+
+msgid "Recover Password"
+msgstr "Recuperar Senha"
+
+msgid "Send e-mail"
+msgstr "Enviar e-mail"
+
+msgid "Email already registered"
+msgstr "E-mail já cadastrado"
+
+msgid "User already registered"
+msgstr "Usuário já cadastrado"

@@ -15,25 +15,25 @@ services:
     depends_on:
       - postgres
       - redis
-      - daphne
+      # - daphne
     restart: always
 
-  gunicorn:
-    image: gunicorn
-    container_name: gunicorn
-    build:
-      context: ../ #raiz do projeto
-      dockerfile: srcs/requirements/gunicorn/Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-      - app_vol:/ft_transcendence
-    networks:
-      - transcendence
-    depends_on:
-      - app
-    restart: always
+  # gunicorn:
+  #   image: gunicorn
+  #   container_name: gunicorn
+  #   build:
+  #     context: ../ #raiz do projeto
+  #     dockerfile: srcs/requirements/gunicorn/Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
+  #     - app_vol:/ft_transcendence
+  #   networks:
+  #     - transcendence
+  #   depends_on:
+  #     - app
+  #   restart: always
 
   postgres:
     image: postgres
@@ -184,20 +184,20 @@ services:
       - nginx
     restart: always
 
-  daphne:
-    image: daphne
-    container_name: daphne
-    build:
-      context: ../ #raiz do projeto
-      dockerfile: srcs/requirements/daphne/Dockerfile
-    ports:
-      - "8001:8001"
-    volumes:
-      - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-      - daphne_vol:/ft_transcendence
-    networks:
-      - transcendence
-    restart: always
+  # daphne:
+  #   image: daphne
+  #   container_name: daphne
+  #   build:
+  #     context: ../ #raiz do projeto
+  #     dockerfile: srcs/requirements/daphne/Dockerfile
+  #   ports:
+  #     - "8001:8001"
+  #   volumes:
+  #     - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
+  #     - daphne_vol:/ft_transcendence
+  #   networks:
+  #     - transcendence
+  #   restart: always
 
   redis:
     image: redis:latest
@@ -281,12 +281,12 @@ volumes:
       type: none
       device: /home/${USER}/data/nginx
 
-  daphne_vol:
-    name: daphne_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/daphne
+  # daphne_vol:
+  #   name: daphne_vol
+  #   driver_opts:
+  #     o: bind
+  #     type: none
+  #     device: /home/${USER}/data/daphne
 
   static_vol:
     name: static_vol

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<main class="container py-3 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <div class="bg-white rounded-4 shadow p-4 p-md-5">
+                <div class="container-xxl flex-grow-1 container-p-y" id="content-div" hx-history-elt></div>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

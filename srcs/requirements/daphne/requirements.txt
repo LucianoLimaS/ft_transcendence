@@ -1,26 +1,55 @@
-bash
+attrs==24.3.0
+autobahn==24.4.2
+Automat==24.8.1
+certifi==2024.12.14
+cffi==1.17.1
+charset-normalizer==3.4.0
+cloudinary==1.41.0
+constantly==23.10.4
+cryptography==44.0.0
+django-cloudinary-storage==0.3.0
+django-environ==0.11.2
+hyperlink==21.0.0
+idna==3.10
+incremental==24.7.2
+pyasn1==0.6.1
+pyasn1_modules==0.4.1
+pycparser==2.22
+pyOpenSSL==24.3.0
+requests==2.32.3
+service-identity==24.2.0
+setuptools==75.6.0
+shortuuid==1.0.13
+six==1.17.0
+Twisted==24.11.0
+txaio==23.1.1
+urllib3==2.2.3
+whitenoise==6.8.2
+zope.interface==7.2
 
 # Pacotes essenciais para Django e Channels
 asgiref==3.8.1
-Django==5.1.1
-channels>=4.0.0,<5.0.0
+Django==5.1.4
+channels==4.2.0
 
 # Servidor ASGI
-daphne==4.0.0
+daphne==4.1.2
 
 # Banco de dados
 psycopg==3.2.1
 psycopg-binary==3.2.1
 
 # Utilitários para Django e suporte
-sqlparse==0.5.1
+sqlparse==0.5.3
 tzdata==2024.1
-pillow==10.4.0
-django-htmx==1.19.0
-django-cleanup
-django-allauth
+pillow==11.0.0
+django-htmx==1.21.0
+django-cleanup==9.0.0
+django-allauth==65.3.0
 django-cors-headers
 typing_extensions==4.12.2
+minio==7.2.10
+sendgrid==6.9.7
 
 # Monitoramento e métricas
 django-prometheus==2.3.1
@@ -29,6 +58,3 @@ prometheus_client==0.20.0
 # Redis para backend do Channels
 channels-redis==4.2.0
 django-redis==5.3.0
-
-# WebSockets
-websockets
