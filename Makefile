@@ -201,11 +201,11 @@ clean-migrations:
 	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete > /dev/null 2>&1
 
 clean-staticfiles:
-	@sudo rm -rf ./srcs/app/transcendence/staticfiles > /dev/null 2>&1
+	@sudo rm -rf ./srcs/app/transcendence/staticfiles/ > /dev/null 2>&1
 	@sudo rm -rf ./srcs/app/transcendence/app > /dev/null 2>&1
 
 stop-redis:
-	@if systemctl list-units --type=service --all | grep -q 'redis.service'; then \
+	@if systemctl status redis | grep 'active'; then \
 		sudo systemctl stop redis; \
 		echo "✅ Redis service stopped."; \
 	fi
