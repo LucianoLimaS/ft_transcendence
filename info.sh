@@ -17,20 +17,7 @@ MINIO_ROOT_PASSWORD="87654321"
 # Exibe informações sobre os serviços disponíveis
 
 echo -e "\n ##### app #####"
-echo -e "WSGI App (Gunicorn + Nginx - static files):"
-echo -e "   - HTTP:       http://localhost"
-echo -e "   - HTTPS:      https://localhost"
-echo -e
-echo -e "ASGI App (Consumer Service):"
-echo -e "   - HTTP:       http://localhost:8001"
-echo -e "   - Test Endpoint: http://localhost:8001/test/"
-echo -e
-echo -e "ASGI App (WebSocket):"
-echo -e "   - WebSocket:  http://localhost/test"
-echo -e "   - WebSocket (HTTPS): https://localhost/test/"
-
-echo -e "   - WebSocket:  http://localhost/chat"
-echo -e "   - WebSocket (HTTPS): https://localhost/chat/"
+echo -e "   - http://localhost"
 
 # echo -e "Portainer:    https://localhost:9443"
 
