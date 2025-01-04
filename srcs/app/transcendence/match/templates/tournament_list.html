@@ -1,0 +1,21 @@
+{% extends 'base2.html' %}
+{% block content %}
+    <h1>Torneios</h1>
+    <div id="tournament-list-container">
+        {% include 'partials/tournament_list.html' %}
+    </div>
+    <h2>Criar Torneio</h2>
+    <form method="post" hx-post="{% url 'tournament_list' %}" hx-target="#tournament-list-container" hx-swap="innerHTML">
+        {% csrf_token %}
+        <input type="text" name="tournament_name" placeholder="Nome do Torneio" >
+        <select name="tournament_size">
+            <option value="2">2 Jogadores</option>
+            <option value="4">4 Jogadores</option>
+            <option value="8">8 Jogadores</option>
+            <option value="16">16 Jogadores</option>
+        </select>
+        <button type="submit">Criar Torneio</button>
+    </form>
+
+    
+{% endblock %}

@@ -1,38 +1,35 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from a_users.models import User
-from tournaments.models import Tournaments
+from django.conf import settings
+from django.utils import timezone
 
-class Match(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('ongoing', 'Ongoing'),
-        ('finished', 'Finished'),
-    ]
 
-    player_1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='matches_as_player1')
-    player_2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='matches_as_player2')
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    initial_lifes = models.IntegerField(default=3)
-    player1_lifes = models.IntegerField(default=3)
-    player2_lifes = models.IntegerField(default=3)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField(null=True, blank=True)
-    result = models.TextField(null=True, blank=True)
+class Tournament(models.Model):
+    name = models.CharField(max_length=200, default="Tournament")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    size = models.PositiveSmallIntegerField(choices=[(2, '2 Players'), (4, '4 Players'), (8, '8 Players'), (16, '16 Players')], default=4)
+    is_started = models.BooleanField(default=False)
+    current_round = models.PositiveSmallIntegerField(default=1)
 
     def __str__(self):
-        return f"Match between {self.player_1.username} and {self.player_2.username}"
+        return f"{self.name} ({self.size} players) by {self.created_by.username}"
 
-class UserMatch(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    @property
+    def available_slots(self):
+        return self.size - self.participants.count()
 
+    @property
+    def is_full(self):
+        return self.available_slots == 0
+
+
+class Participant(models.Model):
+    tournament = models.ForeignKey(Tournament, related_name='participants', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    position = models.PositiveSmallIntegerField(default=0)
+    wins = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('tournament', 'user')
     def __str__(self):
-        return f"{self.user.username} plays in match {self.match.id}"
-    
-class TournamentMatch(models.Model):
-    tournament = models.ForeignKey(Tournaments, on_delete=models.CASCADE)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Match {self.match.id} in Tournament {self.tournament.name}"
+        return f"{self.user.username} in {self.tournament.name} (position: {self.position})"
