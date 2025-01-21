@@ -14,6 +14,7 @@ from django.core.asgi import get_asgi_application
 from channels.security.websocket import AllowedHostsOriginValidator
 import a_rtchat.routing
 import match.routing
+from pong.routing import channel_routing, ws_pong_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'a_core.settings')
 
@@ -24,7 +25,7 @@ application = ProtocolTypeRouter({
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
-                a_rtchat.routing.websocket_urlpatterns + match.routing.websocket_urlpatterns
+                a_rtchat.routing.websocket_urlpatterns + match.routing.websocket_urlpatterns + ws_pong_application
             )
         )
     ),
