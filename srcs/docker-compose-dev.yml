@@ -187,12 +187,13 @@ services:
     networks:
       - transcendence
     restart: always
+    attach: false
   
   redis-exporter:
     image: oliver006/redis_exporter:v1.67.0
     container_name: redis-exporter
     env_file:
-    - ./.env
+      - ./.env
     ports:
       - "9121:9121"
     networks:
@@ -200,7 +201,52 @@ services:
     depends_on:
       - redis
     restart: always
-    # attach: false
+    attach: false
+
+  elasticsearch:
+    image: elasticsearch
+    container_name: elasticsearch
+    env_file:
+      - ./.env
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/elasticsearch/Dockerfile
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_vol:/usr/share/elasticsearch/data
+    networks:
+      - transcendence
+    restart: always
+
+  logstash:
+    image: logstash:8.17.0
+    container_name: logstash
+    volumes:
+      - ./requirements/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5044:5044"
+    networks:
+      - transcendence
+    depends_on:
+      - elasticsearch
+    restart: always
+
+  kibana:
+    image: kibana
+    container_name: kibana
+    env_file:
+      - ./.env
+    build:
+      context: ../ #raiz do projeto
+      dockerfile: srcs/requirements/kibana/Dockerfile
+    ports:
+      - "5601:5601"
+    networks:
+      - transcendence
+    depends_on:
+      - elasticsearch
+    restart: always
 
   portainer:
     image: portainer/portainer-ce:alpine-sts
@@ -294,6 +340,13 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/redis
+  
+  elasticsearch_vol:
+    name: elasticsearch_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/elasticsearch
 
 networks:
     transcendence:

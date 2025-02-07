@@ -1,0 +1,783 @@
+{% load static %}
+{% load i18n %}
+{% block content %}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet?v={{ random_number }}">
+<div id="menu" class="d-flex flex-column align-items-center">
+    <button class="btn btn-light" id="singleplayerBtn">Single Player</button>
+    <button class="btn btn-light" id="multiplayerBtn">Multiplayer</button>
+    <div id="difficulty">
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-light" id="easyBtn">Fácil</button>
+            <button class="btn btn-light" id="mediumBtn">Médio</button>
+            <button class="btn btn-light" id="hardBtn">Difícil</button>
+        </div>
+        <br>
+        <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
+            divertido o jogo.</span>
+    </div>
+</div>
+<div id="scoreboardContainer">
+    <div class="players d-flex justify-content-between">
+        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
+        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+    </div>
+</div>
+<div id="countdown" class="d-flex justify-content-center align-items-center"></div>
+<div id="pointCountdown" class="d-flex justify-content-center align-items-center"></div>
+<div id="winner" class="d-flex flex-column align-items-center">
+    <p id="winnerText"></p>
+    <button class="btn btn-light" id="restartBtn">Reiniciar</button>
+    <button class="btn btn-light" id="menuBtn">Menu</button>
+</div>
+<div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+</div>
+
+<script>
+    initializePongLocal();
+    function initializePongLocal() {
+        // Obtém o elemento canvas do DOM
+        let canvas = document.getElementById('gameCanvas');
+
+        let initialCanvasWidth;
+        let initialCanvasHeight;
+        let aspectRatio;
+        let currentDifficulty = null;
+        let maxScore = 3;
+        let leftScore = 0;
+        let rightScore = 0;
+         // Elemento que exibe as vidas do Player 1
+        let p1LivesElement = document.getElementById('p1Lives');
+        // Elemento que exibe as vidas do Player 2
+        let p2LivesElement = document.getElementById('p2Lives');
+        // Altura da raquete
+        let paddleHeight = 100;
+        // Largura da raquete
+        let paddleWidth = 10;
+        // Posições iniciais das raquetes
+        let initialPaddlePositions = {
+            left: canvas.height / 2 - paddleHeight / 2,
+            right: canvas.height / 2 - paddleHeight / 2
+        };
+
+        // Objeto que representa a bola
+        let ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speedX: 4,
+            speedY: 4
+        };
+
+         // Objeto que representa a raquete esquerda
+        let leftPaddle = {
+            x: 0,
+            y: initialPaddlePositions.left
+        };
+
+        // Objeto que representa a raquete direita (controlada pela IA)
+        let rightPaddle = {
+            x: canvas.width - paddleWidth,
+            y: initialPaddlePositions.right,
+            speed: 6,
+            state: 'WAITING',
+            targetY: canvas.height / 2 - paddleHeight / 2,
+            reactionDistance: canvas.width / 3,
+            uncertainty: paddleHeight / 4,
+            randomMoveInterval: 1000,
+            lastRandomMove: 0
+        };
+
+
+
+        // Função para redimensionar o canvas com base na proporção 2:1
+        function resizeCanvas() {
+            let aspectRatio = 2 / 1; // Proporção 2:1
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+
+            let canvasWidth, canvasHeight;
+
+            // Ajusta o tamanho do canvas com base na proporção da janela
+            if (windowWidth / windowHeight > aspectRatio) {
+                canvasHeight = windowHeight * 0.8; // 80% da altura da janela
+                canvasWidth = canvasHeight * aspectRatio;
+            } else {
+                canvasWidth = windowWidth * 0.8; // 80% da largura da janela
+                canvasHeight = canvasWidth / aspectRatio;
+            }
+
+            // Define a largura e altura do canvas
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            // Ajuste as posições das raquetes
+             leftPaddle.y = (canvas.height * (leftPaddle.y / initialCanvasHeight));
+             rightPaddle.y = (canvas.height * (rightPaddle.y / initialCanvasHeight));
+
+            // Ajuste a posição da bola
+            ball.x = (canvas.width * (ball.x / initialCanvasWidth));
+            ball.y = (canvas.height * (ball.y / initialCanvasHeight));
+
+           //atualiza as propriedades da IA
+            if(currentDifficulty){
+                let settings = difficultyLevels[currentDifficulty];
+                rightPaddle.uncertainty = settings.uncertainty * (canvas.height / initialCanvasHeight);
+                rightPaddle.reactionDistance = settings.reactionDistance * (canvas.width / initialCanvasWidth);
+            }
+
+            initialCanvasWidth = canvas.width;
+            initialCanvasHeight = canvas.height;
+
+            updateLivesDisplay();
+        }
+
+
+        // Chama a função para redimensionar o canvas inicialmente e quando a janela for redimensionada
+        window.addEventListener('resize', resizeCanvas);
+
+        resizeCanvas(); // Chama inicialmente para configurar o tamanho
+
+        initialCanvasWidth = canvas.width;
+        initialCanvasHeight = canvas.height;
+        aspectRatio = canvas.width / canvas.height;
+
+
+
+        // Obtém o contexto de renderização 2D do canvas
+        let ctx = canvas.getContext('2d');
+        // Elemento de contagem regressiva
+        let countdownElement = document.getElementById('countdown');
+        // Elemento de contagem regressiva para pontos
+        let pointCountdownElement = document.getElementById('pointCountdown');
+        // Elemento que exibe o vencedor
+        let winnerElement = document.getElementById('winner');
+        
+        // Botão para iniciar o modo single player
+        let singleplayerBtn = document.getElementById('singleplayerBtn');
+        // Botão para iniciar o modo multiplayer
+        let multiplayerBtn = document.getElementById('multiplayerBtn');
+        // Div que contém as opções de dificuldade
+        let difficultyDiv = document.getElementById('difficulty');
+        // Botão para selecionar a dificuldade fácil
+        let easyBtn = document.getElementById('easyBtn');
+        // Botão para selecionar a dificuldade média
+        let mediumBtn = document.getElementById('mediumBtn');
+        // Botão para selecionar a dificuldade difícil
+        let hardBtn = document.getElementById('hardBtn');
+        // Botão para reiniciar o jogo
+        let restartBtn = document.getElementById('restartBtn');
+        // Botão para voltar ao menu
+        let menuBtn = document.getElementById('menuBtn');
+        // Elemento que exibe o texto do vencedor
+        let winnerText = document.getElementById('winnerText');
+        // Elemento do menu principal
+        let menu = document.getElementById('menu');
+        // Variável para controlar o reset do jogo
+        let resetMenu = false;
+
+        // Variável para controlar se o jogo começou
+        let gameStarted = false;
+        // Variável para controlar se o jogo terminou
+        let gameEnded = false;
+        // Variável para a contagem regressiva inicial
+        let countdown = 3;
+        // Variável para a contagem regressiva entre pontos
+        let pointCountdown = 3;
+        // Variável para controlar se a contagem regressiva de pontos está ativa
+        let isPointCountdownActive = false;
+        // Multiplicador de velocidade da bola
+        let ballSpeedMultiplier = 1;
+        // Variável para controlar o modo single player
+        let singlePlayer = false;
+
+
+
+        // Evento para o botão de single player
+        singleplayerBtn.addEventListener('click', () => {
+            console.log("Single Player button clicked");
+            singlePlayer = true;
+            difficultyDiv.style.display = 'block';
+            singleplayerBtn.style.backgroundColor = 'red';
+        });
+
+        // Evento para o botão de multiplayer
+         multiplayerBtn.addEventListener('click', () => {
+            console.log("Multiplayer button clicked");
+            singlePlayer = false;
+            menu.style.display = 'none';
+             if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startCountdown();
+            }
+        });
+
+
+        // Evento para o botão de dificuldade fácil
+         easyBtn.addEventListener('click', () => {
+            console.log("Easy button clicked");
+              setDifficulty('easy');
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startGameAfterDifficultySelection();
+            }
+        });
+
+        // Evento para o botão de dificuldade média
+         mediumBtn.addEventListener('click', () => {
+             console.log("Medium button clicked");
+               setDifficulty('medium');
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startGameAfterDifficultySelection();
+            }
+        });
+
+       // Evento para o botão de dificuldade difícil
+        hardBtn.addEventListener('click', () => {
+             console.log("Hard button clicked");
+               setDifficulty('hard');
+            if (resetMenu) {
+                resetMenu = false;
+                resetGame();
+            } else {
+                startGameAfterDifficultySelection();
+            }
+        });
+
+        // Função para reiniciar o jogo
+         function resetGame() {
+            gameStarted = false;
+            gameEnded = false;
+            countdown = 3;
+            pointCountdown = 3;
+            isPointCountdownActive = false;
+            ballSpeedMultiplier = 1;
+            leftScore = 0;
+            rightScore = 0;
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speedX = initialBallSpeed;
+            ball.speedY = initialBallSpeed;
+            leftPaddle.y = initialPaddlePositions.left;
+            rightPaddle.y = initialPaddlePositions.right;
+            winnerElement.style.display = 'none';
+           if (singlePlayer) {
+                menu.style.display = 'none'; // Esconde o menu se estiver no modo single player
+            }
+             countdownElement.style.display = 'flex';
+            startCountdown();
+        }
+
+
+        // Evento para o botão de reiniciar
+        restartBtn.addEventListener('click', () => {
+            resetGame();
+        });
+
+         // Evento para o botão de voltar ao menu
+        menuBtn.addEventListener('click', () => {
+            resetMenu = true;
+            singleplayerBtn.style.backgroundColor = 'white';
+            menu.style.display = 'flex';
+            difficultyDiv.style.display = 'none';
+             winnerElement.style.display = 'none';
+        });
+
+        // Função para definir o modo single player
+        function setSinglePlayer(enabled) {
+            singlePlayer = enabled;
+        }
+
+
+          // Níveis de dificuldade para a IA
+        let difficultyLevels = {
+            easy: {
+                speed: 2,
+                uncertainty: paddleHeight,
+                reactionDistance: canvas.width / 8,
+                randomMoveInterval: 2000,
+                predictionIterations: 100,
+                time: 1000
+            },
+            medium: {
+                speed: 8,
+                uncertainty: paddleHeight / 16,
+                reactionDistance: canvas.width * 0.75,
+                randomMoveInterval: 500,
+                predictionIterations: 5000,
+                time: 1000
+            },
+             hard: {
+                speed: 8,
+                uncertainty: paddleHeight / 16,
+                reactionDistance: canvas.width * 0.75,
+                randomMoveInterval: 500,
+                predictionIterations: 5000,
+                time: 1
+            },
+        };
+
+        // Função para definir a dificuldade do jogo
+        function setDifficulty(level) {
+             currentDifficulty = level;
+            let settings = difficultyLevels[level];
+            rightPaddle.speed = settings.speed;
+           rightPaddle.uncertainty = settings.uncertainty * (canvas.height / initialCanvasHeight);
+            rightPaddle.reactionDistance = settings.reactionDistance * (canvas.width / initialCanvasWidth);
+            rightPaddle.randomMoveInterval = settings.randomMoveInterval;
+        }
+
+        // Objeto para armazenar o estado das teclas pressionadas
+        let keys = {};
+
+        // Evento para detectar quando uma tecla é pressionada
+        document.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+        });
+
+        // Evento para detectar quando uma tecla é solta
+        document.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+
+        // Função para iniciar a contagem regressiva
+        function startCountdown() {
+            countdownElement.textContent = countdown;
+
+            let countdownInterval = setInterval(() => {
+
+                countdown--;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.style.display = 'none';
+                    gameStarted = true;
+                    gameLoop();
+                } else {
+                    countdownElement.textContent = countdown;
+                }
+            }, 1000);
+        }
+
+        // Função para iniciar o jogo após a seleção da dificuldade
+         function startGameAfterDifficultySelection() {
+            menu.style.display = 'none';
+             startCountdown();
+        }
+
+
+       // Função para atualizar o display das vidas dos jogadores
+        function updateLivesDisplay() {
+            let remainingLivesP1 = '🐄'.repeat(maxScore - rightScore);
+            let remainingLivesP2 = '🐄'.repeat(maxScore - leftScore);
+            p1LivesElement.textContent = remainingLivesP1;
+            p2LivesElement.textContent = remainingLivesP2;
+
+            // Ajusta o tamanho da fonte com base na largura do canvas
+             p1LivesElement.style.fontSize = `${Math.min(18, canvas.width / 40)}px`;
+             p2LivesElement.style.fontSize = `${Math.min(18, canvas.width / 40)}px`;
+        }
+
+
+        // Função para verificar se há um vencedor
+        function checkWinner() {
+            if (rightScore >= maxScore) {
+                gameEnded = true;
+                winnerElement.style.display = 'block';
+                winnerText.textContent = 'Player 2 Venceu! 🏆';
+                return true;
+            } else if (leftScore >= maxScore) {
+                gameEnded = true;
+                winnerElement.style.display = 'block';
+                winnerText.textContent = 'Player 1 Venceu! 🏆';
+                return true;
+            }
+            return false;
+        }
+
+        let lastAIUpdate = 0;
+
+         // Função para mover a raquete da IA
+        function aiMovePaddle() {
+            let currentTime = Date.now();
+            let time = difficultyLevels[currentDifficulty].time;
+
+            // Verifica se passou o tempo necessário desde a última atualização
+            if (currentTime - lastAIUpdate >= time) {
+                let settings = difficultyLevels[currentDifficulty];
+
+                 // Se a bola está se movendo em direção à raquete direita e está dentro da distância de reação
+                if (ball.speedX > 0 && ball.x > rightPaddle.reactionDistance) {
+                    rightPaddle.targetY = predictBallPosition(settings.predictionIterations, 0.01);
+
+                    // Adiciona incerteza na posição alvo da raquete (apenas nos modos fácil e médio)
+                    if (currentDifficulty !== 'hard') {
+                       rightPaddle.targetY += (Math.random() - 0.5) * 2 * rightPaddle.uncertainty;
+                    }
+                } else {
+                    // Movimentos aleatórios enquanto espera
+                    if (Date.now() - rightPaddle.lastRandomMove > rightPaddle.randomMoveInterval) {
+                        rightPaddle.targetY = Math.random() * (canvas.height - paddleHeight);
+                        rightPaddle.lastRandomMove = Date.now();
+                    }
+                }
+                lastAIUpdate = currentTime;
+            }
+
+
+            let dy = rightPaddle.targetY - rightPaddle.y;
+            let moveSpeed = Math.min(Math.abs(dy), rightPaddle.speed);
+             rightPaddle.y += Math.sign(dy) * moveSpeed;
+
+           rightPaddle.y = Math.max(0, Math.min(rightPaddle.y, canvas.height - paddleHeight));
+        }
+        // Função para prever a posição da bola
+        function predictBallPosition(iterations, step) {
+            let position = { x: ball.x, y: ball.y };
+            let velocity = { x: ball.speedX, y: ball.speedY };
+
+            for (let i = 0; i < iterations; i++) {
+                position.x += velocity.x * step;
+                position.y += velocity.y * step;
+
+                if (position.y + ball.radius > canvas.height || position.y - ball.radius < 0) {
+                    velocity.y *= -1;
+                }
+
+                if (position.x + ball.radius > canvas.width - paddleWidth) {
+                    return position.y - paddleHeight / 2;
+                }
+            }
+
+            return position.y - paddleHeight / 2;
+        }
+
+        // Função para mover as raquetes
+        function movePaddles() {
+           if (keys['KeyW'] && leftPaddle.y > 0) {
+               leftPaddle.y -= 7 * (canvas.height / initialCanvasHeight);
+            }
+            if (keys['KeyS'] && leftPaddle.y < canvas.height - paddleHeight) {
+                leftPaddle.y += 7 * (canvas.height / initialCanvasHeight);
+            }
+
+            if (!singlePlayer) {
+                if (keys['ArrowUp'] && rightPaddle.y > 0) {
+                   rightPaddle.y -= 7 * (canvas.height / initialCanvasHeight);
+                }
+                if (keys['ArrowDown'] && rightPaddle.y < canvas.height - paddleHeight) {
+                    rightPaddle.y += 7 * (canvas.height / initialCanvasHeight);
+                }
+            } else {
+                aiMovePaddle();
+            }
+        }
+
+       function moveBall() {
+            if (!gameStarted) return;
+
+             // Número de passos para verificar colisões
+            const steps = 10;
+            const stepX = ball.speedX / steps;
+            const stepY = ball.speedY / steps;
+
+            for (let i = 0; i < steps; i++) {
+               // Atualiza a posição da bola em pequenos incrementos
+                ball.x += stepX;
+                ball.y += stepY;
+
+                // Verifica colisão com as bordas superior e inferior
+                if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                    ball.speedY = -ball.speedY; // Inverte a direção da velocidade Y
+                    break;
+                }
+
+                let paddleHit = null; // Para rastrear qual raquete foi atingida
+
+                // Verifica colisão com a raquete esquerda
+                if (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.x - ball.radius > leftPaddle.x && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) {
+                    paddleHit = leftPaddle;
+                // Verifica colisão com a raquete direita
+                } else if (ball.x + ball.radius > rightPaddle.x && ball.x + ball.radius < rightPaddle.x + paddleWidth && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight) {
+                    paddleHit = rightPaddle;
+                }
+
+                // Se a bola colidiu com uma raquete
+                if (paddleHit) {
+                     ball.speedX = -ball.speedX; // Inverte a direção da velocidade X
+
+                   // Aumenta a velocidade a cada batida
+                    let speedIncrement = 1.5; // Valor do incremento de velocidade
+                    let currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY); // Calcula a velocidade atual
+                    let newSpeed = currentSpeed + speedIncrement; // Nova velocidade após o incremento
+
+                   // Mantém a direção, mas altera a magnitude da velocidade
+                    ball.speedX = (ball.speedX / currentSpeed) * newSpeed;
+                    ball.speedY = (ball.speedY / currentSpeed) * newSpeed;
+                     break;
+                }
+
+                 // Verifica se a bola passou pela borda direita
+                if (ball.x + ball.radius > canvas.width) {
+                    leftScore++; // Incrementa a pontuação do Player 1
+                    resetBall(); // Reinicia a posição da bola
+                    break;
+                   // Verifica se a bola passou pela borda esquerda
+                } else if (ball.x - ball.radius < 0) {
+                    rightScore++; // Incrementa a pontuação do Player 2
+                    resetBall(); // Reinicia a posição da bola
+                    break;
+                }
+            }
+        }
+
+        // Função para iniciar a contagem regressiva entre pontos
+        function startPointCountdown() {
+            isPointCountdownActive = true;
+            pointCountdown = 3;
+            pointCountdownElement.style.display = 'flex';
+            pointCountdownElement.textContent = pointCountdown;
+
+            let pointCountdownInterval = setInterval(() => {
+                pointCountdown--;
+
+                if (pointCountdown <= 0) {
+                    clearInterval(pointCountdownInterval);
+                   pointCountdownElement.style.display = 'none';
+                    isPointCountdownActive = false;
+                    gameStarted = true;
+                } else {
+                    pointCountdownElement.textContent = pointCountdown;
+                }
+            }, 1000);
+        }
+
+        // Função para reiniciar a posição da bola
+        function resetBall() {
+             ballSpeedMultiplier += 0.4;
+            ball.x = canvas.width / 2;
+             ball.y = Math.random() * (canvas.height - 2 * ball.radius) + ball.radius;
+
+            ball.speedX = -ball.speedX;
+            ball.speedY = (Math.random() > 0.5 ? initialBallSpeed : -initialBallSpeed) * ballSpeedMultiplier;
+            ball.speedX = Math.sign(ball.speedX) * initialBallSpeed * ballSpeedMultiplier;
+
+            leftPaddle.y = initialPaddlePositions.left;
+            rightPaddle.y = initialPaddlePositions.right;
+
+            updateLivesDisplay();
+             if (!checkWinner()) {
+                gameStarted = false;
+                startPointCountdown();
+            }
+        }
+
+        // Função para desenhar os elementos do jogo no canvas
+        function draw() {
+            // Limpa o canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.654)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Desenha a raquete esquerda
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
+
+            // Desenha a raquete direita
+            ctx.fillRect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
+
+            // Desenha a bola
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Desenha a linha tracejada no meio do campo
+            ctx.setLineDash([10, 10]);
+            ctx.strokeStyle = 'white'; // Define a cor do traço para branco
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+        }
+
+        // Função principal do loop do jogo
+         function gameLoop() {
+             if (!gameEnded) {
+                if (!isPointCountdownActive) {
+                    movePaddles();
+                     moveBall();
+                }
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+         function closeGame() {
+            // Remove referências a elementos do DOM
+            canvas = null;
+            ctx = null;
+            countdownElement = null;
+            pointCountdownElement = null;
+            winnerElement = null;
+            p1LivesElement = null;
+            p2LivesElement = null;
+            singleplayerBtn = null;
+            multiplayerBtn = null;
+            difficultyDiv = null;
+            easyBtn = null;
+            mediumBtn = null;
+            hardBtn = null;
+            restartBtn = null;
+            menuBtn = null;
+            winnerText = null;
+            menu = null;
+
+            // Esta parte é crucial para o htmx: Remove os elementos do DOM, para evitar a redeclaração.
+            let elementsToRemove = ['gameCanvas', 'countdown', 'pointCountdown', 'winner', 'p1Lives', 'p2Lives',
+                'singleplayerBtn', 'multiplayerBtn', 'difficulty', 'easyBtn', 'mediumBtn', 'hardBtn',
+                'restartBtn', 'menuBtn', 'winnerText', 'menu'];
+
+            elementsToRemove.forEach(id => {
+                let element = document.getElementById(id);
+                if (element) {
+                    element.remove();
+                }
+            });
+
+            // Limpa variáveis do jogo (pode ser necessário limpar mais variáveis)
+            gameStarted = null;
+            gameEnded = null;
+            countdown = null;
+            pointCountdown = null;
+            isPointCountdownActive = null;
+            ballSpeedMultiplier = null;
+            singlePlayer = null;
+            leftScore = null;
+            rightScore = null;
+            ball = null;
+            leftPaddle = null;
+            rightPaddle = null;
+            keys = null;
+            lastAIUpdate = null;
+            currentDifficulty = null;
+        }
+    }
+</script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #000;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    #gameCanvas {
+        border: 2px solid #fff;
+        background-color: rgba(0, 0, 0, 0.654);
+    }
+
+    #countdown,
+    #pointCountdown {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-size: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .players {
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        width: 800px;
+        margin-bottom: 20px;
+    }
+
+     #p1Lives,
+    #p2Lives {
+        white-space: nowrap;
+    }
+
+    #winner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-size: 32px;
+        text-align: center;
+        display: none;
+        background-color: rgba(0, 0, 0, 0.654);
+        padding: 20px;
+        border: 2px solid #fff;
+    }
+
+    #menu {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.654);
+        padding: 20px;
+        border: 2px solid #fff;
+        color: #fff;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        max-width: 500px;
+    }
+
+    #difficulty {
+        display: none;
+        margin-top: 10px;
+    }
+
+
+    span {
+        font-size: 11px;
+        text-align: justify;
+    }
+
+    @media (max-width: 800px) {
+        .players {
+            width: 100%;
+            margin-bottom: 0px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        #menu {
+            max-width: 90%;
+        }
+    }
+
+    #gameContainer,
+    #scoreboardContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #gameCanvas {
+        border: 1px solid #fff;
+    }
+</style>
+
+{% endblock %}

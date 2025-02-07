@@ -179,7 +179,7 @@ clean:
 
 cleandev: clean
 	@printf "🔧 Cleaning development for ${name}...\n"
-	@docker compose -f ./srcs/docker-compose-dev.yml down --rmi local
+	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local
 	@docker compose -f ./srcs/docker-compose.yml down --rmi local
 
 fclean:
