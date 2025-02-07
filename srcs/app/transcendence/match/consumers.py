@@ -21,7 +21,6 @@ class PongConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content):
         action = content.get("action")
         game_id = content.get("game_id")
-        print(content)
         if action == "join_game":
             await self.join_game(game_id)
         elif action == "update_game_state":

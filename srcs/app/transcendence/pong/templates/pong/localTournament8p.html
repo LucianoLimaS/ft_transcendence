@@ -1,0 +1,172 @@
+{% extends 'pong/base_app.html' %}
+{% load static %}
+{% block content %}
+<div id="div-status" class="app-row d-flex flex-column flex-md-row justify-content-center gap-2 gap-md-4 px-3 px-md-4 px-lg-5">
+    <div class="col col-12 col-md-4 d-flex flex-row flex-md-column gap-3 d-flex justify-content-center"
+    id="game-data"
+    data-tournament-id="{{ tournament.id }}"
+    data-game-mode="tournament"
+    data-username="{{ user.username }}">
+        <div class="col-tournament p-0 rounded-4">
+            <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
+                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Tournament</p>
+            </div>
+            <div class="p-3">
+                <p class="text-tournament m-0 text-nowrap" id="tourn-name">Name: </p>
+                <p class="text-tournament m-0 text-nowrap">Number of Players:
+                    <span id="maxPlayersValue">8</span>
+                </p>
+                <p class="text-tournament m-0 text-nowrap" id="tourn-winner">Winner: </p>
+            </div>
+        </div>
+        <div class="col-tournament p-0 rounded-4">
+            <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
+                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Players</p>
+            </div>
+            <div class="p-2 px-md-3">
+                <form id="tournamentForm">
+                {% for i in "12345678"|slice:":" %}
+                <div class="d-flex flex-row p-0 mb-2">
+                    <label for="player-{{ i }}" id="player-name-{{ i }}"></label>
+                    <input type="text" id="player-{{ i }}" name="player-{{ i }}" 
+                        class="form-control form-player rounded-5 border-0 mr-2" 
+                        placeholder="Choose a name" 
+                        title="player-name-{{ i }}" maxlength="20" required>
+                </div>
+                {% endfor %}
+                <p id="p-warn" class="text-tournament m-0 text-nowrap" style="color: red; text-align: center;"></p>
+                <div class="d-flex justify-content-center">
+                    <p class="text-tournament status-game text-center m-0 d-none" id="startTournamentText">
+                        Tournament started!
+                    </p>
+                    <button id="startTournament" class="btn btn-custom">
+                        <p class="btn-custom-name-enter m-0">Start</p>
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-matches col col-12 col-md-7 p-0 rounded-4">
+        <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
+            <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Matches</p>
+        </div>
+        <div class="matches p-2 d-flex flex-column gap-1 gap-md-2">
+            <div id="quarter-finals">
+                <p class="enter-title m-0">Quarterfinals</p>
+                <div class="row d-flex justify-content-center gap-2">
+                    {% for i in "1234"|slice:":" %}
+                    <div class="create-room-box col col-5 rounded-4 px-2 d-flex justify-content-center">
+                        <div class="d-flex flex-column py-1 rounded-3" id="Match{{ i }}">
+                            <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p1">
+                                TBD
+                            </div>
+                            <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p2">
+                                TBD
+                            </div>
+                            <p class="text-tournament status-game text-center m-0" id="status-Match{{ i }}">
+                                waiting for game...
+                            </p>
+                            <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
+                            id="gameModeForm"
+                            method="post"
+                            formType="localTournamentMatchForm"
+                            action="{% url 'pong:selectmode' %}"
+                            match-id="Match{{ i }}"
+                            api-link>
+                            {% csrf_token %}
+                                <input type="hidden" name="game_mode" value="local">
+                                <button id="btn-Match{{ i }}" class="btn btn-custom py-1 px-2 d-none" disabled="" type="submit" api-link>
+                                    <p class="btn-custom-name-enter m-0">start</p>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="semi-finals">
+                <p class="enter-title m-0">Semifinals</p>
+                <div class="row d-flex justify-content-center gap-2">
+                    {% for i in "56"|slice:":" %}
+                    <div class="create-room-box col col-5 rounded-4 px-2 d-flex justify-content-center">
+                        <div class="d-flex flex-column py-1 rounded-3" id="Match{{ i }}">
+                            <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p1">
+                                TBD
+                            </div>
+                            <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p2">
+                                TBD
+                            </div>
+                            <p class="text-tournament status-game text-center m-0" id="status-Match{{ i }}">
+                                waiting for game...
+                            </p>
+                            <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
+                            id="gameModeForm"
+                            method="post"
+                            formType="localTournamentMatchForm"
+                            action="{% url 'pong:selectmode' %}"
+                            match-id="Match{{ i }}"
+                            api-link>
+                            {% csrf_token %}
+                                <input type="hidden" name="game_mode" value="local">
+                                <button id="btn-Match{{ i }}" class="btn btn-custom py-1 px-2 d-none" disabled="" type="submit" api-link>
+                                    <p class="btn-custom-name-enter m-0">start</p>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="final">
+                <p class="enter-title m-0">Final</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <div class="create-room-box col col-6 rounded-4 px-2 d-flex justify-content-center">
+                        <div class="d-flex flex-column py-1 rounded-3" id="Match7">
+                            <div class="text-tournament text-center m-0 text-nowrap" id="Match7-p1">
+                                TBD
+                            </div>
+                            <div class="text-tournament text-center m-0 text-nowrap" id="Match7-p2">
+                                TBD
+                            </div>
+                            <p class="text-tournament status-game text-center m-0" id="status-Match7">
+                                waiting for game...
+                            </p>
+                            <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
+                            id="gameModeForm"
+                            method="post"
+                            formType="localTournamentMatchForm"
+                            action="{% url 'pong:selectmode' %}"
+                            match-id="Match7"
+                            api-link>
+                            {% csrf_token %}
+                                <input type="hidden" name="game_mode" value="local">
+                                <button id="btn-Match7" class="btn btn-custom py-1 px-2 d-none" disabled="" type="submit" api-link>
+                                    <p class="btn-custom-name-enter m-0">start</p>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="div-game" class="row app-row justify-content-center gap-4 gap-md-5 px-3 px-md-4 px-lg-5 d-none">
+    <div class="section_pong d-flex justify-content-center align-items-center flex-column"
+    id="game-data"
+    data-room-id="{{ room.id }}"
+    data-game-mode="{{ game_mode }}">
+
+
+        <canvas id="pongCanvas" width="650" height="480" tabindex="0"></canvas>
+
+        <button id="startGame" class="btn btn-custom mt-2">
+            <p id="startGameText" class="btn-custom-play-name m-0">Play</p>
+        </button>
+        <div id="messageContainer" class="text-play m-0 mt-1"></div>
+    </div>
+</div>
+{% endblock %}

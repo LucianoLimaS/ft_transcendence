@@ -20,14 +20,12 @@ logger = logging.getLogger(__name__)
 class PongSelectGameMode(LoginRequiredMixin, TemplateView):
     template_name = "pong/play.html"
     def get(self, request, *args, **kwargs):
-        print("aqui 1")
         context = {"GameMode": GameMode.as_dict()}
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return render(request, "pong/play.html", context)
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        print("aqui 2")
         game_mode = request.POST.get("game_mode")
         logger.info(f"Selected game_mode: {game_mode}")
         if game_mode == GameMode.LOCAL.value:
@@ -49,7 +47,6 @@ class PongEnterView(LoginRequiredMixin, TemplateView):
     template_name = "pong/enter.html"
 
     def get_context_data(self, **kwargs):
-        print("aqui 3")
         context = super().get_context_data(**kwargs)
         game_mode = kwargs.get("game_mode")
 
@@ -58,26 +55,22 @@ class PongEnterView(LoginRequiredMixin, TemplateView):
         context["game_mode"] = game_mode
         context["GameMode"] = GameMode.as_dict()
 
-        """ if game_mode == GameMode.TOURNAMENT.value: """
-        
-        context["form"] = TournamentForm()
-        context["tournaments"] = Tournament.objects.filter(is_active=True)
-        
-        """  else:
+        if game_mode == GameMode.TOURNAMENT.value:
+            context["form"] = TournamentForm()
+            context["tournaments"] = Tournament.objects.filter(is_active=True)
+        else:
             context["form"] = PongRoomForm()
             context["rooms"] = PongRoom.objects.filter(
                 game_mode=game_mode, is_active=True
-            ) """
+            )
         return context
 
     def get(self, request, *args, **kwargs):
-        print("aqui 4")
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return render(request, "pong/enter.html", self.get_context_data(**kwargs))
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
-        print("aqui 5")
         game_mode = kwargs.get("game_mode")
 
         logger.info(f"PongEnterView POST game_mode: {game_mode}")
@@ -109,7 +102,6 @@ class PongRoomView(LoginRequiredMixin, TemplateView):
     template_name = "pong/room.html"
 
     def get_context_data(self, **kwargs):
-        print("aqui 6")
         context = super().get_context_data(**kwargs)
         room_id = kwargs.get("room_id")
         try:
@@ -122,7 +114,6 @@ class PongRoomView(LoginRequiredMixin, TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        print("aqui 7")
         context = self.get_context_data(**kwargs)
         if context["room"] is None:
             return redirect("pong:selectmode")
@@ -138,7 +129,6 @@ class PongTournamentView(LoginRequiredMixin, DetailView):
     pk_url_kwarg = "tournament_id"
 
     def get_context_data(self, **kwargs):
-        print("aqui 8")
         self.object = self.get_object()
         context = super().get_context_data(**kwargs)
         tournament = self.object
@@ -156,7 +146,6 @@ class PongTournamentView(LoginRequiredMixin, DetailView):
         return context
 
     def get(self, request, *args, **kwargs):
-        print("aqui 9")
         self.object = self.get_object()
         context = self.get_context_data(**kwargs)
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -164,11 +153,10 @@ class PongTournamentView(LoginRequiredMixin, DetailView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        print("aqui 10")
         tournament = self.get_object()
         return redirect("pong:pongtournament", tournament_id=tournament.id)
 
-""" class PongEnterLocalTournamentView(LoginRequiredMixin, TemplateView):
+class PongEnterLocalTournamentView(LoginRequiredMixin, TemplateView):
     template_name = "pong/enterLocalTournament.html"
 
     def get(self, request, *args, **kwargs):
@@ -184,7 +172,7 @@ class PongLocalTournamentView(LoginRequiredMixin, TemplateView):
         # else ADDERRORPAGE pagina de erro
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return render(request, template_path)
-        return render(request, self.template_name) """
+        return render(request, self.template_name)
 
 
 def format_datetime(dt):
@@ -203,7 +191,6 @@ class UserStatsView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        print("aqui 11")
         user = request.user
         last_online = format_datetime(user.last_login)
         total_matches = (
@@ -234,7 +221,6 @@ class UserHistoryView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        print("aqui 12")
         user = request.user
 
         # Match history
@@ -276,7 +262,6 @@ class UserMatchHistoryView(LoginRequiredMixin, TemplateView):
     template_name = "pong/match_history.html"
 
     def get_context_data(self, **kwargs):
-        print("aqui 13")
         context = super().get_context_data(**kwargs)
         user_id = kwargs.get("user_id")  # Fetch user_id from the route
 
@@ -303,7 +288,6 @@ class UserMatchHistoryView(LoginRequiredMixin, TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        print("aqui 14")
         context = self.get_context_data(**kwargs)
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -315,7 +299,6 @@ class UserTournamentHistoryView(LoginRequiredMixin, TemplateView):
     template_name = "pong/tournament_history.html"
 
     def get_context_data(self, **kwargs):
-        print("aqui 15")
         context = super().get_context_data(**kwargs)
         user_id = kwargs.get("user_id")  # Fetch user_id from the route
 
@@ -340,7 +323,6 @@ class UserTournamentHistoryView(LoginRequiredMixin, TemplateView):
         return context
 
     def get(self, request, *args, **kwargs):
-        print("aqui 16")
         context = self.get_context_data(**kwargs)
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
