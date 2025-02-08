@@ -60,6 +60,7 @@
     <canvas id="gameCanvas" width="800" height="400"></canvas>
 
     <script>
+        let gameId = "{{ game_id }}";
         let playerNum = null; // Inicialize playerNum como null
         let websocket = new WebSocket('ws://localhost:8000/ws/pong/');
 
@@ -224,8 +225,6 @@
                     rightPaddle.y += 5;
                 }
             }
-
-
         }
 
         function draw() {
@@ -253,7 +252,7 @@
 
         websocket.onopen = function (event) {
             console.log("Conexão WebSocket aberta.");
-            websocket.send(JSON.stringify({ "action": "join_game" })); // Envie join_game no onopen
+            websocket.send(JSON.stringify({ "action": "join_game", "game_id": gameId  })); // Envie join_game no onopen
         };
 
         function gameLoop() {
@@ -264,7 +263,8 @@
 
                 // Envia a posição do paddle correspondente ao jogador
                 let message = {
-                    "action": "update_game_state"
+                    "action": "update_game_state",
+                    "game_id": gameId
                 };
                 if (playerNum === 1) {
                     message.left_paddle_y = leftPaddle.y;
@@ -280,7 +280,7 @@
 
 
         window.addEventListener('beforeunload', function () {
-            websocket.send(JSON.stringify({ "action": "leave_game" }));
+            websocket.send(JSON.stringify({ "action": "leave_game", "game_id": gameId }));
         });
     </script>
 

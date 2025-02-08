@@ -1,0 +1,895 @@
+@import url("https://fonts.cdnfonts.com/css/arcade");
+/* font-family: "Arcade Rounded", sans-serif; */
+
+@import url('https://fonts.cdnfonts.com/css/lt-galaxy-reverse');
+/* font-family: 'LT Galaxy Reverse', sans-serif; */
+
+:root {
+    --cor-1: #ffffff;
+    --cor-2: #c0c0c0;
+    --cor-3: #157a8c;
+    --cor-4: #003f69;
+    --cor-5: #260d33;
+    --cor-6: #e0e0e0;
+
+    --regular: 400;
+    --bold: 700;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--cor-2);
+    font-family: "Arcade Rounded", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+}
+
+.d-none {
+    display: none !important;
+}
+.menu {
+    padding: 8px 24px;
+    color: var(--cor-1);
+    background-color: var(--cor-4);
+}
+
+.menu-logo {
+    font-size: 20px;
+    text-shadow: 2px 2px 4px #fff;
+}
+
+.nav-link:hover {
+    text-shadow:
+        -0.3px -0.3px 0.1em #fff,
+        0.3px -0.3px 0.1em #fff,
+        -0.3px 0.3px 0.1em #fff,
+        0.3px 0.3px 0.1em #fff;
+}
+
+.menu-profile-img {
+    width: 50px;
+    height: 50px;
+    background-color: var(--cor-5);
+}
+
+.menu-profile-username {
+    text-decoration: none;
+    font-size: 12px;
+    color: var(--cor-1);
+}
+
+.menu-profile-username:hover {
+    text-shadow:
+        -0.3px -0.3px 0.1em #fff,
+        0.3px -0.3px 0.1em #fff,
+        -0.3px 0.3px 0.1em #fff,
+        0.3px 0.3px 0.1em #fff;
+}
+
+.menu-profile-logout {
+    color: var(--cor-1);
+    cursor: pointer;
+    border-color: transparent !important;
+}
+
+.menu-profile-logout:hover {
+    color: var(--cor-5);
+}
+
+.rodape {
+    padding: 16px 24px;
+    background-color: var(--cor-3);
+}
+
+.rodape-link {
+    text-decoration: none;
+    font-size: 12px;
+    color: var(--cor-1);
+}
+
+.rodape-link:hover {
+    color: var(--cor-4);
+}
+
+.app-container {
+    background-color: var(--cor-6);
+    min-height: calc(100vh - 182px);
+    display: flex;
+}
+
+/* profile page */
+
+.profile-img {
+    background-color: var(--cor-5);
+    width: 160px;
+    height: 160px;
+}
+
+.profile-img.friends {
+    display: none;
+}
+
+.profile-div,
+.history,
+.history-info {
+    background-color: var(--cor-2);
+}
+
+.col-history {
+    min-width: 240px;
+}
+
+.title {
+    background-color: var(--cor-4);
+    color: var(--cor-1);
+    font-size: 13px;
+}
+
+
+.title-friends {
+    background-color: #2c72a1;
+    color: var(--cor-1);
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.title-friends:hover {
+    font-weight: 900;
+}
+
+
+.title-friends.selected {
+    background-color: var(--cor-4);
+    color: var(--cor-1);
+    cursor: pointer;
+}
+
+.history-box {
+    height: 100px;
+}
+
+.text-profile {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: bold;
+    color: black;
+}
+
+.text-play {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.7;
+    font-weight: bold;
+    color: var(--cor-5);
+    height: 27.2px;
+}
+
+.text-tournament {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--cor-5);
+}
+
+/* .text-profile.option:hover {
+    font-weight: 900;
+    color: var(--cor-4);
+    cursor: pointer;
+} */
+
+button {
+    border: none;
+    background-color: transparent;
+}
+
+/* chat page */
+.col-friends {
+    background-color: var(--cor-2);
+    height: 196px;
+    overflow: hidden;
+    min-width: 220px;
+    max-width: 340px;
+}
+
+.col-room {
+    background-color: var(--cor-2);
+    overflow: hidden;
+    height: 380px;
+}
+
+
+.col-room-tournament {
+    background-color: var(--cor-2);
+    overflow: hidden;
+}
+
+.col-tournament {
+    background-color: var(--cor-2);
+    overflow: hidden;
+    min-width: 180px;
+}
+
+.col-matches {
+    background-color: var(--cor-2);
+    overflow: hidden;
+}
+
+.col-profile {
+    min-width: 160px;
+}
+
+.col-friends.friends {
+    height: 180px;
+}
+
+.col-friends.friends.unselected {
+    height: 420px;
+    width: 300px;
+}
+
+.col-chat {
+    background-color: var(--cor-2);
+    height: 300px;
+}
+
+.search {
+    background-color: var(--cor-1);
+}
+
+.form-control {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.form-control:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.friends-box {
+    height: 106px;
+    overflow-y: auto;
+}
+
+
+.form-player {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    background-color: var(--cor-6);
+    margin-right: 3px;
+    padding: 0 10px;
+}
+
+.friends-box.friends {
+    height: 68px;
+}
+
+.friends-box.friends.unselected {
+    height: 300px;
+}
+
+.friends-box::-webkit-scrollbar {
+    width: 8px; 
+}
+
+.friends-box::-webkit-scrollbar-thumb {
+    background: var(--cor-6);
+    border-radius: 10px; 
+}
+
+.friends-box::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-1);
+}
+
+.friend {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+}
+
+.friend.selected {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    background-color: var(--cor-6);
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.friend-img {
+    width: 20px;
+    height: 20px;
+    background-color: var(--cor-5);
+}
+
+.friend-name {
+    color: var(--cor-5);
+}
+
+.friend-name:hover {
+    font-weight: 900;
+    color: var(--cor-4);
+    cursor: pointer;
+}
+
+.no-friend-msg {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: #505050;
+}
+
+.messages {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    height: 210px;
+    flex-direction: column-reverse;
+}
+
+.messages::before {
+    content: "";
+    flex-grow: 1;
+}
+
+*::-webkit-scrollbar {
+    width: 8px; 
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--cor-6);
+    border-radius: 10px; 
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-1);
+}
+
+.chat-msg-user-time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cor-1);
+    margin: 0;
+    text-align: end;
+}
+
+.chat-msg-content {
+    color: var(--cor-5);
+    margin-bottom: 4px;
+    text-align: end;
+}
+
+.message-input {
+    background-color: var(--cor-1);
+    font-size: 13px;
+    z-index: 1;
+}
+
+.refresh-icon-tag{
+    color: inherit;
+
+}
+
+.refresh-icon {
+    color: inherit;
+    pointer-events: none;
+    font-size: 20px;
+    text-shadow:
+    0.3px 0 #fff,
+    -0.3px 0 #fff,
+    0 0.3px #fff,
+    0 -0.3px #fff,
+    0.3px 0.3px #fff,
+    -0.3px -0.3px #fff,
+    0.3px -0.3px #fff,
+    -0.3px 0.3px #fff;
+}
+
+.search-icon {
+    font-size: 16px;
+    text-shadow:
+    0.1px 0 black,
+    -0.1px 0 black,
+    0 0.1px black,
+    0 -0.1px black,
+    0.1px 0.1px black,
+    -0.1px -0.1px black,
+    0.1px -0.1px black,
+    -0.1px 0.1px black;
+}
+
+.info-icon, .add-icon, .remove-icon, .block-icon {
+    font-size: 14px;
+    text-shadow:
+    0.1px 0 black,
+    -0.1px 0 black,
+    0 0.1px black,
+    0 -0.1px black,
+    0.1px 0.1px black,
+    -0.1px -0.1px black,
+    0.1px -0.1px black,
+    -0.1px 0.1px black;
+}
+
+.send-icon {
+    font-size: 30px;
+    line-height: 0.5;
+    color: var(--cor-4);
+    pointer-events: none;
+    text-shadow: 0.3px 0 var(--cor-4), -0.3px 0 var(--cor-4),
+                 0 0.3px var(--cor-4), 0 -0.3px var(--cor-4),
+                 0.3px 0.3px var(--cor-4), -0.3px -0.3px var(--cor-4),
+                 0.3px -0.3px var(--cor-4), -0.3px 0.3px var(--cor-4);
+}
+
+button {
+    border: none;
+    background-color: transparent;
+}
+
+/* change_password */
+
+.form-style {
+    background-color: var(--cor-2);
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    color: var(--cor-5);
+}
+
+.form-title {
+    font-family: "Arcade Rounded", sans-serif;
+    background-color: var(--cor-4);
+    font-size: 16px;
+    color: #fff;
+}
+
+.btn-custom {
+    background-color: var(--cor-4);
+}
+
+.btn-custom.disabled {
+    background-color: #505050;
+    pointer-events: none;
+}
+
+.btn-custom:hover {
+    background-color: var(--cor-4);
+    color: #fff;
+    text-shadow:
+    -0.3px -0.3px 0.1em #fff,
+    0.3px -0.3px 0.1em #fff,
+    -0.3px 0.3px 0.1em #fff,
+    0.3px 0.3px 0.1em #fff;
+    text-decoration: none;
+}
+
+.btn-custom-name {
+    color: #fff;
+    font-family: "Arcade Rounded", sans-serif;
+    font-size: 12px;
+}
+
+.btn-custom-name-enter {
+    color: #fff;
+    font-family: "Arcade Rounded", sans-serif;
+    font-size: 10px;
+}
+
+.btn-custom-name-enter:hover {
+    color: #fff;
+    font-family: "Arcade Rounded", sans-serif;
+    font-size: 10px;
+    text-decoration: none;
+}
+
+.btn-custom-play {
+    background-color: var(--cor-4);
+}
+
+.btn-custom-play-name {
+    color: #fff;
+    font-family: "Arcade Rounded", sans-serif;
+    font-size: 13px;
+}
+
+.form-control {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.form-control[name="old_password"],
+.form-control[name="new_password1"], 
+.form-control[name="new_password2"] {
+    letter-spacing: 3px;
+    font-weight: 700;
+}
+
+.alert {
+    font-size: 16px;
+}
+
+
+/* jogar */
+
+.col-play-mode {
+    background-color: var(--cor-2);
+}
+
+.title-play-mode {
+    font-size: 16px;
+}
+
+.play-mode-btn {
+    background-color: var(--cor-6);
+    color: var(--cor-4);
+    font-size: 14px;
+    font-weight: 900;
+    height: 48px;
+    min-width: 168px;
+    border: 2px solid transparent;
+    padding: 0 16px;
+}
+
+.play-mode-btn:hover {
+    background-color: #ececec;
+    color: #156181;
+    border: 2px solid #ececec; /* Adiciona borda sólida */
+    box-shadow: 
+        -0.3px -0.3px 0.2em #ececec,
+        0.3px -0.3px 0.2em #ececec,
+        -0.3px 0.3px 0.2em #ececec,
+        0.3px 0.3px 0.2em #ececec; /* Efeito borrado */
+}
+
+.enter-box-background {
+    background-color: var(--cor-6);
+}
+
+.enter-box {
+    height: 168px;
+    overflow-y: auto;
+}
+
+.enter-box::-webkit-scrollbar {
+    width: 8px; 
+}
+
+.enter-box::-webkit-scrollbar-thumb {
+    background: var(--cor-1);
+    border-radius: 10px; 
+}
+
+.enter-box::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-1);
+}
+
+.enter{
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+}
+
+.enter:hover {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    background-color: var(--cor-1);
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.enter-name {
+    color: var(--cor-5);
+}
+
+.enter-name:hover {
+    font-weight: 900;
+    color: var(--cor-4);
+    cursor: pointer;
+}
+
+.enter-title {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--cor-5);
+    text-align: center;
+}
+
+.create-room-box {
+    background-color: var(--cor-6);
+}
+
+#match-history {
+    max-height: 300px; /* Set the desired max height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-right: 10px; /* Add padding to prevent scrollbars from overlapping content */
+    background-color: #ffffff;
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.scrollable-container::-webkit-scrollbar {
+    width: 8px; /* Customize scrollbar width */
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+    background-color: #888; /* Customize scrollbar thumb color */
+    border-radius: 4px; /* Rounded scrollbar edges */
+}
+
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Change color on hover */
+}
+
+@media (min-width: 520px) {
+    .app-container {
+        min-height: calc(100vh - 126px);
+    }
+
+}
+
+@media (min-width: 768px) {
+
+
+    body {
+        font-size: 16px;
+    }
+
+    .menu-logo {
+        font-size: 25px;
+    }
+
+    .menu-profile-img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .menu-profile-username {
+        font-size: 14px;
+    }
+
+    .rodape-link {
+        font-size: 14px;
+    }
+
+    .app-container {
+        min-height: calc(100vh - 144px);
+    }
+
+    .col-profile {
+        min-width: 220px;
+    }
+
+    .profile-img.friends {
+        display: block;
+    }
+
+    .col-profile.friends {
+        min-width: 160px;
+    }
+
+    .history-box {
+        height: 160px;
+    }
+
+    .profile-img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .text-profile {
+        font-size: 16px;
+    }
+
+    .friends-box {
+        height: 372px;
+    }
+
+    .friends-box.friends {
+        height: 320px;
+    }
+
+    .friend {
+        font-family: 'LT Galaxy Reverse', sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 1.5px;
+    }
+
+    .friend-img {
+        width: 26px;
+        height: 26px;
+        background-color: var(--cor-5);
+    }
+
+    .col-friends,
+    .col-chat {
+        height: 480px;
+    }
+
+    .col-room {
+        height: 420px;
+    }
+
+    .col-friends.friends {
+        height: 418px;
+    }
+
+    .messages {
+        font-family: 'LT Galaxy Reverse', sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 1.5px;
+        height: 384px;
+        overflow-y: auto;
+        flex-direction: column-reverse;
+    }
+
+    .chat-msg-user-time {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--cor-1);
+        margin: 0;
+        text-align: end;
+    }
+
+    .chat-msg-content {
+        color: var(--cor-5);
+        margin-bottom: 4px;
+        text-align: end;
+    }
+
+    .message-input {
+        background-color: var(--cor-1);
+        font-size: 14px;
+    }
+
+    .form-title {
+        font-size: 18px;
+    }
+
+    .btn-custom {
+        font-size: 16px;
+    }
+
+    /* .title-play-mode {
+        font-size: 18px;
+    } */
+    
+    .play-mode-btn {
+        font-size: 14px;
+        height: 56px;
+    }
+/*
+    .col-play-mode {
+        min-width: 390px;
+    } */
+
+    .enter-box-background {
+        height: 240px;
+    }
+
+    .enter-box {
+        height: 200px;
+    }
+
+    .enter-title {
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+    }
+
+    .text-tournament {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+
+
+@media (min-width: 992px) {
+
+    .friends-box.friends {
+        height: 312px;
+    }
+
+    .col-friends.friends {
+        height: 420px;
+    }
+
+    .title {
+        font-size: 16px;
+    }
+
+}
+
+@media (min-width: 992px) {
+
+    .friends-box.friends {
+        height: 312px;
+    }
+
+    .col-friends.friends {
+        height: 420px;
+    }
+
+    .title {
+        font-size: 16px;
+    }
+    
+    .title-play-mode {
+        font-size: 18px;
+    }
+    
+    .play-mode-btn {
+        font-size: 14px;
+        height: 76px;
+    }
+    
+
+}
+
+@media (min-width: 1200px) {
+    .profile-img {
+        width: 240px;
+        height: 240px;
+    }
+
+    .col-friends.friends {
+        height: 460px;
+        min-width: 220px;
+    }
+    
+    .friends-box.friends {
+        height: 352px;
+    }
+    
+    .col-friends.friends {
+        height: 460px;
+        min-width: 220px;
+    }
+    
+    .friends-box.friends {
+        height: 352px;
+    }
+
+    .history-box {
+        height: 200px;
+    }
+
+    .enter-box-background {
+        height: 240px;
+    }
+
+    .profile-div {
+        min-width: 240px;
+    }
+}

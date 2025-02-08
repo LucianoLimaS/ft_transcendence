@@ -1,4 +1,5 @@
 services:
+# mover compose pra raiz
   app:
     image: app
     container_name: app
@@ -17,6 +18,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - django-worker
     restart: always
 
   postgres:
@@ -161,6 +163,7 @@ services:
       - transcendence
     depends_on:
       - app
+      - django-worker
     restart: always
     attach: false
 
@@ -201,6 +204,23 @@ services:
       - redis
     restart: always
     # attach: false
+
+  django-worker:
+    container_name: django-worker
+    image: django-worker
+    build:
+      context: ../
+      dockerfile: srcs/requirements/django-worker/Dockerfile
+    restart: always
+    networks:
+      - transcendence
+    expose:
+      - "6379"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
 
   portainer:
     image: portainer/portainer-ce:alpine-sts

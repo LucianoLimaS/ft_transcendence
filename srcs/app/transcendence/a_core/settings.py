@@ -42,6 +42,7 @@ INTERNAL_IPS = (
 
 INSTALLED_APPS = [
     'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,12 +55,13 @@ INSTALLED_APPS = [
     'cloudinary',
     'django_htmx',
     'a_home',
-    'a_users',
+    'users',
     'a_rtchat',
     'custom_auth',
     #'badges',
     'match',
     'tournaments',
+    'pong.apps.PongConfig',
     #'django_prometheus',
 ]
 

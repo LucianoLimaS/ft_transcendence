@@ -1,0 +1,153 @@
+@import url("https://fonts.cdnfonts.com/css/arcade");
+/* font-family: "Arcade Rounded", sans-serif; */
+
+@import url('https://fonts.cdnfonts.com/css/lt-galaxy-reverse');
+/* font-family: 'LT Galaxy Reverse', sans-serif; */
+
+:root {
+    --cor-1: #ffffff;
+    --cor-2: #e0e0e0;
+    --cor-3: #c0c0c0;
+    --cor-4: #157a8c;
+    --cor-5: #003f69;
+    --cor-6: #260d33;
+
+    --regular: 400;
+    --bold: 700;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--cor-2);
+    font-family: "Arcade Rounded", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+}
+
+.menu {
+    padding: 8px 24px;
+    color: var(--cor-1);
+    background-color: var(--cor-5);
+}
+
+.menu-logo {
+    font-size: 20px;
+    text-shadow: 2px 2px 4px #fff;
+}
+
+.nav-link:hover {
+    text-shadow:
+        -0.3px -0.3px 0.1em #fff,
+        0.3px -0.3px 0.1em #fff,
+        -0.3px 0.3px 0.1em #fff,
+        0.3px 0.3px 0.1em #fff;
+}
+
+.rodape {
+    padding: 16px 24px;
+    background-color: var(--cor-4);
+}
+
+.rodape-link {
+    text-decoration: none;
+    font-size: 12px;
+    color: var(--cor-1);
+}
+
+.rodape-link:hover {
+    color: var(--cor-5);
+}
+
+.app-container {
+    background-color: var(--cor-2);
+    min-height: calc(100vh - 126px);
+}
+
+.form-sign {
+    background-color: var(--cor-3);
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    color: var(--cor-6);
+}
+
+.form-title {
+    font-family: "Arcade Rounded", sans-serif;
+    background-color: var(--cor-5);
+    font-size: 16px;
+    color: #fff;
+}
+
+.btn-custom {
+    background-color: var(--cor-5);
+}
+
+
+.btn-custom:hover {
+    background-color: var(--cor-5);
+    color: #fff;
+    text-shadow:
+    -0.3px -0.3px 0.1em #fff,
+    0.3px -0.3px 0.1em #fff,
+    -0.3px 0.3px 0.1em #fff,
+    0.3px 0.3px 0.1em #fff;
+}
+
+.btn-custom-name {
+    color: #fff;
+    font-family: "Arcade Rounded", sans-serif;
+    font-size: 12px;
+}
+
+.form-control {
+    font-family: 'LT Galaxy Reverse', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.form-control[name="password"],
+.form-control[name="password1"], 
+.form-control[name="password2"] {
+    letter-spacing: 3px;
+    font-weight: 700;
+}
+.alert {
+    font-size: 16px;
+}
+
+
+@media (min-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    .menu-logo {
+        font-size: 25px;
+    }
+
+    .rodape-link {
+        font-size: 14px;
+    }
+
+    .app-container {
+        min-height: calc(100vh - 144px);
+    }
+
+    .form-title {
+        font-size: 18px;
+    }
+
+    .btn-custom {
+        font-size: 16px;
+    }
+}
