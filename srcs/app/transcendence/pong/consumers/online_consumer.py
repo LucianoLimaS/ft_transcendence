@@ -41,6 +41,9 @@ class OnlinePongConsumer(BasePongConsumer):
 
         self.ready_lock = asyncio.Lock()
 
+        self.room_group_name = f"room_{self.scope['user'].username}"  # Exemplo de inicialização
+        # players_data = cache.get(f"{self.room_group_name}_players", [])
+
     # Methods to interact with the database
     async def create_match(self) -> None:
         """

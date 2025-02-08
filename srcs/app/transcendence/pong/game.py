@@ -2,24 +2,18 @@ import random
 import asyncio
 from typing import Dict, Optional, TypedDict
 
-THICKNESS = float(15.0)
-BALL_SPEED = float(5.0)
-MAX_SPEED = float(12.0)
-PADDLE_SPEED = float(BALL_SPEED * 2)
-X = "x"
-Y = "y"
-RIGHT = "right"
-LEFT = "left"
-UP = "up"
-DOWN = "down"
-STOP = "stop"
+THICKNESS = 10
+BALL_SPEED = 4
+MAX_SPEED = 10
+PADDLE_SPEED = 7
 WINNER_SCORE = 3
+WIDTH, HEIGHT = 800, 400  # Dimensões do jogo
+
 
 class BallPosition(TypedDict):
     x: float
     y: float
     size: float
-    center: float
     x_speed: float
     y_speed: float
 
@@ -32,261 +26,138 @@ class PaddlePosition(TypedDict):
 
 
 class GameState(TypedDict):
-    width: int
-    height: int
     ball: BallPosition
     paddle_left: PaddlePosition
     paddle_right: PaddlePosition
-    players: Dict[str, str]
     score: Dict[str, int]
-    winner: Optional[int]
+    winner: Optional[str]
 
 
 class Ball:
-    def __init__(self, width: int, height: int) -> None:
-        """
-        Ball class constructor. Initializes the ball's size, position, and speed.
-        Self x and y coordinates are defined relative to the top-left corner.
-
-        Args:
-            width (int): The width of game are from canvas.
-            height (int): The height of the game area from canvas.
-        """
-        self.size: float = float(THICKNESS)
-        self.center: float = float(self.size / 2)
-        self.base_speed: float = BALL_SPEED
-        self.max_speed: float = MAX_SPEED
-        self.x_start: float = float(width / 2) - self.center
-        self.y_start: float = float(height / 2) - self.center
-        self.y_min_start: int = 6 * THICKNESS
-        self.y_max_start: int = height - (6 * THICKNESS)
-        self.x: float = self.x_start
-        self.y: float = self.y_start
-        self.x_speed: float = float(self.base_speed)
-        self.y_speed: float = float(self.base_speed)
+    def __init__(self) -> None:
+        self.size = 10
+        self.reset()
 
     def move(self) -> None:
-        """
-        Updates the ball's position based on its current speed.
-        """
         self.x += self.x_speed
         self.y += self.y_speed
 
-    def bounce(self, direction: str) -> None:
-        """
-        Reverses the ball's speed in the given direction.
-
-        Args:
-            direction (str): The direction in which to reverse the ball's speed ('x' or 'y').
-        """
-        if direction == X:
-            self.x_speed *= -1
-            self.x_speed *= 1.1
-            if self.x_speed > self.max_speed:
-                self.x_speed = self.max_speed
-        elif direction == Y:
-            self.y_speed *= -1
+    def bounce(self, axis: str) -> None:
+        if axis == "x":
+            self.x_speed = -self.x_speed * 1.1  # Aceleração a cada batida
+            if abs(self.x_speed) > MAX_SPEED:
+                self.x_speed = MAX_SPEED * (1 if self.x_speed > 0 else -1)
+        elif axis == "y":
+            self.y_speed = -self.y_speed
 
     def reset(self) -> None:
-        """
-        Reset the ball to the center of the game area with a random y position and speed.
-        """
-        self.x = self.x_start
-        self.y = float(random.randint(int(self.y_min_start), int(self.y_max_start)))
-        self.x_speed = self.base_speed
-        if random.randint(0, 1) == 0:
-            self.bounce(X)
-        angle = random.choice([0,1,2])
-        if angle == 0:
-            self.y_speed = 1.2 * self.base_speed
-        elif angle == 1:
-            self.y_speed = self.base_speed
-        elif angle == 2:
-            self.y_speed = 0.8 * self.base_speed
+        self.x = WIDTH / 2
+        self.y = HEIGHT / 2
+        self.x_speed = random.choice([-BALL_SPEED, BALL_SPEED])
+        self.y_speed = random.choice([-BALL_SPEED, BALL_SPEED])
 
 
 class Paddle:
-    def __init__(self, width: int, height: int, side: str) -> None:
-        """
-        Paddle class constructor. Initializes the paddle's position, size, and movement speed.
-
-        Args:
-            width (int): The width of the game area.
-            height (int): The height of the game area.
-            side (str): The side the paddle is on ('left' or 'right').
-        """
-        self.width: float = float(THICKNESS)
-        self.height: float = 120.0
-        self.top_limit: float = float(THICKNESS)
-        self.bottom_limit: float = float(height - self.height - THICKNESS)
-        self.y: float = float(height / 2) - (self.height / 2)
-        if side == LEFT:
-            self.x: float = float(THICKNESS * 2)
-        else:
-            self.x: float = float(width - self.width - (THICKNESS * 2))
-        self.speed: float = 0.0
-
-    async def set_speed(self, direction: str) -> None:
-        """
-        Sets the paddle's speed based on the direction of movement.
-
-        Args:
-            direction (str): The direction to move the paddle ('up', 'down', or 'stop').
-        """
-        if direction == UP:
-            self.speed = -PADDLE_SPEED
-        elif direction == DOWN:
-            self.speed = PADDLE_SPEED
-        elif direction == STOP:
-            self.speed = 0
-
-    def limit(self) -> None:
-        """
-        Limits the paddle's movement to prevent it from moving outside the game area.
-        """
-        if self.y <= self.top_limit:
-            self.y = self.top_limit
-
-        if self.y >= self.bottom_limit:
-            self.y = self.bottom_limit
+    def __init__(self, x: float) -> None:
+        self.width = 10
+        self.height = 80
+        self.x = x
+        self.y = HEIGHT / 2 - self.height / 2
+        self.speed = 0
 
     def move(self) -> None:
-        """
-        Updates the paddle's position based on its speed and applies movement limits.
-        """
         self.y += self.speed
-        self.limit()
+        self.y = max(0, min(self.y, HEIGHT - self.height))  # Impede sair da tela
 
 
 class PongGame:
-    def __init__(self, width: int, height: int) -> None:
-        """
-        PongGame class constructor. Initializes the game area, ball, and paddles.
+    def __init__(self, singleplayer: bool) -> None:
+        self.ball = Ball()
+        self.paddle_left = Paddle(10)
+        self.paddle_right = Paddle(WIDTH - 20)
+        self.score = {"left": 0, "right": 0}
+        self.winner = None
+        self.singleplayer = singleplayer
 
-        Args:
-            width (int): The width of the game area.
-            height (int): The height of the game area.
-        """
-        self.width: int = width
-        self.height: int = height
-        self.ball: Ball = Ball(width, height)
-        self.paddle_left: Paddle = Paddle(width, height, LEFT)
-        self.paddle_right: Paddle = Paddle(width, height, RIGHT)
-        self.score: Dict[str, int] = {"left": 0, "right": 0}
-        self.winner: Optional[str] = None
-        self.lock: asyncio.Lock = asyncio.Lock()
+    def move_ai(self) -> None:
+        if self.ball.x_speed > 0:  # A IA só se move quando a bola vem para o lado dela
+            if self.ball.y > self.paddle_right.y + self.paddle_right.height / 2:
+                self.paddle_right.y += min(PADDLE_SPEED, HEIGHT - self.paddle_right.y - self.paddle_right.height)
+            elif self.ball.y < self.paddle_right.y + self.paddle_right.height / 2:
+                self.paddle_right.y -= min(PADDLE_SPEED, self.paddle_right.y)
 
-    def update_score(self, side: str) -> None:
-        """
-        Updates the score for the given side and checks if a player has won.
-        """
-        self.score[side] += 1
-        if self.score[side] == WINNER_SCORE:
-            self.winner = side
+    def check_collisions(self) -> None:
+        # Colisão com o topo e a base
+        if self.ball.y - self.ball.size <= 0 or self.ball.y + self.ball.size >= HEIGHT:
+            self.ball.bounce("y")
 
-    async def paddle_on(self, paddle: str, direction: str) -> None:
-        """
-        Activates the paddle's movement based on the key pressed.
-
-        Args:
-            paddle (str): The paddle to move ('left' or 'right').
-            direction (str): The direction to move the paddle ('up' or 'down').
-        """
-        async with self.lock:
-            if paddle == "left":
-                await self.paddle_left.set_speed(direction)
-            if paddle == "right":
-                await self.paddle_right.set_speed(direction)
-
-    async def paddle_off(self, paddle: str) -> None:
-        """
-        Stops the paddle's movement when the key is released.
-
-        Args:
-            paddle(str): The paddle to stop ('left' or 'right').
-        """
-        async with self.lock:
-            if paddle == "left":
-                await self.paddle_left.set_speed(STOP)
-            elif paddle == "right":
-                await self.paddle_right.set_speed(STOP)
-
-    def calculate_ball_colision(self) -> None:
-        """
-        Checks if the ball hits the top or bottom boundaries and bounces it.
-        Resets the ball if it hits the left or right boundaries.
-        """
-        if self.ball.y <= THICKNESS or self.ball.y + self.ball.size >= (
-            self.height - THICKNESS
+        # Colisão com a raquete esquerda
+        if (
+            self.ball.x - self.ball.size <= self.paddle_left.x + self.paddle_left.width
+            and self.paddle_left.y <= self.ball.y <= self.paddle_left.y + self.paddle_left.height
         ):
-            self.ball.bounce(Y)
-        if self.ball.x <= 0:
-            self.update_score(RIGHT)
+            self.ball.bounce("x")
+
+        # Colisão com a raquete direita
+        if (
+            self.ball.x + self.ball.size >= self.paddle_right.x
+            and self.paddle_right.y <= self.ball.y <= self.paddle_right.y + self.paddle_right.height
+        ):
+            self.ball.bounce("x")
+
+        # Pontuação
+        if self.ball.x - self.ball.size <= 0:
+            self.score["right"] += 1
             self.ball.reset()
-        if self.ball.x + self.ball.size >= self.width:
-            self.update_score(LEFT)
+        elif self.ball.x + self.ball.size >= WIDTH:
+            self.score["left"] += 1
             self.ball.reset()
 
-    def calculate_paddle_colision(self) -> None:
-        """
-        Checks if the ball hits the paddles and bounces it.
-        """
-        if self.paddle_left.x <= self.ball.x <= self.paddle_left.x + self.paddle_left.width:
-            if self.paddle_left.y <= self.ball.y <= self.paddle_left.y + self.paddle_left.height:
-                self.ball.bounce(X)
-                self.ball.x = self.paddle_left.x + self.paddle_left.width
+        # Verifica se há um vencedor
+        if self.score["left"] >= WINNER_SCORE:
+            self.winner = "left"
+        elif self.score["right"] >= WINNER_SCORE:
+            self.winner = "right"
+    
+    def paddle_on(self, paddle: str, direction: str) -> None:
+        """Ativa o movimento de uma paddle (para cima ou para baixo)."""
+        if paddle == "left":
+            if direction == "up":
+                self.paddle_left.speed = -PADDLE_SPEED
+            elif direction == "down":
+                self.paddle_left.speed = PADDLE_SPEED
+        elif paddle == "right":
+            if direction == "up":
+                self.paddle_right.speed = -PADDLE_SPEED
+            elif direction == "down":
+                self.paddle_right.speed = PADDLE_SPEED
 
-        if self.paddle_right.x <= self.ball.x + self.ball.size <= self.paddle_right.x + self.paddle_right.width:
-            if self.paddle_right.y <= self.ball.y <= self.paddle_right.y + self.paddle_right.height:
-                self.ball.bounce(X)
-                self.ball.x = self.paddle_right.x - self.ball.size
+    def paddle_off(self, paddle: str) -> None:
+        """Desativa o movimento de uma paddle (para que ela pare)."""
+        if paddle == "left":
+            self.paddle_left.speed = 0
+        elif paddle == "right":
+            self.paddle_right.speed = 0
 
-
-    def check_colisions(self) -> None:
-        """
-        Checks for collisions between the ball and the paddles.
-        """
-        self.calculate_ball_colision()
-        self.calculate_paddle_colision()
-
-    def move_objects(self) -> None:
-        """
-        Moves the ball and paddles based on their current speeds.
-        """
-        self.ball.move()
-        self.paddle_left.move()
-        self.paddle_right.move()
-
-    async def calculate_game_tick(self) -> GameState:
-        """
-        Checks for collisions and moves the objects in the game if the game has no winner.
-        Returns the current state of the game.
-        """
-        async with self.lock:
-            self.check_colisions()
-            # just do next move if the game is not finished, so don't have a winner
-            if not self.has_winner():
-                self.move_objects()
+    async def game_tick(self) -> GameState:
+        if self.winner:
             return await self.get_game_state()
-
-    def has_winner(self) -> bool:
-        """
-        Checks if a player has reached the winning score.
-        """
-        return bool(self.winner)
+        
+        self.paddle_left.move()
+        if self.singleplayer:
+            self.move_ai()
+        self.paddle_right.move()
+        self.ball.move()
+        self.check_collisions()
+        
+        return await self.get_game_state()
 
     async def get_game_state(self) -> GameState:
-        """
-        Returns the current state of the game.
-        """
         return {
-            "width": self.width,
-            "height": self.height,
             "ball": {
                 "x": self.ball.x,
                 "y": self.ball.y,
                 "size": self.ball.size,
-                "center": self.ball.center,
                 "x_speed": self.ball.x_speed,
                 "y_speed": self.ball.y_speed,
             },
