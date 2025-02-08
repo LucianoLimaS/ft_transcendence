@@ -71,13 +71,14 @@ class Paddle:
 
 
 class PongGame:
-    def __init__(self, singleplayer: bool) -> None:
+    def __init__(self, singleplayer: bool, dificulty:int) -> None:
         self.ball = Ball()
         self.paddle_left = Paddle(10)
         self.paddle_right = Paddle(WIDTH - 20)
         self.score = {"left": 0, "right": 0}
         self.winner = None
         self.singleplayer = singleplayer
+        self.dificulty = dificulty
 
     def move_ai(self) -> None:
         if self.ball.x_speed > 0:  # A IA só se move quando a bola vem para o lado dela
