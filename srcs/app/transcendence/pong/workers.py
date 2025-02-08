@@ -42,7 +42,10 @@ class PongGameWorker(AsyncConsumer):
             height: int = message["height"]
 
             if room_id not in self.sessions:
-                game = PongGame(singleplayer=False)
+                # game = PongGame(singleplayer=False)
+                # game = PongGame(singleplayer=True, difficulty="easy")
+                # game = PongGame(singleplayer=True, difficulty="normal")
+                game = PongGame(singleplayer=True, difficulty="hard")
                 self.sessions[room_id] = GameSession(game=game)
                 logger.info(f"Game initialized for room {room_id}")
 
