@@ -159,8 +159,8 @@ down:
 # ======================
 
 service:
-	@docker compose -f ./srcs/docker-compose.yml down --volumes --rmi local $(name) 
-	@docker compose -f ./srcs/docker-compose.yml up -d --build $(name)
+	@docker compose -f ./srcs/docker-compose-dev.yml down --volumes --rmi local $(name) 
+	@docker compose -f ./srcs/docker-compose-dev.yml up -d --build $(name)
 
 restart:
 	@docker compose -f ./srcs/docker-compose.yml restart $(name)

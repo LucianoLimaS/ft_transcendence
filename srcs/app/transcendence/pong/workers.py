@@ -5,26 +5,22 @@ from typing import Dict, Optional
 
 from channels.consumer import AsyncConsumer
 
-from .game import PongGame
+from .game import PongGame  # Garantir que isso seja o caminho correto
 
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class GameSession:
     """
     Represents a game session with its game instance and associated task.
     """
-
     game: PongGame
     task: Optional[asyncio.Task] = None
-
 
 class PongGameWorker(AsyncConsumer):
     """
     Worker that handles the game logic and communication with the websocket group
     """
-
     def __init__(self, *args, **kwargs):
         """
         Initializes the worker with empty dictionaries to store game sessions.
@@ -46,7 +42,7 @@ class PongGameWorker(AsyncConsumer):
             height: int = message["height"]
 
             if room_id not in self.sessions:
-                game = PongGame(width, height)
+                game = PongGame(singleplayer=False)
                 self.sessions[room_id] = GameSession(game=game)
                 logger.info(f"Game initialized for room {room_id}")
 
@@ -77,10 +73,9 @@ class PongGameWorker(AsyncConsumer):
                 return
 
             while room_id in self.sessions:
-                game_state = await session.game.calculate_game_tick()
+                game_state = await session.game.game_tick()
                 logger.debug(f"Game state for room {room_id}: {game_state}")
 
-                # Send game state to clients
                 await self.channel_layer.group_send(
                     room_group_name,
                     {
@@ -89,8 +84,7 @@ class PongGameWorker(AsyncConsumer):
                     },
                 )
 
-                # checks if game has a winner and send to clients
-                if session.game.has_winner():
+                if session.game.winner:
                     await self.channel_layer.group_send(
                         room_group_name,
                         {
@@ -101,7 +95,6 @@ class PongGameWorker(AsyncConsumer):
                     await self.cleanup_game(room_id)
                     break  # Exit the loop since the game has ended
 
-                # Sleep to simulate game tick rate (e.g., 60 FPS)
                 await asyncio.sleep(0.016)
         except Exception as e:
             logger.exception(f"Error in game loop for room {room_id}: {e}")
@@ -118,7 +111,6 @@ class PongGameWorker(AsyncConsumer):
             room_id: str = message["room_id"]
             room_group_name: str = message["room_group_name"]
 
-            # Initialize the game if not already initialized
             if room_id not in self.sessions:
                 await self.initialize_game(message)
 
@@ -127,7 +119,6 @@ class PongGameWorker(AsyncConsumer):
                 logger.warning(f"No game session found for room {room_id}")
                 return
 
-            # Start the game loop task if not already started
             if not session.task or session.task.done():
                 session.task = asyncio.create_task(
                     self.start_game_loop(room_id, room_group_name)
@@ -149,11 +140,25 @@ class PongGameWorker(AsyncConsumer):
             state: bool = message["state"]
 
             session: Optional[GameSession] = self.sessions.get(room_id)
-            if session:
+            if not session:
+                logger.warning(f"No session found for room {room_id}")
+                return
+
+            if session.game is None:
+                logger.warning(f"Game object is None for room {room_id}")
+                return
+
+            if hasattr(session.game.paddle_on, '__call__') and asyncio.iscoroutinefunction(session.game.paddle_on):
                 if state:
                     await session.game.paddle_on(paddle, direction)
                 else:
                     await session.game.paddle_off(paddle)
+            else:
+                if state:
+                    session.game.paddle_on(paddle, direction)  # Sem await
+                else:
+                    session.game.paddle_off(paddle)  # Sem await
+
         except Exception as e:
             logger.exception(
                 f"Failed to update paddle positions for room {room_id}: {e}"
@@ -183,11 +188,9 @@ class PongGameWorker(AsyncConsumer):
         try:
             session: Optional[GameSession] = self.sessions.get(room_id)
             if session:
-                # cancel the task it it's running
                 if session.task and not session.task.cancelled():
                     session.task.cancel()
                     logger.info(f"Game task cancelled for room {room_id}")
-                # remove the session
                 del self.sessions[room_id]
                 logger.info(f"Game session deleted for room {room_id}")
             else:

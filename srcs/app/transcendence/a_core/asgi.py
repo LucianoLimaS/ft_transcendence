@@ -9,16 +9,17 @@ https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 
 import os
 from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter, URLRouter, ChannelNameRouter
 from django.core.asgi import get_asgi_application
 from channels.security.websocket import AllowedHostsOriginValidator
 import a_rtchat.routing
 import match.routing
-from pong.routing import channel_routing, ws_pong_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'a_core.settings')
 
 django_asgi_app = get_asgi_application()
+
+from pong.routing import channel_routing, ws_pong_application
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
@@ -29,4 +30,5 @@ application = ProtocolTypeRouter({
             )
         )
     ),
+    "channel": ChannelNameRouter(channel_routing),
 })
