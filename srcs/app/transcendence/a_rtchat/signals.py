@@ -25,5 +25,17 @@ def create_admin_user(sender, **kwargs):
             User.objects.create_superuser(
                 username='admin',
                 email='admin@admin.com',
-                password='admin'
+                password='admin',
+                first_name='Admin',
             )
+        for i in range(1, 5):
+            username = f'teste{i}'
+            email = f'teste{i}@teste.com'
+            if not User.objects.filter(username=username).exists():
+                print(f"Criando usuário {username}")
+                User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password='teste',
+                    first_name=f'Teste {i}',
+                )

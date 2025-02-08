@@ -18,18 +18,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from a_users.views import profile_view
+from users.views import profile_view
 from a_home.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     #path('accounts/', include('allauth.urls')),
     path('', include('a_rtchat.urls')),
-    path('profile/', include('a_users.urls')),
+    path('profile/', include('users.urls')),
     path('@<username>/', profile_view, name="profile"),
     path('auth/', include('custom_auth.urls')),  # Inclua suas rotas de autenticação
     path('', include('django_prometheus.urls')),  # Monitoramento
     path('', include('match.urls')),  # Adicione isso para incluir as URLs do jogo
+    path("", include("pong.urls")),
 ]
 
 # Only used when DEBUG=True, whitenoise can serve files when DEBUG=False

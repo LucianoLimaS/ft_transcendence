@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from a_users.models import User
+from users.models import User
 
 class Tournaments(models.Model):
     name = models.CharField(max_length=100)

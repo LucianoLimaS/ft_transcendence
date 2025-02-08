@@ -1,0 +1,119 @@
+{% extends 'pong/base_app.html' %}
+{% load static %}
+{% block content %}
+    <div class="row app-row justify-content-center gap-4 gap-md-5 px-3 px-md-4 px-lg-5">
+        <div class="col-room col col-11 col-sm-9 col-md-8 col-lg-7 col-xl-6 p-0 rounded-4">
+            {% if game_mode == GameMode.TOURNAMENT %}
+            <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
+                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Rooms</p>
+                <a class="refresh-icon-tag text-decoration-none" href="/enter/tournament/" data-link>
+                    <i class="refresh-icon mb-1 bi bi-arrow-clockwise"></i>
+                </a>
+            </div>
+            <div class="create-room-box rounded-4 p-2 m-2">
+                <form
+                action="{% url 'pong:pongenter' game_mode='tournament' %}"
+                formType="createTournamentForm"
+                method="post"
+                api-link>
+                    {% csrf_token %}
+                    <div>
+                        <p class="enter-title m-0">Create a room</p>
+                        <div class="search d-flex flex-row align-items-center rounded-5 mb-2">
+                        {{ form.name.label_tag }}
+                        </div>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.name.errors %}
+                                    {{ error }}
+                                    <br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-custom mt-2" type="submit" name="max_players" value="4">
+                                <p class="btn-custom-name-enter m-0">4 Players</p>
+                            </button>
+                            <button class="btn btn-custom mt-2" type="submit" name="max_players" value="8">
+                                <p class="btn-custom-name-enter m-0">8 Players</p>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="enter-box-background rounded-4 p-2 m-2">
+                <p class="enter-title m-0">Rooms</p>
+                <div class="enter-box d-flex flex-column justify-content-start overflow-y-auto rounded-4">
+                    {% if tournaments %}
+                        {% for t in tournaments %}
+                        <div class="enter d-flex flex-row align-items-center justify-content-center gap-2 px-2 py-1 mb-1 mx-1 rounded-5">
+                            <div class="d-flex flex-row align-items-center gap-3">
+                                <a class="enter-name m-0 mt-1 d-flex text-decoration-none" href="/tournament/{{ t.id }}/" data-link>
+                                    {{ t.name }} - max players: {{ t.max_players }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-friend-msg my-2 text-nowrap d-flex justify-content-center">No active tournaments available!</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% else %}
+            <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
+                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Rooms</p>
+                <a class="refresh-icon-tag text-decoration-none" href="/enter/online/" data-link>
+                    <i class="refresh-icon mb-1 bi bi-arrow-clockwise"></i>
+                </a>
+            </div>
+            <div class="create-room-box rounded-4 p-2 m-2">
+                <form
+                action="{% url 'pong:pongenter' game_mode='online' %}"
+                formType="createRoomForm"
+                method="post"
+                api-link>
+                    {% csrf_token %}
+                    <div>
+                    {% for field in form %}
+                        <p class="enter-title m-0">Create a room</p>
+                        <div class="search d-flex flex-row align-items-center rounded-5 mb-2">
+                            {{ field.label_tag }}
+                        </div>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">{{ field.errors.as_text }}</div>
+                        {% endif %}
+                        {% endfor %}
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-custom mt-2" type="submit" name="max_players">
+                                <p class="btn-custom-name-enter m-0">Create</p>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div>
+            <div class="enter-box-background rounded-4 p-2 m-2">
+                <p class="enter-title m-0">Rooms</p>
+                <div class="enter-box d-flex flex-column justify-content-start overflow-y-auto rounded-4">
+                    {% if rooms %}
+                        {% for room in rooms %}
+                        <div class="enter d-flex flex-row align-items-center justify-content-center gap-2 px-2 py-1 mb-1 mx-1 rounded-5">
+                            <div class="d-flex flex-row align-items-center gap-3">
+                                <a class="enter-name m-0 mt-1 d-flex text-decoration-none" href="{% url 'pong:pongroom' room.id %}" data-link>
+                                    {{ room.name }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="no-friend-msg my-2 text-nowrap d-flex justify-content-center">No active rooms found!</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

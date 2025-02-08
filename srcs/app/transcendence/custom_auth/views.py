@@ -25,6 +25,7 @@ class CustomLoginView(LoginView):
 def signup(request):
     if request.method == 'POST':
         username = request.POST.get('username')
+        first_name = request.POST.get('first_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
@@ -35,6 +36,7 @@ def signup(request):
             'e-mail': email,
             'password': password,
             'confirm password': confirm_password,
+            'first name': first_name,
         }
         are_empty, message = are_fields_empty(fields)
         if are_empty:
@@ -43,7 +45,7 @@ def signup(request):
             return render(request, "response.html", {"messages": messages.get_messages(request)})
 
         if password != confirm_password:
-            messages.add_message(request, constants.ERROR, getTranslated("As senhas não conferem"))
+            messages.add_message(request, constants.ERROR, getTranslated("Passwords do not match"))
             # Passa o objeto messages para o template
             return render(request, "response.html", {"messages": messages.get_messages(request)})
         
@@ -70,7 +72,7 @@ def signup(request):
             username = username,
             email = email,
             password = password,
-            first_name = "",
+            first_name = first_name,
             last_name = "",
             )
         user.save()
