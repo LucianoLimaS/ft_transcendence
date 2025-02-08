@@ -19,4 +19,5 @@ urlpatterns = [
     path("user/history/", views.UserHistoryView.as_view(), name="user_history"),
     path("tournamenthistory/<int:user_id>/", views.UserTournamentHistoryView.as_view(), name="tournament_history"),
     path("matchhistory/<int:user_id>/", views.UserMatchHistoryView.as_view(), name="match_history"),
+    path("config_nbr_players/", views.PongSelectNbrPlayers.as_view(), name="config_nbr_players"),
 ]

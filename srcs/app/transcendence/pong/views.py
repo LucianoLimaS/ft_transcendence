@@ -28,6 +28,7 @@ class PongSelectGameMode(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         game_mode = request.POST.get("game_mode")
         logger.info(f"Selected game_mode: {game_mode}")
+        print(GameMode)
         if game_mode == GameMode.LOCAL.value:
             room_name = f"Local-{get_random_string(8)}"
             room = PongRoom.objects.create(
@@ -38,10 +39,22 @@ class PongSelectGameMode(LoginRequiredMixin, TemplateView):
                 "room_id": room.id,
             })
             return response
+        elif game_mode == "select_dificulty":
+            return redirect("pong:config_nbr_players")
         else:
             logger.info(f"Redirecting to PongEnterView with game_mode: {game_mode}")
             return redirect("pong:pongenter", game_mode=game_mode)
 
+class PongSelectNbrPlayers(LoginRequiredMixin, TemplateView) :
+    template_name = "pong/config_nbr_players.html"
+    def get(self, request, *args, **kwargs):
+        context = {"GameMode": GameMode.as_dict()}
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return render(request, "pong/config_nbr_players.html", context)
+        return render(request, self.template_name, context)
+    def post(self, request, *args, **kwargs):
+        context = {"GameMode": GameMode.as_dict()}
+        return render(request, self.template_name, context)
 
 class PongEnterView(LoginRequiredMixin, TemplateView):
     template_name = "pong/enter.html"

@@ -11,14 +11,11 @@
                 formType="localGameForm"
                 api-link>
                 {% csrf_token %}
-                <input type="hidden" name="game_mode" value="select_dificulty">
+                <input type="hidden" name="game_mode" value="{{ GameMode.LOCAL }}">
                 <button class="play-mode-btn rounded-4 col-11 col-sm-9" type="submit" api-link>
-                    <p class="d-flex justify-content-center m-0">Match</p>
+                    <p class="d-flex justify-content-center m-0">HERE!!!</p>
                 </button>
             </form>
-            <a href="http://localhost/config_nbr_players" class="play-mode-btn rounded-4 col-11 col-sm-9" type="submit" api-link>
-                <p class="d-flex justify-content-center m-0">TESTE</p>
-            </a>
             <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
                 <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none" href="/enter/localtournament/" data-link>
                     Tournament
