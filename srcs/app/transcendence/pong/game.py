@@ -125,16 +125,19 @@ class PongGame:
                     self.paddle_right.y = max(self.paddle_right.y - int(PADDLE_SPEED * 1.2), 0)
 
     def check_collisions(self) -> None:
+        # Colisão com a parede superior e inferior
         if self.ball.y - self.ball.size <= 0 or self.ball.y + self.ball.size >= HEIGHT:
             self.ball.bounce("y")
 
+        # Colisão com o paddle esquerdo (considerando apenas a borda esquerda da bola)
         if (
-            self.ball.x - self.ball.size <= self.paddle_left.x + self.paddle_left.width
+            self.ball.x - self.ball.size <= self.paddle_left.x + self.paddle_left.width - 10
             and self.paddle_left.y <= self.ball.y <= self.paddle_left.y + self.paddle_left.height
             and self.ball.x_speed < 0
         ):
             self.ball.bounce("x")
 
+        # Colisão com o paddle direito
         if (
             self.ball.x + self.ball.size >= self.paddle_right.x
             and self.paddle_right.y <= self.ball.y <= self.paddle_right.y + self.paddle_right.height
@@ -142,18 +145,20 @@ class PongGame:
         ):
             self.ball.bounce("x")
 
-        if self.ball.x - self.ball.size <= 0:
+        # Atualiza o placar
+        if self.ball.x - self.ball.size <= 0:  # A bola passou pelo paddle esquerdo
             self.score["right"] += 1
             self.ball.reset()
-        elif self.ball.x + self.ball.size >= WIDTH:
+        elif self.ball.x + self.ball.size >= WIDTH:  # A bola passou pelo paddle direito
             self.score["left"] += 1
             self.ball.reset()
 
+        # Verifica se algum jogador ganhou
         if self.score["left"] >= WINNER_SCORE:
             self.winner = "left"
         elif self.score["right"] >= WINNER_SCORE:
             self.winner = "right"
-    
+
     def paddle_on(self, paddle: str, direction: str) -> None:
         if paddle == "left":
             if direction == "up":
