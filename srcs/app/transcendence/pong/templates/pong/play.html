@@ -1,0 +1,41 @@
+{% extends 'pong/base_app.html' %}
+{% load static %}
+{% block content %}
+<div class="row app-row justify-content-center gap-2 gap-md-5 px-1 px-md-2 px-lg-3 gap-2">
+    <div class="col-play-mode col col-12 col-lg-5 p-0 mx-2 d-flex flex-column rounded-4 mb-4 mb-md-0">
+        <p class="title title-play-mode rounded-top-4 text-center m-0 p-2 py-2">Local game</p>
+        <div class="mode d-flex flex-column flex-lg-row justify-content-center py-1 py-md-1">
+            <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
+                id="gameModeForm"
+                method="post"
+                formType="localGameForm"
+                api-link>
+                {% csrf_token %}
+                <input type="hidden" name="game_mode" value="{{ GameMode.LOCAL }}">
+                <button class="play-mode-btn rounded-4 col-11 col-sm-9" type="submit" api-link>
+                    <p class="d-flex justify-content-center m-0">Match</p>
+                </button>
+            </form>
+            <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
+                <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none" href="/enter/localtournament/" data-link>
+                    Tournament
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-play-mode col col-12 col-lg-5 p-0 mx-2 d-flex flex-column rounded-4">
+        <p class="title title-play-mode rounded-top-4 text-center m-0 p-2 py-2">Online game</p>
+        <div class="mode d-flex flex-column flex-lg-row justify-content-center py-1 py-md-1">
+            <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
+                <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none" href="/enter/online/" data-link>
+                    Match
+                </a>
+            </div>
+            <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
+                <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none" href="/enter/tournament/" data-link>
+                    Tournament
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

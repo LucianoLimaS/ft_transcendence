@@ -1,0 +1,4 @@
+<a href="{% url 'tournament_detail' tournament_id=tournament.id %}">
+    {{ tournament.name }} - {{ tournament.size }} Jogadores - Criado por: {{ tournament.created_by.username }} - Participantes: {{ tournament.participants.count }}/{{ tournament.size}}
+    
+    </a>

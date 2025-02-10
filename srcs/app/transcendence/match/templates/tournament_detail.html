@@ -1,0 +1,10 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+    <h1>Detalhes do Torneio: {{ tournament.name }}</h1>
+
+    <div id="tournament-detail-container">
+        {% include 'partials/tournament_detail.html' %}
+    </div>
+    
+{% endblock %}

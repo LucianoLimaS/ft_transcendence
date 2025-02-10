@@ -125,3 +125,6 @@ msgstr "E-mail já cadastrado"
 
 msgid "User already registered"
 msgstr "Usuário já cadastrado"
+
+msgid "First name:"
+msgstr "Nome:"

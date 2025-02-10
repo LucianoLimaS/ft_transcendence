@@ -1,0 +1,11 @@
+{% if tournaments %}
+    <ul>
+    {% for tournament in tournaments %}
+            <li >
+            {% include 'partials/tournament_item.html' %}
+            </li>
+    {% endfor %}
+    </ul>
+    {% else %}
+    <p>Nenhum torneio disponível.</p>
+    {% endif %}

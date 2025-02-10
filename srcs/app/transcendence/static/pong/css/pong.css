@@ -1,0 +1,84 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+}
+
+.section_enter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    padding: 2rem;
+}
+
+canvas {
+    display: block;
+}
+
+
+/* Estilos do Bracket */
+.bracket-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    margin-top: 40px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.round {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 200px;
+}
+
+.round h4 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #343a40;
+}
+
+.match {
+    border: 2px solid #6c757d;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    position: relative;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.match.finished {
+    background-color: #d4edda;
+    border-color: #28a745;
+}
+
+.match p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.match .winner {
+    font-weight: bold;
+    color: #155724;
+}
+
+.match button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.match button:hover {
+    background-color: #0056b3;
+}

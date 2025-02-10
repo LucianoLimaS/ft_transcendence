@@ -1,0 +1,31 @@
+<p>Criado por: {{ tournament.created_by.username }}</p>
+    <p>Tamanho: {{ tournament.size }} Jogadores</p>
+    <p>Participantes: {{ tournament.participants.count }}/{{ tournament.size}}</p>
+
+    <h2>Participantes:</h2>
+    <ul id="participant-list">
+        {% for participant in tournament.participants.all %}
+                {% include 'partials/participant_item.html' with participant=participant %}
+        {% endfor %}
+    </ul>
+
+    {% if not tournament.is_full and not user_is_participant %}
+    <form method="post" hx-post="{% url 'tournament_detail' tournament_id=tournament.id %}" hx-target="#tournament-detail-container" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button type="submit">Participar</button>
+    </form>
+    {% endif %}
+
+    {% if matches %}
+        <h2>Chaves do Torneio</h2>
+        <div id="match-container">
+            {% for round in matches %}
+            <h3>Rodada {{ forloop.counter }}</h3>
+            <ul>
+                {% for match in round %}
+                    {% include 'partials/match_item.html' with match=match %}
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </div>
+    {% endif %}
