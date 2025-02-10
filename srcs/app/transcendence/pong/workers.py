@@ -45,7 +45,14 @@ class PongGameWorker(AsyncConsumer):
             if room_id not in self.sessions:
                 # Criando o Lock para a sessão
                 lock = asyncio.Lock()
-                game = PongGame(singleplayer=True, difficulty="hard")
+                # local
+                # game = PongGame(singleplayer=False)
+                # local + IA
+                # game = PongGame(singleplayer=True, difficulty="easy")
+                game = PongGame(singleplayer=True, difficulty="normal")
+                # game = PongGame(singleplayer=True, difficulty="hard")
+                #online
+                # game = PongGame(singleplayer=False)
                 self.sessions[room_id] = GameSession(game=game, lock=lock)
                 logger.info(f"Game initialized for room {room_id}")
 
