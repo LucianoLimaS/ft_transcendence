@@ -105,7 +105,7 @@ services:
     attach: false
 
   minio:
-    image: bitnami/minio:2025.2.7-debian-12-r1
+    image: minio/minio:RELEASE.2025-02-07T23-21-09Z-cpuv1
     container_name: minio
     env_file:
       - ./srcs/.env
