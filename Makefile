@@ -134,62 +134,93 @@ all:
 	if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
 		$(MAKE) --no-print-directory setup; \
 	fi;
-	@printf "🔧 Launching ${name}...\n"
+	@echo -e "🔧 Launching ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
 
 build:
-	@printf "🔧 Building ${name}...\n"
+	@echo -e "🔧 Building ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
-	@docker compose -f ./docker-compose.yml build
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Building development ${name}..."; \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env build; \
+	else \
+		echo "🔧 Building production environment...\n"; \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env build; \
+	fi
 
 dev:
-	@printf "🔧 Launching development for ${name}...\n"
+	@echo -e "🔧 Launching development for ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up --build
 
 down:
-	@printf "🔧 Stopping ${name}...\n"
-	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env down
+	@echo -e "🔧 Stopping ${name}..."
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Stopping development environment..."; \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down; \
+	else \
+		echo "🔧 Stopping production environment..."; \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down; \
+	fi
 
 # ======================
 # Additional Docker Services
 # ======================
 
 service:
-	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local $(name) 
-	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up -d --build $(name)
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up -d --build $(name); \
+	else \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build $(name); \
+	fi
 
 restart:
-	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env restart $(name)
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env restart $(name); \
+	else \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env restart $(name); \
+	fi
 
 getin:
-	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env exec -it $(name) sh 
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env exec -it $(name) sh; \
+	else \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env exec -it $(name) sh; \
+	fi
 
 # ======================
 # Cleaning
 # ======================
 
-clean: 
-	@printf "🔧 Cleaning ${name}...\n"
-	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes
-	@$(MAKE) --no-print-directory clean-host
-
-cleandev: clean
-	@printf "🔧 Cleaning development for ${name}...\n"
-	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local
+clean:
+	@echo -e "🔧 Cleaning ${name}..."
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Cleaning development environment..."; \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local; \
+	else \
+		echo "🔧 Cleaning production environment..."; \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi local; \
+	fi
 	@$(MAKE) --no-print-directory clean-host
 
 fclean:
-	@printf "🔧 Full cleaning of ${name}...\n"
-	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --rmi all --volumes --remove-orphans
-	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --rmi all --volumes --remove-orphans
+	@echo -e "🔧 Full cleaning of ${name}..."
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Full cleaning of development environment..."; \
+		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi all; \
+	else \
+		echo "🔧 Full cleaning of production environment..."; \
+		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi all; \
+	fi
 	@$(MAKE) --no-print-directory remove-setup
 
 deepclean: fclean
-	@printf "\n💀 Removing all Docker configurations...\n"
+	@echo -e "\n💀 Removing all Docker configurations...\n"
 	@docker system prune --all
 
 clean-host: clean-dirs clean-migrations clean-staticfiles stop-redis
@@ -214,11 +245,11 @@ stop-redis:
 # ======================
 
 re: fclean
-	@printf "🔧 Rebuilding ${name}...\n"
+	@echo -e "🔧 Rebuilding ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
 
-.PHONY : all build down re clean cleandev fclean dev info sudoers remove-sudoers \
+.PHONY : all build down re clean fclean dev info sudoers remove-sudoers \
 	certs env redisconf remove-redisconf setup remove-setup docker remove-env \
 	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles stop-redis
 	restart
