@@ -1,0 +1,20 @@
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+
+#  aceitar certificados autoassinados
+elasticsearch.ssl.verificationMode: none
+
+# Ativar SSL para o Kibana
+server.ssl.enabled: true
+server.ssl.certificate: /usr/share/kibana/config/certs/cert.pem
+server.ssl.key: /usr/share/kibana/config/certs/key.pem
+
+xpack.security.encryptionKey: "uma-chave-unica-e-longa-para-seguranca"
+xpack.reporting.encryptionKey: "uma-chave-unica-e-longa-para-relatorios"
+xpack.encryptedSavedObjects.encryptionKey: "uma-chave-unica-e-longa-para-objetos-salvos"
+
+# Ativar autenticação do Kibana
+elasticsearch.username: ${ELASTICSEARCH_USERNAME}
+elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
+
+# # Certificado da CA (se necessário)
+elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/cert.pem"]

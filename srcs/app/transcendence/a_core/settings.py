@@ -249,3 +249,6 @@ MINIO_SECRET_KEY = os.getenv("MINIO_ROOT_PASSWORD", "secret-key")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET", "my-local-bucket")
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "my-local-bucket")
 MINIO_EXTERNAL_ENDPOINT = os.getenv("MINIO_EXTERNAL_ENDPOINT", "http://localhost:9002")
+
+# Configuração de armazenamento
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
