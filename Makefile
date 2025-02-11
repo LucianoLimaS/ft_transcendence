@@ -130,10 +130,12 @@ remove-certs:
 # ======================
 
 all:
-	@read -p "Do you want to run the setup? (y/N): " choice; \
-	if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
-		$(MAKE) --no-print-directory setup; \
-	fi;
+	@if [ ! -f srcs/.env ]; then \
+		read -p "Do you want to run the setup? (y/N): " choice && \
+		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
+			$(MAKE) --no-print-directory setup; \
+		fi; \
+	fi
 	@echo -e "🔧 Launching ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
@@ -151,6 +153,12 @@ build:
 	fi
 
 dev:
+	@if [ ! -f srcs/.env ]; then \
+		read -p "Do you want to run the setup? (y/N): " choice && \
+		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
+			$(MAKE) --no-print-directory setup; \
+		fi; \
+	fi
 	@echo -e "🔧 Launching development for ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
