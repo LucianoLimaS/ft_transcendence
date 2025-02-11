@@ -3,15 +3,10 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'gunicorn'
+  - job_name: 'app'
     metrics_path: /metrics
     static_configs:
-      - targets: ['gunicorn:8000'] # Endpoint da aplicação que expõe métricas
-
-  - job_name: 'daphne'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['daphne:8001'] # Endpoint da aplicação que expõe métricas
+      - targets: ['app:8000'] # Endpoint da aplicação que expõe métricas
 
   - job_name: 'nginx-exporter'
     static_configs:

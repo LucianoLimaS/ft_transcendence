@@ -1,26 +1,3 @@
-# FROM python:3.12.6-alpine3.20
-
-# WORKDIR /ft_transcendence
-
-# # Copia o projeto para dentro do container
-# COPY . /ft_transcendence
-
-# # Garantindo que o script de entrada tenha permissões de execução
-# RUN chmod +x /ft_transcendence/srcs/requirements/daphne/entrypoint.sh
-
-# # Expondo a porta que o Daphne vai utilizar
-# EXPOSE 8001
-
-# # Criando um ambiente virtual e instalando as dependências
-# RUN pip install --upgrade pip && \
-#     pip install -r /ft_transcendence/srcs/requirements/daphne/requirements.txt
-
-# # Definindo a variável de ambiente PYTHONPATH
-# ENV PYTHONPATH="${PYTHONPATH}:/ft_transcendence/srcs/app"
-
-# # Executa o script de inicialização do Daphne
-# CMD ["/ft_transcendence/srcs/requirements/daphne/entrypoint.sh"]
-
 FROM python:3.12.6-alpine3.20
 
 # Essa variável de ambiente é usada para controlar se o Python deve 
@@ -33,8 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Copia a pasta "ft_transcendence" e "scripts" para dentro do container.
-COPY ./srcs/app/transcendence /ft_transcendence
-COPY ./srcs/requirements/daphne/scripts /scripts
+COPY . /ft_transcendence
+COPY ./srcs/requirements/daphne/scripts/entrypoint.sh /scripts/entrypoint.sh
 
 # Entra na pasta ft_transcendence no container
 WORKDIR /ft_transcendence
@@ -44,14 +21,19 @@ EXPOSE 8001
 
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
-  /venv/bin/pip install -r /ft_transcendence/requirements.txt 
+  /venv/bin/pip install -r /ft_transcendence/srcs/requirements/daphne/requirements.txt 
 
 # Adiciona a pasta scripts e venv/bin 
 # no $PATH do container.
 ENV PATH="/scripts:/venv/bin:$PATH"
 
-# Executa o arquivo scripts/commands.sh
-CMD ["/scripts/entrypoint.sh"]
+# Garantindo que o script de entrada tenha permissões de execução
+RUN chmod +x /scripts/entrypoint.sh
+
+CMD daphne -p 8001 -b 0.0.0.0 a_core.asgi:application
+
+# # Executa o arquivo scripts/entrypoint.sh
+# CMD ["/scripts/entrypoint.sh"]
 
 # Comando para iniciar os servidores
 # CMD ["sh", "-c", "gunicorn ft_transcendence.wsgi:application --bind 0.0.0.0:8000 & daphne ft_transcendence.asgi:application --bind 0.0.0.0 --port 8001"]

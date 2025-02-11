@@ -19,23 +19,12 @@ services:
       - redis
       - django-worker
     restart: always
-
-  # gunicorn:
-  #   image: gunicorn
-  #   container_name: gunicorn
-  #   build:
-  #     context: ./ #raiz do projeto
-  #     dockerfile: srcs/requirements/gunicorn/Dockerfile
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - static_vol:/ft_transcendence/srcs/app/transcendence/staticfiles  # Arquivos estáticos com volume persistente
-  #     - app_vol:/ft_transcendence
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - app
-  #   restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
   
   postgres:
     image: postgres
@@ -107,7 +96,7 @@ services:
       - "9090:9090"
     volumes:
       - prometheus_vol:/prometheus
-      - ./srcs/requirements/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./srcs/requirements/prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml
     networks:
       - transcendence
     depends_on:
@@ -171,7 +160,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./srcs/requirements/nginx/nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
+      - ./srcs/requirements/nginx/nginx-dev.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
       - ./srcs/requirements/certs:/etc/nginx/certs
       - static_vol:/static  # Arquivos estáticos com volume persistente
       - nginx_vol:/var/log/nginx # Logs do nginx
