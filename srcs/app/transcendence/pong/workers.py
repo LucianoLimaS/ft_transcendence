@@ -15,6 +15,7 @@ class GameSession:
     Represents a game session with its game instance and associated task.
     """
     game: PongGame
+    lock: asyncio.Lock  # Adicionando um Lock para cada sessão de jogo
     task: Optional[asyncio.Task] = None
 
 class PongGameWorker(AsyncConsumer):
@@ -42,8 +43,17 @@ class PongGameWorker(AsyncConsumer):
             height: int = message["height"]
 
             if room_id not in self.sessions:
-                game = PongGame(singleplayer=False)
-                self.sessions[room_id] = GameSession(game=game)
+                # Criando o Lock para a sessão
+                lock = asyncio.Lock()
+                # local
+                # game = PongGame(singleplayer=False)
+                # local + IA
+                # game = PongGame(singleplayer=True, difficulty="easy")
+                game = PongGame(singleplayer=True, difficulty="normal")
+                # game = PongGame(singleplayer=True, difficulty="hard")
+                #online
+                # game = PongGame(singleplayer=False)
+                self.sessions[room_id] = GameSession(game=game, lock=lock)
                 logger.info(f"Game initialized for room {room_id}")
 
             game_state = await self.sessions[room_id].game.get_game_state()
@@ -72,30 +82,32 @@ class PongGameWorker(AsyncConsumer):
                 logger.warning(f"No game session found for room {room_id}")
                 return
 
-            while room_id in self.sessions:
-                game_state = await session.game.game_tick()
-                logger.debug(f"Game state for room {room_id}: {game_state}")
+            # Usando o Lock para garantir acesso exclusivo à sessão
+            async with session.lock:
+                while room_id in self.sessions:
+                    game_state = await session.game.game_tick()
+                    logger.debug(f"Game state for room {room_id}: {game_state}")
 
-                await self.channel_layer.group_send(
-                    room_group_name,
-                    {
-                        "type": "send_game_state",
-                        "game_state": game_state,
-                    },
-                )
-
-                if session.game.winner:
                     await self.channel_layer.group_send(
                         room_group_name,
                         {
-                            "type": "send_winner",
+                            "type": "send_game_state",
                             "game_state": game_state,
                         },
                     )
-                    await self.cleanup_game(room_id)
-                    break  # Exit the loop since the game has ended
 
-                await asyncio.sleep(0.016)
+                    if session.game.winner:
+                        await self.channel_layer.group_send(
+                            room_group_name,
+                            {
+                                "type": "send_winner",
+                                "game_state": game_state,
+                            },
+                        )
+                        await self.cleanup_game(room_id)
+                        break  # Exit the loop since the game has ended
+
+                    await asyncio.sleep(0.016)
         except Exception as e:
             logger.exception(f"Error in game loop for room {room_id}: {e}")
             await self.cleanup_game(room_id)
@@ -129,9 +141,6 @@ class PongGameWorker(AsyncConsumer):
     async def update_paddles_position(self, message: dict) -> None:
         """
         Updates the paddle positions based on user input.
-
-        Args:
-            message (dict): The message containing paddle movement information.
         """
         try:
             room_id: str = message["room_id"]
@@ -148,21 +157,17 @@ class PongGameWorker(AsyncConsumer):
                 logger.warning(f"Game object is None for room {room_id}")
                 return
 
-            if hasattr(session.game.paddle_on, '__call__') and asyncio.iscoroutinefunction(session.game.paddle_on):
-                if state:
-                    await session.game.paddle_on(paddle, direction)
+            # Utilize o Lock apenas quando for necessário
+            if state:
+                if hasattr(session.game.paddle_on, '__call__') and asyncio.iscoroutinefunction(session.game.paddle_on):
+                    await session.game.paddle_on(paddle, direction)  # Sem o Lock aqui
                 else:
-                    await session.game.paddle_off(paddle)
+                    session.game.paddle_on(paddle, direction)  # Sem o Lock aqui
             else:
-                if state:
-                    session.game.paddle_on(paddle, direction)  # Sem await
-                else:
-                    session.game.paddle_off(paddle)  # Sem await
+                session.game.paddle_off(paddle)  # Sem o Lock aqui
 
         except Exception as e:
-            logger.exception(
-                f"Failed to update paddle positions for room {room_id}: {e}"
-            )
+            logger.exception(f"Failed to update paddle positions for room {room_id}: {e}")
 
     async def finish_game(self, message: dict) -> None:
         """

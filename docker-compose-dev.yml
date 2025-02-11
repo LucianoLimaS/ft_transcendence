@@ -1,17 +1,16 @@
 services:
-# mover compose pra raiz
   app:
     image: app
     container_name: app
     env_file:
-      - ./.env
+      - ./srcs/.env
     build:
-      context: ../ #raiz do projeto
+      context: ./ #raiz do projeto
       dockerfile: srcs/app/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./app/transcendence:/ft_transcendence
+      - ./srcs/app/transcendence:/ft_transcendence
       - static_vol:/ft_transcendence/staticfiles
     networks:
       - transcendence
@@ -20,15 +19,21 @@ services:
       - redis
       - django-worker
     restart: always
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+  
   postgres:
     image: postgres
     container_name: postgres
     build:
-      context: ../ #raiz do projeto
+      context: ./ #raiz do projeto
       dockerfile: srcs/requirements/postgres/Dockerfile
     env_file:
-      - ./.env
+      - ./srcs/.env
     ports:
       - "5432:5432"
     volumes:
@@ -42,7 +47,7 @@ services:
     image: wrouesnel/postgres_exporter:v0.8.0
     container_name: postgres-exporter
     env_file:
-    - ./.env
+      - ./srcs/.env
     ports:
       - "9187:9187"
     networks:
@@ -56,7 +61,7 @@ services:
     image: dpage/pgadmin4:8.14.0
     container_name: pgadmin
     env_file:
-      - ./.env
+      - ./srcs/.env
     ports:
       - "5050:80"
     volumes:
@@ -72,7 +77,7 @@ services:
     image: grafana/grafana:main-ubuntu
     container_name: grafana
     env_file:
-      - ./.env
+      - ./srcs/.env
     ports:
       - "3000:3000"
     volumes:
@@ -91,7 +96,7 @@ services:
       - "9090:9090"
     volumes:
       - prometheus_vol:/prometheus
-      - ./requirements/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./srcs/requirements/prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml
     networks:
       - transcendence
     depends_on:
@@ -100,10 +105,10 @@ services:
     attach: false
 
   minio:
-    image: minio/minio:RELEASE.2024-12-18T13-15-44Z.fips
+    image: bitnami/minio:2025.2.7-debian-12-r1
     container_name: minio
     env_file:
-      - ./.env
+      - ./srcs/.env
     ports:
       - "9001:9001"
       - "9002:9000"  # Porta 9000 mapeada para a API S3
@@ -117,6 +122,9 @@ services:
     restart: always
     entrypoint: >
       /bin/sh -c '
+        apk add --no-cache curl && \  # Instala o curl (caso não esteja disponível)
+        wget -qO /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc && \  # Baixa o mc
+        chmod +x /usr/local/bin/mc && \  # Torna o mc executável
         isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }    # check if Minio is alive
         minio $0 "$@" --quiet & echo $! > /tmp/minio.pid                   # start Minio in the background
         while ! isAlive; do sleep 0.1; done                                # wait until Minio is alive
@@ -149,14 +157,14 @@ services:
     image: nginx
     container_name: nginx
     build:
-      context: ../ #raiz do projeto
+      context: ./ #raiz do projeto
       dockerfile: srcs/requirements/nginx/Dockerfile
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./requirements/nginx/nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
-      - ./requirements/certs:/etc/nginx/certs
+      - ./srcs/requirements/nginx/nginx-dev.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
+      - ./srcs/requirements/certs:/etc/nginx/certs
       - static_vol:/static  # Arquivos estáticos com volume persistente
       - nginx_vol:/var/log/nginx # Logs do nginx
     networks:
@@ -190,12 +198,13 @@ services:
     networks:
       - transcendence
     restart: always
+    attach: false
   
   redis-exporter:
     image: oliver006/redis_exporter:v1.67.0
     container_name: redis-exporter
     env_file:
-    - ./.env
+      - ./srcs/.env
     ports:
       - "9121:9121"
     networks:
@@ -203,21 +212,66 @@ services:
     depends_on:
       - redis
     restart: always
-    # attach: false
+    attach: false
+
+  # elasticsearch:
+  #   image: elasticsearch
+  #   container_name: elasticsearch
+  #   env_file:
+  #     - ./srcs/.env
+  #   build:
+  #     context: ../ #raiz do projeto
+  #     dockerfile: srcs/srcs/requirements/elasticsearch/Dockerfile
+  #   ports:
+  #     - "9200:9200"
+  #   volumes:
+  #     - elasticsearch_vol:/usr/share/elasticsearch/data
+  #   networks:
+  #     - transcendence
+  #   restart: always
+
+  # logstash:
+  #   image: logstash:8.17.0
+  #   container_name: logstash
+  #   volumes:
+  #     - ./srcs/requirements/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+  #   ports:
+  #     - "5044:5044"
+  #   networks:
+  #     - transcendence
+  #   depends_on:
+  #     - elasticsearch
+  #   restart: always
+
+  # kibana:
+  #   image: kibana
+  #   container_name: kibana
+  #   env_file:
+  #     - ./srcs/.env
+  #   build:
+  #     context: ./ #raiz do projeto
+  #     dockerfile: srcs/requirements/kibana/Dockerfile
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - transcendence
+  #   depends_on:
+  #     - elasticsearch
+  #   restart: always
 
   django-worker:
     container_name: django-worker
+    env_file:
+      - ./srcs/.env
     image: django-worker
     build:
-      context: ../
+      context: ./
       dockerfile: srcs/requirements/django-worker/Dockerfile
-    restart: always
     networks:
       - transcendence
     expose:
       - "6379"
-    env_file:
-      - .env
+    restart: always
     depends_on:
       - postgres
       - redis
@@ -314,6 +368,13 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/redis
+  
+  # elasticsearch_vol:
+  #   name: elasticsearch_vol
+  #   driver_opts:
+  #     o: bind
+  #     type: none
+  #     device: /home/${USER}/data/elasticsearch
 
 networks:
     transcendence:

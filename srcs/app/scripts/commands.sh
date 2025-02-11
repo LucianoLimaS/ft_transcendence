@@ -21,6 +21,13 @@ echo "🔧 Ajustando permissões para o diretório de arquivos estáticos..."
 chown -R 1000:1000 ./staticfiles
 
 # Verifica se DEBUG está definido como False
+if [ "$DEBUG" = "1" ]; then
+  echo "🔧 DEBUG=True detectado. Iniciando o servidor de desenvolvimento do Django..."
+  exec python manage.py runserver 0.0.0.0:8000
+else
+  echo "🔧 DEBUG=False detectado. Mantendo container do app ativo..."
+  tail -f /dev/null
+fi
 
-echo "🔧 Iniciando o servidor de desenvolvimento do Django..."
-python manage.py runserver 0.0.0.0:8000
+# echo "🔧 Iniciando o servidor de desenvolvimento do Django..."
+# python manage.py runserver 0.0.0.0:8000
