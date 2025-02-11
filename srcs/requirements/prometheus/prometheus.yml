@@ -6,7 +6,7 @@ scrape_configs:
   - job_name: 'gunicorn'
     metrics_path: /metrics
     static_configs:
-      - targets: ['gunicorn:8000'] # Endpoint da aplicação que expõe métricas
+      - targets: ['gunicorn:8005'] # Endpoint da aplicação que expõe métricas
 
   - job_name: 'daphne'
     metrics_path: /metrics
