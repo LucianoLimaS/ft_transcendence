@@ -136,7 +136,7 @@ all:
 			$(MAKE) --no-print-directory setup; \
 		fi; \
 	fi
-	@echo -e "🔧 Launching ${name}..."
+	@echo -e "🔧 Launching production for ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
@@ -145,7 +145,7 @@ build:
 	@echo -e "🔧 Building ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		echo "🔧 Building development ${name}..."; \
+		echo "🔧 Building development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env build; \
 	else \
 		echo "🔧 Building production environment...\n"; \
