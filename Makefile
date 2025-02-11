@@ -225,6 +225,7 @@ fclean:
 		echo "🔧 Full cleaning of production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi all; \
 	fi
+	@$(MAKE) --no-print-directory clean-host
 	@$(MAKE) --no-print-directory remove-setup
 
 deepclean: fclean
