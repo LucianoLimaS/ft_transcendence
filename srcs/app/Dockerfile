@@ -19,16 +19,8 @@ WORKDIR /ft_transcendence
 # Exponha a porta que os servidores vão usar
 EXPOSE 8000
 
-RUN apk update && apk add gettext
- 
-# RUN executa comandos em um shell dentro do container para construir a imagem. 
-# O resultado da execução do comando é armazenado no sistema de arquivos da 
-# imagem como uma nova camada.
-# Agrupar os comandos em um único RUN pode reduzir a quantidade de camadas da 
-# imagem e torná-la mais eficiente.
-RUN apk update
-RUN apk add gettext
-RUN python -m venv /venv && \
+RUN apk update && apk add gettext && \
+  python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
   /venv/bin/pip install -r /ft_transcendence/requirements.txt 
 
@@ -38,6 +30,3 @@ ENV PATH="/scripts:/venv/bin:$PATH"
 
 # Executa o arquivo scripts/commands.sh
 CMD ["/scripts/commands.sh"]
-
-# Comando para iniciar os servidores
-# CMD ["sh", "-c", "gunicorn ft_transcendence.wsgi:application --bind 0.0.0.0:8000 & daphne ft_transcendence.asgi:application --bind 0.0.0.0 --port 8001"]

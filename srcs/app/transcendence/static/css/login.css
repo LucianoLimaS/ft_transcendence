@@ -1,0 +1,44 @@
+.card-glow {
+    width: 18rem;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .card-glow:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6);
+  }
+  
+  #registration_modal {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .form-control {
+    margin-bottom: 1rem; 
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .alert {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    z-index: 1050; 
+  }
+  
+  .switch-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .btn {
+    width: 100%; 
+  }
+  
+  .hidden {
+    display: none;
+  }

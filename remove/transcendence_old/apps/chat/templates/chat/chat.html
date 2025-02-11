@@ -1,0 +1,61 @@
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="chat-container">
+    <input type="hidden" id="username" name="username" value="{{ user.username }}">
+    <div class="user-list">
+        <h3>Usuários Conectados</h3>
+        <ul>
+            <!-- Exemplo de usuários, substitua por conteúdo dinâmico -->
+            <li>User1</li>
+            <li>User2</li>
+            <li>User3</li>
+        </ul>
+    </div>
+    <div class="chat-area">
+        <div id="chat-messages" style="background-color: #e9ecef; padding: 10px; border: 1px solid #ccc; overflow-y: auto; height: 80vh;">
+            <!-- As mensagens do chat aparecerão aqui -->
+        </div>
+        <form id="chat-form">
+            <div class="form-group">
+                <input id="message" name="message" type="text" class="form-control" placeholder="Digite sua mensagem aqui..." required />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        display: flex;
+        height: 100vh;
+    }
+    .user-list {
+        width: 20%;
+        border-right: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f8f9fa;
+    }
+    .chat-area {
+        width: 80%;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        background-color: #ffffff;
+    }
+    #chat-messages {
+        flex-grow: 1;
+        border: 1px solid #ccc;
+        padding: 10px;
+        overflow-y: auto;
+        background-color: #e9ecef;
+    }
+    #chat-form {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+{% endblock %}

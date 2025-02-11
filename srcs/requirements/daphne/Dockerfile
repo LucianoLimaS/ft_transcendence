@@ -1,26 +1,39 @@
 FROM python:3.12.6-alpine3.20
 
-# Copia o projeto para dentro do container
+# Essa variável de ambiente é usada para controlar se o Python deve 
+# gravar arquivos de bytecode (.pyc) no disco. 1 = Não, 0 = Sim
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# Define que a saída do Python será exibida imediatamente no console ou em 
+# outros dispositivos de saída, sem ser armazenada em buffer.
+# Em resumo, você verá os outputs do Python em tempo real.
+ENV PYTHONUNBUFFERED 1
+
+# Copia a pasta "ft_transcendence" e "scripts" para dentro do container.
 COPY . /ft_transcendence
+COPY ./srcs/requirements/daphne/scripts/entrypoint.sh /scripts/entrypoint.sh
 
-# Definindo o diretório de trabalho
-WORKDIR /ft_transcendence/srcs/app/transcendence
+# Entra na pasta ft_transcendence no container
+WORKDIR /ft_transcendence
 
-# Expondo a porta que o Daphne vai utilizar
+# Exponha a porta que os servidores vão usar
 EXPOSE 8001
 
-# Criando um ambiente virtual e instalando as dependências
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
-  /venv/bin/pip install -r requirements.txt 
+  /venv/bin/pip install -r /ft_transcendence/srcs/requirements/daphne/requirements.txt 
 
-# Adiciona a pasta venv/bin no $PATH do container
-ENV PATH="/venv/bin:$PATH"
+# Adiciona a pasta scripts e venv/bin 
+# no $PATH do container.
+ENV PATH="/scripts:/venv/bin:$PATH"
 
-ENV PYTHONPATH="${PYTHONPATH}:/ft_transcendence/srcs/app"
+# Garantindo que o script de entrada tenha permissões de execução
+RUN chmod +x /scripts/entrypoint.sh
 
-# Definindo o diretório de trabalho
-WORKDIR /ft_transcendence/srcs/app/transcendence
+CMD daphne -p 8001 -b 0.0.0.0 a_core.asgi:application
 
-# Executa o script de inicialização do Daphne
-CMD ["sh", "/ft_transcendence/srcs/app/scripts/commands_daphne.sh"]
+# # Executa o arquivo scripts/entrypoint.sh
+# CMD ["/scripts/entrypoint.sh"]
+
+# Comando para iniciar os servidores
+# CMD ["sh", "-c", "gunicorn ft_transcendence.wsgi:application --bind 0.0.0.0:8000 & daphne ft_transcendence.asgi:application --bind 0.0.0.0 --port 8001"]
