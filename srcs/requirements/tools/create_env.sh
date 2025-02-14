@@ -15,7 +15,10 @@ SECRET_KEY="django-insecure-hy0f)6#-mkp1kq9+4o2dh!(uv=oa07yy&eaamu*y@6(di22rm("
 DJANGO_SETTINGS_MODULE=a_core.settings
 
 # 0 False, 1 True
-DEBUG="0"
+DEBUG="1"
+
+#setup windows desktop environment
+WINDOWS="1"
 
 # Comma Separated values
 ALLOWED_HOSTS="transcendence, 127.0.0.1, localhost, app, *"
@@ -49,6 +52,7 @@ DEFAULT_FROM_EMAIL="ft_transcendence@gmx.com"
 REDIS_HOST="redis"
 REDIS_PORT="6379"
 REDIS_ADDR="redis:6379"
+
 EOL
 
 echo "✅ .env file created successfully."

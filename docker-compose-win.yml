@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     volumes:
       - ./srcs/app/transcendence:/ft_transcendence
-      - static_vol:/ft_transcendence/staticfiles
+      - /home/${USER}/data/staticfiles:/ft_transcendence/staticfiles
     networks:
       - transcendence
     depends_on:
@@ -37,7 +37,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_vol:/var/lib/postgresql/data
+      - /home/${USER}/data/postgres:/var/lib/postgresql/data
     networks:
       - transcendence
     restart: always
@@ -65,7 +65,7 @@ services:
     ports:
       - "5050:80"
     volumes:
-      - pgadmin_vol:/var/lib/pgadmin
+      - /home/${USER}/data/pgadmin:/var/lib/pgadmin
     networks:
       - transcendence
     depends_on:
@@ -81,7 +81,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana_vol:/var/lib/grafana
+      - /home/${USER}/data/grafana:/var/lib/grafana
     networks:
       - transcendence
     depends_on:
@@ -95,7 +95,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - prometheus_vol:/prometheus
+      - /home/${USER}/data/prometheus:/prometheus
       - ./srcs/requirements/prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml
     networks:
       - transcendence
@@ -114,7 +114,7 @@ services:
       - "9002:9000"  # Porta 9000 mapeada para a API S3
     command: server /data --console-address ":9001"
     volumes:
-      - minio_vol:/data
+      - /home/${USER}/data/minio:/data
     networks:
       - transcendence
     depends_on:
@@ -144,7 +144,7 @@ services:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
-      - selenium_vol:/var/log/selenium
+      - /home/${USER}/data/selenium:/var/log/selenium
       # - chrome_profiles:/tmp/chrome
     networks:
       - transcendence
@@ -165,8 +165,8 @@ services:
     volumes:
       - ./srcs/requirements/nginx/nginx-dev.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
       - ./srcs/requirements/certs:/etc/nginx/certs
-      - static_vol:/static  # Arquivos estáticos com volume persistente
-      - nginx_vol:/var/log/nginx # Logs do nginx
+      - /home/${USER}/data/staticfiles:/static  # Arquivos estáticos com volume persistente
+      - /home/${USER}/data/nginx:/var/log/nginx # Logs do nginx
     networks:
       - transcendence
     depends_on:
@@ -194,7 +194,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis_vol:/data
+      - /home/${USER}/data/redis:/data
     networks:
       - transcendence
     restart: always
@@ -213,51 +213,6 @@ services:
       - redis
     restart: always
     attach: false
-
-  # elasticsearch:
-  #   image: elasticsearch
-  #   container_name: elasticsearch
-  #   env_file:
-  #     - ./srcs/.env
-  #   build:
-  #     context: ../ #raiz do projeto
-  #     dockerfile: srcs/srcs/requirements/elasticsearch/Dockerfile
-  #   ports:
-  #     - "9200:9200"
-  #   volumes:
-  #     - elasticsearch_vol:/usr/share/elasticsearch/data
-  #   networks:
-  #     - transcendence
-  #   restart: always
-
-  # logstash:
-  #   image: logstash:8.17.0
-  #   container_name: logstash
-  #   volumes:
-  #     - ./srcs/requirements/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-  #   ports:
-  #     - "5044:5044"
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - elasticsearch
-  #   restart: always
-
-  # kibana:
-  #   image: kibana
-  #   container_name: kibana
-  #   env_file:
-  #     - ./srcs/.env
-  #   build:
-  #     context: ./ #raiz do projeto
-  #     dockerfile: srcs/requirements/kibana/Dockerfile
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - elasticsearch
-  #   restart: always
 
   django-worker:
     container_name: django-worker
@@ -284,98 +239,13 @@ services:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_vol:/data 
+      - /home/${USER}/data/portainer:/data 
     networks:
       - transcendence
     depends_on:
       - app
     restart: always
     attach: false
-
-volumes:
-  app_vol:
-    name: app_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/app
-
-  postgres_vol:
-    name: postgres_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/postgres
-
-  pgadmin_vol:
-    name: pgadmin_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/pgadmin
-
-  grafana_vol:
-    name: grafana_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/grafana
-
-  prometheus_vol:
-    name: prometheus_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/prometheus
-
-  selenium_vol:
-    name: selenium_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/selenium
-
-  minio_vol:
-    name: minio_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/minio
-  
-  nginx_vol:
-    name: nginx_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/nginx
-
-  static_vol:
-    name: static_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/staticfiles
-
-  portainer_vol:
-    name: portainer_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/portainer
-
-  redis_vol:
-    name: redis_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/redis
-  
-  # elasticsearch_vol:
-  #   name: elasticsearch_vol
-  #   driver_opts:
-  #     o: bind
-  #     type: none
-  #     device: /home/${USER}/data/elasticsearch
 
 networks:
     transcendence:
