@@ -19,12 +19,6 @@ services:
       - redis
       - django-worker
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 5s
   
   postgres:
     image: postgres
@@ -74,14 +68,20 @@ services:
     attach: false
   
   grafana:
-    image: grafana/grafana:main-ubuntu
+    image: grafana
     container_name: grafana
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/grafana/Dockerfile
     env_file:
       - ./srcs/.env
     ports:
       - "3000:3000"
     volumes:
       - grafana_vol:/var/lib/grafana
+      - ./srcs/requirements/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./srcs/requirements/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./srcs/requirements/grafana/dashboards:/etc/grafana/dashboards
     networks:
       - transcendence
     depends_on:
