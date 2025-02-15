@@ -19,7 +19,7 @@ services:
       - redis
       - django-worker
     restart: always
-    attach: false
+    attach: true
   
   postgres:
     image: postgres
