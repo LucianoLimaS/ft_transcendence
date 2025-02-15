@@ -78,7 +78,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana_vol:/var/lib/grafana
+      - /home/${USER}/data/grafana:/var/lib/grafana
       - ./srcs/requirements/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./srcs/requirements/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./srcs/requirements/grafana/dashboards:/etc/grafana/dashboards
@@ -116,7 +116,7 @@ services:
       - "9001:9001"
       - "9002:9000"  # Porta 9000 mapeada para a API S3
     volumes:
-      - minio_vol:/data
+      - /home/${USER}/data/minio:/data
     networks:
       - transcendence
     depends_on:
