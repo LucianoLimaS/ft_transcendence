@@ -1,0 +1,7 @@
+<li>
+  {{ match.0.user.username }}
+  {% if match|length > 1 %} vs {{ match.1.user.username }}{% endif %}
+  {% if match|length > 1 %}
+    <a href="{% url 'pong' game_id=tournament.id %}" class="start-game">Jogar</a>
+  {% endif %}
+</li>

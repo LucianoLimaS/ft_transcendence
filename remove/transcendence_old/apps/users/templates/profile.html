@@ -1,0 +1,76 @@
+{% load static %} 
+{% load i18n %} 
+{% block content %}
+
+<div class="container full-height d-flex justify-content-center align-items-center">
+    {% if messages %} {% for message in messages %}
+    <div id="alert" class="alert {{ message.tags }}" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %} {% endif %}
+    <div class="card card-profile">
+        <div class="card-body">
+
+            <!-- Área de imagem do perfil -->
+            <div class="profile-img" id="profileImg">
+                <!-- Imagem de perfil -->
+                {% if user.profile_picture %}
+                <img src="{{ MINIO_EXTERNAL_ENDPOINT }}/{{ MINIO_BUCKET_NAME }}/{{ user.profile_picture }}" class="rounded-circle" height="150" alt="User Photo"> {% else %}
+                <img src="{% static 'assets/profileDefault.png' %}" class="rounded-circle" height="150" alt="User Photo"> {% endif %}
+
+            </div>
+
+            <!-- Campos read-only -->
+            <form hx-post="{% url 'profile' %}" hx-target="#content-div" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Campo para o nome -->
+                <div class="form-group">
+                    <label for="userNameField">{% trans "Name:" %}</label>
+                    <input type="text" class="form-control" id="userNameField" name="first_name" value="{{ user.first_name }}">
+                </div>
+
+                <!-- Campo para o username -->
+                <div class="form-group">
+                    <label for="nicknameField">{% trans "Username:" %}</label>
+                    <input type="text" class="form-control" id="nicknameField" name="username" value="{{ user.username }}">
+                </div>
+
+                <!-- Campo para o e-mail -->
+                <div class="form-group">
+                    <label for="emailField">E-mail</label>
+                    <input type="email" class="form-control" id="emailField" name="email" value="{{ user.email }}">
+                </div>
+
+                <!-- Campo para a descrição -->
+                <div class="form-group">
+                    <label for="descriptionField">{% trans "Description:" %}</label>
+                    <textarea class="form-control" id="descriptionField" name="description" rows="3">{{ user.description }}</textarea>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-control-placeholder" for="password">{% trans "Password:" %}</label>
+                    <input id="password" name="password" type="password" class="form-control">
+                    <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-control-placeholder" for="confirm_password">{% trans "Confirm Password:" %}</label>
+                    <input id="confirm_password" name="confirm_password" type="password" class="form-control">
+                    <span toggle="#confirm_password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                </div>
+
+                <!-- Campo para a imagem de perfil -->
+                <div class="form-group">
+                    <label for="uploadImage">{% trans "Profile picture:" %}</label>
+                    <input type="file" class="" id="uploadImage" name="profile_picture" accept="image/*">
+                </div>
+
+                <!-- Botão de salvar -->
+                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'users/user.css' %}"> {% endblock %} {% block extra_js %} {% endblock %}

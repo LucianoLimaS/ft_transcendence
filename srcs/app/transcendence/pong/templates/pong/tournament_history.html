@@ -1,0 +1,27 @@
+{% extends 'pong/base_app.html' %}
+{% load static %}
+{% block content %}
+<div class="col col-10 col-sm-9 col-md-8 col-lg-6 col-xl-5 mx-auto">
+    <p class="form-title text-center rounded-top-4 py-2 py-md-3 m-0">Tournament History</p>
+        <div id="match-history"  class="scrollable-container p-0 rounded-bottom-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Tournament</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tournament in tournament_history %}
+                    <tr>
+                        <td>{{ tournament.date }}</td>
+                        <td>{{ tournament.tournament }}</td>
+                        <td>{{ tournament.result }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+<div id="online-user-count">
+    {% if online_users %}
+    <span class="badge rounded-pill bg-danger text-white ms-3">
+        {{ online_users.count }} online
+    </span>
+    {% endif %}
+</div>
+
+<div id="online-in-chats">
+    {% if online_in_chats %}
+    <div class="rounded-circle bg-success position-absolute top-0 end-0 z-3" style="width: 8px; height: 8px;"></div>
+    {% endif %}
+</div>
+
+<ul id="chats-list" class="list-unstyled">
+    <li class="position-relative">
+        {% if public_chat_users %}
+        <div class="rounded-circle bg-success position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+        {% else %}
+        <div class="rounded-circle bg-secondary position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+        {% endif %}
+        <a href="{% url 'home' %}" class="text-decoration-none d-block ps-4 py-2">Public Chat</a>
+    </li>
+    
+    {% for chatroom in user.chat_groups.all %}
+    {% if chatroom.groupchat_name %}
+    <li class="position-relative">
+        {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+            <div class="rounded-circle bg-success position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+        {% else %}
+            <div class="rounded-circle bg-secondary position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+        {% endif %}
+        <a href="{% url 'chatroom' chatroom.group_name %}" class="text-decoration-none text-end d-block ps-4 py-2">
+            {{ chatroom.groupchat_name|slice:":30" }}
+        </a>
+    </li>
+    {% endif %}
+    {% endfor %}
+    
+    {% for chatroom in user.chat_groups.all %}
+        {% if chatroom.is_private %}
+            {% for member in chatroom.members.all %}
+                {% if member != user %}
+                <li class="position-relative">
+                    {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+                        <div class="rounded-circle bg-success position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+                    {% else %}
+                        <div class="rounded-circle bg-secondary position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+                    {% endif %}
+                    <a href="{% url 'chatroom' chatroom.group_name %}" class="text-decoration-none d-block ps-4 py-2">
+                        {{ member.profile.name }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+</ul>

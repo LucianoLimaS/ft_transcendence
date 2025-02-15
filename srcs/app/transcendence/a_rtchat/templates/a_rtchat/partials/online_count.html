@@ -1,0 +1,45 @@
+<span id="online-count" hx-swap-oob="outerHTML" class="animate-fade-scale pe-1">
+    {{ online_count }}
+</span>
+
+<style>
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(4); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fade-scale {
+        animation: fadeInScale 0.6s ease;
+    }
+</style>
+
+{% if online_count %}
+<div id="online-icon" class="rounded-circle bg-success position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+{% else %}
+<div id="online-icon" class="rounded-circle bg-secondary position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+{% endif %}
+
+<ul id="groupchat-members" class="d-flex gap-3 flex-wrap">
+    {% for member in chat_group.members.all %}
+    <li>
+        <a href="{% url 'profile' member.username %}" class="d-flex flex-column text-muted align-items-center justify-content-center w-25 gap-2 text-center">
+            <div class="position-relative">
+                {% if member in chat_group.users_online.all %}
+                <div class="rounded-circle bg-success border border-dark position-absolute bottom-0 end-0" style="width: 8px; height: 8px;"></div>
+                {% else %}
+                <div class="rounded-circle bg-secondary border border-dark position-absolute bottom-0 end-0" style="width: 8px; height: 8px;"></div>
+                {% endif %}
+                <img src="{{ member.profile.avatar }}" class="rounded-circle img-fluid" style="width: 56px; height: 56px; object-fit: cover;" />
+            </div>
+            {{ member.profile.name|slice:":10" }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% for user in users %}
+    {% if user in chat_group.users_online.all %}
+    <div id="user-{{ user.id }}" class="rounded-circle bg-success border border-dark position-absolute" style="width: 8px; height: 8px; bottom: -4px; right: -4px;"></div>
+    {% else %}
+    <div id="user-{{ user.id }}" class="rounded-circle bg-secondary border border-dark position-absolute" style="width: 8px; height: 8px; bottom: -4px; right: -4px;"></div>
+    {% endif %}
+{% endfor %}

@@ -1,0 +1,240 @@
+services:
+  app:
+    image: app
+    container_name: app
+    env_file:
+      - ./srcs/.env
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/app/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./srcs/app/transcendence:/ft_transcendence
+      - /home/${USER}/data/staticfiles:/ft_transcendence/staticfiles
+    networks:
+      - transcendence
+    depends_on:
+      - postgres
+      - redis
+      - django-worker
+    restart: always
+  
+  postgres:
+    image: postgres
+    container_name: postgres
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/postgres/Dockerfile
+    env_file:
+      - ./srcs/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - /home/${USER}/data/postgres:/var/lib/postgresql/data
+    networks:
+      - transcendence
+    restart: always
+    attach: false
+
+  postgres-exporter:
+    image: wrouesnel/postgres_exporter:v0.8.0
+    container_name: postgres-exporter
+    env_file:
+      - ./srcs/.env
+    ports:
+      - "9187:9187"
+    networks:
+      - transcendence
+    depends_on:
+      - postgres
+    restart: always
+    attach: false
+
+  pgadmin:
+    image: dpage/pgadmin4:8.14.0
+    container_name: pgadmin
+    env_file:
+      - ./srcs/.env
+    ports:
+      - "5050:80"
+    volumes:
+      - /home/${USER}/data/pgadmin:/var/lib/pgadmin
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+    attach: false
+  
+  grafana:
+    image: grafana
+    container_name: grafana
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/grafana/Dockerfile
+    env_file:
+      - ./srcs/.env
+    ports:
+      - "3000:3000"
+    volumes:
+      - /home/${USER}/data/grafana:/var/lib/grafana
+      - ./srcs/requirements/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./srcs/requirements/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./srcs/requirements/grafana/dashboards:/etc/grafana/dashboards
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+    attach: false
+
+  prometheus:
+    image: prom/prometheus:v3.1.0-rc.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/${USER}/data/prometheus:/prometheus
+      - ./srcs/requirements/prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+    attach: false
+
+  minio:
+    image: minio
+    container_name: minio
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/minio/Dockerfile
+    env_file:
+      - ./srcs/.env
+    ports:
+      - "9001:9001"
+      - "9002:9000"  # Porta 9000 mapeada para a API S3
+    volumes:
+      - /home/${USER}/data/minio:/data
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+    attach: false
+  
+  selenium:
+    image: selenium/standalone-chrome:nightly
+    container_name: selenium
+    ports:
+      - "4444:4444"
+    volumes:
+      - /dev/shm:/dev/shm
+      - /home/${USER}/data/selenium:/var/log/selenium
+      # - chrome_profiles:/tmp/chrome
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+    attach: false
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/nginx/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./srcs/requirements/nginx/nginx-dev.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
+      - ./srcs/requirements/certs:/etc/nginx/certs
+      - /home/${USER}/data/staticfiles:/static  # Arquivos estáticos com volume persistente
+      - /home/${USER}/data/nginx:/var/log/nginx # Logs do nginx
+    networks:
+      - transcendence
+    depends_on:
+      - app
+      - django-worker
+    restart: always
+    attach: false
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:edge
+    container_name: nginx-exporter
+    command: [ "--nginx.scrape-uri=http://nginx:80/stub_status" ] 
+    ports:
+      - "9113:9113"
+    networks:
+      - transcendence
+    depends_on:
+      - nginx
+    restart: always
+    attach: false
+
+  redis:
+    image: redis:bookworm
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/${USER}/data/redis:/data
+    networks:
+      - transcendence
+    restart: always
+    attach: false
+  
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.67.0
+    container_name: redis-exporter
+    env_file:
+      - ./srcs/.env
+    ports:
+      - "9121:9121"
+    networks:
+      - transcendence
+    depends_on:
+      - redis
+    restart: always
+    attach: false
+
+  django-worker:
+    container_name: django-worker
+    env_file:
+      - ./srcs/.env
+    image: django-worker
+    build:
+      context: ./
+      dockerfile: srcs/requirements/django-worker/Dockerfile
+    networks:
+      - transcendence
+    expose:
+      - "6379"
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    attach: false
+
+  portainer:
+    image: portainer/portainer-ce:alpine-sts
+    container_name: portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/${USER}/data/portainer:/data 
+    networks:
+      - transcendence
+    depends_on:
+      - app
+    restart: always
+    attach: false
+
+networks:
+    transcendence:
+        name: transcendence
+        driver: bridge

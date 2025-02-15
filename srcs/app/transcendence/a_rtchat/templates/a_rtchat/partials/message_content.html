@@ -1,0 +1,12 @@
+{% if message.body %}
+    <span>{{ message.body }}</span>
+{% elif message.file %}
+    {% if message.is_image %}
+        <img class="img-fluid" style="max-width: 18rem; min-width: 2rem;" src="{{ message.file.url }}" alt="Message Image" />
+    {% else %}
+        &#x1F4CE; 
+        <a class="text-decoration-none fst-italic link-primary" href="{{ message.file.url }}" download>
+            {{ message.filename }}
+        </a>
+    {% endif %}
+{% endif %}
