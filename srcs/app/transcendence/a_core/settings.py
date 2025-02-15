@@ -41,6 +41,7 @@ INTERNAL_IPS = (
 # Application definition
 
 INSTALLED_APPS = [
+    'django_prometheus',
     'daphne',
     'channels',
     'django.contrib.admin',
@@ -62,7 +63,6 @@ INSTALLED_APPS = [
     'match',
     'tournaments',
     'pong.apps.PongConfig',
-    #'django_prometheus',
 ]
 
 SITE_ID = 1
@@ -76,10 +76,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 # CACHES = {

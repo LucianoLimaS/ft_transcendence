@@ -17,6 +17,9 @@ DJANGO_SETTINGS_MODULE=a_core.settings
 # 0 False, 1 True
 DEBUG="0"
 
+#setup windows desktop environment
+WINDOWS="0"
+
 # Comma Separated values
 ALLOWED_HOSTS="transcendence, 127.0.0.1, localhost, app, *"
 CSRF_TRUSTED_ORIGINS="https://localhost, https://127.0.0.1"
@@ -36,6 +39,7 @@ PGADMIN_DEFAULT_PASSWORD="root"
 
 GF_SECURITY_ADMIN_USER="grafana"
 GF_SECURITY_ADMIN_PASSWORD="5432"
+GF_PATHS_PROVISIONING=/etc/grafana/provisioning
 
 MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="87654321"
@@ -49,6 +53,7 @@ DEFAULT_FROM_EMAIL="ft_transcendence@gmx.com"
 REDIS_HOST="redis"
 REDIS_PORT="6379"
 REDIS_ADDR="redis:6379"
+
 EOL
 
 echo "✅ .env file created successfully."
