@@ -19,12 +19,7 @@ services:
       - redis
       - django-worker
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 5s
+    attach: false
   
   postgres:
     image: postgres
@@ -74,14 +69,20 @@ services:
     attach: false
   
   grafana:
-    image: grafana/grafana:main-ubuntu
+    image: grafana
     container_name: grafana
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/grafana/Dockerfile
     env_file:
       - ./srcs/.env
     ports:
       - "3000:3000"
     volumes:
       - grafana_vol:/var/lib/grafana
+      - ./srcs/requirements/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./srcs/requirements/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./srcs/requirements/grafana/dashboards:/etc/grafana/dashboards
     networks:
       - transcendence
     depends_on:
@@ -105,14 +106,16 @@ services:
     attach: false
 
   minio:
-    image: bitnami/minio:2025.2.7-debian-12-r1
+    image: minio
     container_name: minio
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/minio/Dockerfile
     env_file:
       - ./srcs/.env
     ports:
       - "9001:9001"
       - "9002:9000"  # Porta 9000 mapeada para a API S3
-    command: server /data --console-address ":9001"
     volumes:
       - minio_vol:/data
     networks:
@@ -120,21 +123,6 @@ services:
     depends_on:
       - app
     restart: always
-    entrypoint: >
-      /bin/sh -c '
-        apk add --no-cache curl && \  # Instala o curl (caso não esteja disponível)
-        wget -qO /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc && \  # Baixa o mc
-        chmod +x /usr/local/bin/mc && \  # Torna o mc executável
-        isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }    # check if Minio is alive
-        minio $0 "$@" --quiet & echo $! > /tmp/minio.pid                   # start Minio in the background
-        while ! isAlive; do sleep 0.1; done                                # wait until Minio is alive
-        mc alias set minio http://127.0.0.1:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD # setup Minio client
-        mc mb minio/$MINIO_BUCKET || true                                  # create a test bucket
-        mc anonymous set public minio/$MINIO_BUCKET                        # make the test bucket public
-        kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid             # stop Minio
-        while isAlive; do sleep 0.1; done                                  # wait until Minio is stopped
-        exec minio $0 "$@"                                                 # start Minio in the foreground
-      '
     attach: false
   
   selenium:
@@ -275,6 +263,7 @@ services:
     depends_on:
       - postgres
       - redis
+    attach: false
 
   portainer:
     image: portainer/portainer-ce:alpine-sts

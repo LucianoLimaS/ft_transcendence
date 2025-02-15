@@ -139,14 +139,18 @@ all:
 	@echo -e "🔧 Launching production for ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
+	@sed -i 's/^WINDOWS=.*/WINDOWS="0"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
 
 build:
 	@echo -e "🔧 Building ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		echo "🔧 Building development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env build; \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Building windows development environment..."; \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env build; \
 	else \
 		echo "🔧 Building production environment...\n"; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env build; \
@@ -162,13 +166,30 @@ dev:
 	@echo -e "🔧 Launching development for ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
+	@sed -i 's/^WINDOWS=.*/WINDOWS="0"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up --build
+
+win:
+	@if [ ! -f srcs/.env ]; then \
+		read -p "Do you want to run the setup? (y/N): " choice && \
+		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
+			$(MAKE) --no-print-directory setup; \
+		fi; \
+	fi
+	@echo -e "🔧 Launching windows development for ${name}..."
+	@bash srcs/requirements/tools/make_db_dirs.sh
+	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
+	@sed -i 's/^WINDOWS=.*/WINDOWS="1"/' $(ENV_FILE)
+	@docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env up --build
 
 down:
 	@echo -e "🔧 Stopping ${name}..."
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		echo "🔧 Stopping development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down; \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Stopping windows development environment..."; \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down; \
 	else \
 		echo "🔧 Stopping production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down; \
@@ -179,24 +200,32 @@ down:
 # ======================
 
 service:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up -d --build $(name); \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env up -d --build $(name); \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build $(name); \
 	fi
 
+
 restart:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env restart $(name); \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env restart $(name); \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env restart $(name); \
 	fi
 
 getin:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env exec -it $(name) sh; \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env exec -it $(name) sh; \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env exec -it $(name) sh; \
 	fi
@@ -207,9 +236,12 @@ getin:
 
 clean:
 	@echo -e "🔧 Cleaning ${name}..."
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		echo "🔧 Cleaning development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local; \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Cleaning windows development environment..."; \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down --volumes --rmi local; \
 	else \
 		echo "🔧 Cleaning production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi local; \
@@ -218,9 +250,12 @@ clean:
 
 fclean:
 	@echo -e "🔧 Full cleaning of ${name}..."
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
 		echo "🔧 Full cleaning of development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi all; \
+	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
+		echo "🔧 Full cleaning of windows development environment..."; \
+		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down --volumes --rmi all; \
 	else \
 		echo "🔧 Full cleaning of production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi all; \
@@ -261,4 +296,4 @@ re: fclean
 .PHONY : all build down re clean fclean dev info sudoers remove-sudoers \
 	certs env redisconf remove-redisconf setup remove-setup docker remove-env \
 	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles stop-redis
-	restart
+	restart win
