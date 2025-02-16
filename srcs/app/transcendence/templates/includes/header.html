@@ -1,61 +1,45 @@
 {% load static %}
-<header class="navbar navbar-dark bg-dark sticky-top py-3">
-    <div class="container-fluid px-4">
-        <!-- Logo and Brand -->
-        <div class="d-flex align-items-center">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-                <img class="h-auto" style="height: 24px;" src="{% static 'images/logo.svg' %}" alt="Logo" />
-                <span class="fs-5 fw-bold">Project Title</span>
-            </a>
-            <div id="online-user-count"></div>
-        </div>
+<header class="d-flex align-items-center justify-content-between bg-dark text-white sticky-top px-4 py-3" style="z-index: 2">
+  <div class="d-flex align-items-center">
+    <a class="d-flex align-items-center text-decoration-none text-white mr-4" href="/">
+      <img class="mr-2" style="height: 24px;" src="{% static 'images/logo.svg' %}" alt="Logo" />
+      <span class="h5 font-weight-bold mb-0">Project Title</span>
+    </a>
 
-        <!-- Navigation -->
-        <nav>
-            <ul class="navbar-nav d-flex flex-row align-items-center gap-3 mb-0">
-                {% if request.user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Home</a>
-                </li>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="flex-direction: row;">
+      <li class="nav-item m-2"><a href="#" class="nav-link">Chat</a></li>
+      <li class="nav-item m-2"><a href="#" class="nav-link">Match</a></li>
+      <li class="nav-item m-2"><a href="#" class="nav-link">Tournament</a></li>
+    </ul>
 
-                <!-- Chat Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="chatDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div id="online-in-chats" class="d-inline"></div>
-                        Chat
-                        <img class="transition-transform" style="width: 16px;" src="https://img.icons8.com/small/32/777777/expand-arrow.png" alt="Expand">
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="chatDropdown">
-                        <ul id="chats-list"></ul>
-                    </ul>
-                </li>
+    <div id="online-user-count" class="ml-3"></div>
 
-                <!-- User Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img class="rounded-circle object-fit-cover" style="width: 32px; height: 32px;" src="{{ request.user.profile.avatar }}" alt="Avatar" />
-                        <span>{{ request.user.profile.name }}</span>
-                        <img class="transition-transform" style="width: 16px;" src="https://img.icons8.com/small/32/ffffff/expand-arrow.png" alt="Expand">
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item text-end" href="{% url 'profile' %}">My Profile</a></li>
-                        <li><a class="dropdown-item text-end" href="{% url 'profile-edit' %}">Edit Profile</a></li>
-                        <li><a class="dropdown-item text-end" href="{% url 'new-groupchat' %}">Create Chat</a></li>
-                        <li><a class="dropdown-item text-end" href="{% url 'profile-settings' %}">Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-end" href="{% url 'signout' %}">Log Out</a></li>
-                    </ul>
-                </li>
 
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="account_login">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="account_signup">Signup</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
+  </div>
+  <nav class="position-relative">
+    <ul class="nav">
+      {% if request.user.is_authenticated %}
+
+        <li class="nav-item dropdown">
+          <a class="nav-link text-white dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <img class="rounded-circle mr-2" style="width: 40px; height: 40px; object-fit: cover;" src="{{ request.user.profile.avatar }}" alt="Avatar" />
+            <span>{{ request.user.profile.name }}</span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right bg-white text-dark shadow mt-0 mb-0 pt-0 pb-0" aria-labelledby="userDropdown">
+            <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
+            <a class="dropdown-item" href="{% url 'profile-edit' %}">Edit Profile</a>
+            <a class="dropdown-item" href="{% url 'new-groupchat' %}">Create Chat</a>
+            <a class="dropdown-item" href="{% url 'profile-settings' %}">Settings</a>
+          </div>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'account_login' %}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'account_signup' %}?next={% url 'profile-onboarding' %}">Signup</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
 </header>

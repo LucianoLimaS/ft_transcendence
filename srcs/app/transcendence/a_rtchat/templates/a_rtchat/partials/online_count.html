@@ -1,36 +1,38 @@
-<span id="online-count" hx-swap-oob="outerHTML" class="animate-fade-scale pe-1">
+<span id="online-count" hx-swap-oob="outerHTML" class="fade-in-scale pr-1">
     {{ online_count }}
+    <style>
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(4); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .fade-in-scale {
+            animation: fadeInScale 0.6s ease;
+        }
+    </style> 
 </span>
 
-<style>
-    @keyframes fadeInScale {
-        from { opacity: 0; transform: scale(4); }
-        to { opacity: 1; transform: scale(1); }
-    }
-    .animate-fade-scale {
-        animation: fadeInScale 0.6s ease;
-    }
-</style>
-
 {% if online_count %}
-<div id="online-icon" class="rounded-circle bg-success position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+<div id="online-icon" class="dot green-dot position-absolute top-0 start-0"></div>
 {% else %}
-<div id="online-icon" class="rounded-circle bg-secondary position-absolute top-0 start-0" style="width: 8px; height: 8px;"></div>
+<div id="online-icon" class="dot gray-dot position-absolute top-0 start-0"></div>
 {% endif %}
 
-<ul id="groupchat-members" class="d-flex gap-3 flex-wrap">
+<ul id="groupchat-members" class="d-flex justify-content-center row">
     {% for member in chat_group.members.all %}
-    <li>
-        <a href="{% url 'profile' member.username %}" class="d-flex flex-column text-muted align-items-center justify-content-center w-25 gap-2 text-center">
-            <div class="position-relative">
+    <li class="d-flex justify-content-center w-100 col">
+        <a href="{% url 'profile' member.username %}" class="d-flex text-muted align-items-center justify-content-center w-25 row">
+            <div class="position-relative col-6 row">
                 {% if member in chat_group.users_online.all %}
-                <div class="rounded-circle bg-success border border-dark position-absolute bottom-0 end-0" style="width: 8px; height: 8px;"></div>
+                {% comment %} User on {% endcomment %}
+                <div class="green-dot border-2 border-dark col-2 p-0"></div>
                 {% else %}
-                <div class="rounded-circle bg-secondary border border-dark position-absolute bottom-0 end-0" style="width: 8px; height: 8px;"></div>
+                {% comment %} User off {% endcomment %}
+                {% comment %} <div class="gray-dot border-2 border-dark position-absolute bottom-0 end-0"></div> {% endcomment %}
+                <div class="gray-dot border-2 border-dark col-2"></div>
                 {% endif %}
-                <img src="{{ member.profile.avatar }}" class="rounded-circle img-fluid" style="width: 56px; height: 56px; object-fit: cover;" />
+                <img src="{{ member.profile.avatar }}" class="rounded-circle object-cover mr-3 col" style="width: 50px;" />
             </div>
-            {{ member.profile.name|slice:":10" }}
+            {{ member.profile.name|slice:":15" }}
         </a>
     </li>
     {% endfor %}
@@ -38,8 +40,10 @@
 
 {% for user in users %}
     {% if user in chat_group.users_online.all %}
-    <div id="user-{{ user.id }}" class="rounded-circle bg-success border border-dark position-absolute" style="width: 8px; height: 8px; bottom: -4px; right: -4px;"></div>
+    <div id="user-{{ user.id }}" class="green-dot border-2 border-dark col-2 p-0"></div>
     {% else %}
-    <div id="user-{{ user.id }}" class="rounded-circle bg-secondary border border-dark position-absolute" style="width: 8px; height: 8px; bottom: -4px; right: -4px;"></div>
+    {% comment %} <div id="user-{{ user.id }}" class="gray-dot border-2 border-dark position-absolute bottom-0 end-0"></div> {% endcomment %}
+    {% comment %} <div id="user-{{ user.id }}" class="gray-dot border-2 border-dark position-absolute bottom-0 end-0"></div> {% endcomment %}
+    <div id="user-{{ user.id }}" class="gray-dot border-2 border-dark col-2 p-0"></div>
     {% endif %}
 {% endfor %}
