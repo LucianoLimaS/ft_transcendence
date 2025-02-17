@@ -229,7 +229,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/auth/'  # URL para a página de login
+LOGIN_URL = '/signin/'  # URL para a página de login
 
 EMAIL_API_KEY = os.getenv('EMAIL_API_KEY', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')

@@ -1,15 +1,15 @@
 {% load static %}
-<header class="d-flex align-items-center justify-content-between bg-dark text-white sticky-top px-4 py-3" style="z-index: 2">
+<header class="d-flex align-items-center justify-content-between bg-dark text-white sticky-top px-4 py-1" style="z-index: 2">
   <div class="d-flex align-items-center">
     <a class="d-flex align-items-center text-decoration-none text-white mr-4" href="/">
-      <img class="mr-2" style="height: 24px;" src="{% static 'images/logo.svg' %}" alt="Logo" />
-      <span class="h5 font-weight-bold mb-0">Project Title</span>
+      <img class="mr-2 img-fluid" style="max-height: 55px;" src="{% static 'images/logo.png' %}" alt="Logo" />
     </a>
 
     <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="flex-direction: row;">
-      <li class="nav-item m-2"><a href="#" class="nav-link">Chat</a></li>
-      <li class="nav-item m-2"><a href="#" class="nav-link">Match</a></li>
-      <li class="nav-item m-2"><a href="#" class="nav-link">Tournament</a></li>
+      <li class="nav-item m-2"><a href="{% url 'home' %}" class="nav-link">Chat</a></li>
+      <li class="nav-item m-2"><a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a></li>
+      <li class="nav-item m-2"><a href="{% url 'snake' %}" class="nav-link">Snake</a></li>
+      <li class="nav-item m-2"><a href="/play/" class="nav-link">Torneio</a></li>
     </ul>
 
     <div id="online-user-count" class="ml-3"></div>
@@ -30,6 +30,7 @@
             <a class="dropdown-item" href="{% url 'profile-edit' %}">Edit Profile</a>
             <a class="dropdown-item" href="{% url 'new-groupchat' %}">Create Chat</a>
             <a class="dropdown-item" href="{% url 'profile-settings' %}">Settings</a>
+            <a class="dropdown-item" href="{% url 'signout' %}">Sign Out</a>
           </div>
         </li>
       {% else %}
