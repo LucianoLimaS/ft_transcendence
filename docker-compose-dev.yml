@@ -19,7 +19,7 @@ services:
       - redis
       - django-worker
     restart: always
-    attach: true
+    attach: false
   
   postgres:
     image: postgres
@@ -202,27 +202,40 @@ services:
     restart: always
     attach: false
 
-  # elasticsearch:
-  #   image: elasticsearch
-  #   container_name: elasticsearch
-  #   env_file:
-  #     - ./srcs/.env
-  #   build:
-  #     context: ../ #raiz do projeto
-  #     dockerfile: srcs/srcs/requirements/elasticsearch/Dockerfile
-  #   ports:
-  #     - "9200:9200"
-  #   volumes:
-  #     - elasticsearch_vol:/usr/share/elasticsearch/data
-  #   networks:
-  #     - transcendence
-  #   restart: always
+  elasticsearch:
+    image: elasticsearch
+    container_name: elasticsearch
+    build:
+      context: ./
+      dockerfile: srcs/requirements/elasticsearch/Dockerfile
+    env_file:
+      - ./srcs/.env
+    environment:
+      - "ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}"
+      - "ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}"
+      - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
+    volumes:
+      - elasticsearch_vol:/usr/share/elasticsearch/data
+      - elasticsearch_certs:/usr/share/elasticsearch/config/certs
+    ports:
+      - "9200:9200"
+    networks:
+      - transcendence
+    restart: always
+    attach: true
+
 
   # logstash:
-  #   image: logstash:8.17.0
+  #   image: docker.elastic.co/logstash/logstash:8.17.2
   #   container_name: logstash
+  #   environment:
+  #     - LS_JAVA_OPTS=-Xms512m -Xmx512m
+  #     - discovery.type=single-node
+  #     - "ELASTICSEARCH_HOSTS=https://elasticsearch:9200"
   #   volumes:
-  #     - ./srcs/requirements/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+  #     # - ./srcs/requirements/logstash/config:/usr/share/logstash/config
+  #     - ./srcs/requirements/logstash/pipeline:/usr/share/logstash/pipeline
+  #     - elasticsearch_certs:/usr/share/logstash/config/certs
   #   ports:
   #     - "5044:5044"
   #   networks:
@@ -230,22 +243,31 @@ services:
   #   depends_on:
   #     - elasticsearch
   #   restart: always
+  #   attach: false
 
-  # kibana:
-  #   image: kibana
-  #   container_name: kibana
-  #   env_file:
-  #     - ./srcs/.env
-  #   build:
-  #     context: ./ #raiz do projeto
-  #     dockerfile: srcs/requirements/kibana/Dockerfile
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - elasticsearch
-  #   restart: always
+  kibana:
+    image: kibana
+    container_name: kibana
+    build:
+      context: ./
+      dockerfile: srcs/requirements/kibana/Dockerfile
+    env_file:
+      - ./srcs/.env
+    environment:
+      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/certs/ca.crt
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
+    volumes:
+      - elasticsearch_certs:/usr/share/kibana/config/certs
+    ports:
+      - "5601:5601"
+    networks:
+      - transcendence
+    depends_on:
+      - elasticsearch
+    restart: always
 
   django-worker:
     container_name: django-worker
@@ -358,12 +380,18 @@ volumes:
       type: none
       device: /home/${USER}/data/redis
   
-  # elasticsearch_vol:
-  #   name: elasticsearch_vol
-  #   driver_opts:
-  #     o: bind
-  #     type: none
-  #     device: /home/${USER}/data/elasticsearch
+  elasticsearch_vol:
+    name: elasticsearch_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/elasticsearch
+  
+  elasticsearch_certs:
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/elasticsearch/certs
 
 networks:
     transcendence:

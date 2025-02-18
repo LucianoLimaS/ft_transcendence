@@ -54,6 +54,10 @@ REDIS_HOST="redis"
 REDIS_PORT="6379"
 REDIS_ADDR="redis:6379"
 
+ELASTICSEARCH_USERNAME=transcendence
+ELASTICSEARCH_PASSWORD=9876543210
+ES_JAVA_OPTS=-Xms512m -Xmx512m
+
 EOL
 
 echo "✅ .env file created successfully."
