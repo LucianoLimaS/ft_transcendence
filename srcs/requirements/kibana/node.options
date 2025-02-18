@@ -1,2 +1,0 @@
---max-old-space-size=2048  # Limite de memória em MB (aumenta para 2GB)
---openssl-legacy-provider  # Ativa algoritmos legados no OpenSSL (remova se não for necessário)
