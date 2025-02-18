@@ -130,6 +130,7 @@ remove-certs:
 # ======================
 
 all:
+	@$(MAKE) --no-print-directory stop-redis
 	@if [ ! -f srcs/.env ]; then \
 		read -p "Do you want to run the setup? (y/N): " choice && \
 		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
@@ -157,6 +158,7 @@ build:
 	fi
 
 dev:
+	@$(MAKE) --no-print-directory stop-redis
 	@if [ ! -f srcs/.env ]; then \
 		read -p "Do you want to run the setup? (y/N): " choice && \
 		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
@@ -170,6 +172,7 @@ dev:
 	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up --build
 
 win:
+	@$(MAKE) --no-print-directory stop-redis
 	@if [ ! -f srcs/.env ]; then \
 		read -p "Do you want to run the setup? (y/N): " choice && \
 		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
