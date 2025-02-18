@@ -1,25 +1,37 @@
 #!/bin/sh
 
-POSTGRES_DB="transcendence"
-POSTGRES_PASSWORD="transcendence"
-POSTGRES_HOST="postgres"
-POSTGRES_PORT="5432"
+if [ -f ./srcs/.env ]; then
+    export $(cat ./srcs/.env | xargs)
+else
+    echo "Arquivo .env não encontrado!"
+    exit 1
+fi
 
-PGADMIN_DEFAULT_EMAIL="admin@admin.com"
-PGADMIN_DEFAULT_PASSWORD="root"
+# Verificação para garantir que as variáveis foram carregadas corretamente
+echo "POSTGRES_DB: ${POSTGRES_DB}"
+echo "POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}"
 
-GF_SECURITY_ADMIN_USER="grafana"
-GF_SECURITY_ADMIN_PASSWORD="5432"
+# Carrega as variáveis de ambiente
+POSTGRES_DB="${POSTGRES_DB}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
+POSTGRES_HOST="${POSTGRES_HOST}"
+POSTGRES_PORT="${POSTGRES_PORT}"
 
-MINIO_ROOT_USER="minio"
-MINIO_ROOT_PASSWORD="87654321"
+PGADMIN_DEFAULT_EMAIL="${PGADMIN_DEFAULT_EMAIL}"
+PGADMIN_DEFAULT_PASSWORD="${PGADMIN_DEFAULT_PASSWORD}"
+
+GF_SECURITY_ADMIN_USER="${GF_SECURITY_ADMIN_USER}"
+GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD}"
+
+MINIO_ROOT_USER="${MINIO_ROOT_USER}"
+MINIO_ROOT_PASSWORD="${MINIO_ROOT_PASSWORD}"
+
+ELASTICSEARCH_USERNAME="${ELASTIC_USER}"
+ELASTICSEARCH_PASSWORD="${ELASTIC_PASSWORD}"
 
 # Exibe informações sobre os serviços disponíveis
-
 echo -e "\n ##### app #####"
 echo -e "   - http://localhost"
-
-# echo -e "Portainer:    https://localhost:9443"
 
 echo -e "\n ##### pgAdmin #####"
 echo -e "   - URL:      http://localhost:5050"
@@ -45,6 +57,11 @@ echo -e "\n ##### grafana #####"
 echo -e "   - URL:      http://localhost:3000"
 echo -e "   - Username: ${GF_SECURITY_ADMIN_USER}"
 echo -e "   - Password: ${GF_SECURITY_ADMIN_PASSWORD}"
+
+echo -e "\n ##### kibana #####"
+echo -e "   - URL:      http://localhost:5601"
+echo -e "   - Username: ${ELASTICSEARCH_USERNAME}"
+echo -e "   - Password: ${ELASTICSEARCH_PASSWORD}"
 
 echo -e "\n ##### portainer #####"
 echo -e "   - URL:      http://localhost:9000\n"
