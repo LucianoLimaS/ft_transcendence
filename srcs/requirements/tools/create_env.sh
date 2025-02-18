@@ -15,7 +15,7 @@ SECRET_KEY="django-insecure-hy0f)6#-mkp1kq9+4o2dh!(uv=oa07yy&eaamu*y@6(di22rm("
 DJANGO_SETTINGS_MODULE=a_core.settings
 
 # 0 False, 1 True
-DEBUG="0"
+DEBUG="1"
 
 #setup windows desktop environment
 WINDOWS="0"
@@ -54,9 +54,17 @@ REDIS_HOST="redis"
 REDIS_PORT="6379"
 REDIS_ADDR="redis:6379"
 
-ELASTICSEARCH_USERNAME=transcendence
-ELASTICSEARCH_PASSWORD=9876543210
 ES_JAVA_OPTS=-Xms512m -Xmx512m
+ES_MEM_LIMIT=1073741824
+KB_MEM_LIMIT=1073741824
+LICENSE=basic
+CLUSTER_NAME=es_cluster
+ELASTIC_USER=elastic
+ELASTIC_PASSWORD=must_be_string
+ELASTIC_HOSTS=https://elasticsearch:9200
+
+KIBANA_PASSWORD=must_be_string
+ENCRYPTION_KEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
 
 EOL
 
