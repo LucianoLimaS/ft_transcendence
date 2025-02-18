@@ -202,73 +202,6 @@ services:
     restart: always
     attach: false
 
-  # elasticsearch:
-  #   image: elasticsearch
-  #   container_name: elasticsearch
-  #   build:
-  #     context: ./
-  #     dockerfile: srcs/requirements/elasticsearch/Dockerfile
-  #   env_file:
-  #     - ./srcs/.env
-  #   environment:
-  #     - "ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}"
-  #     - "ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}"
-  #     - "ES_JAVA_OPTS=${ES_JAVA_OPTS}"
-  #   volumes:
-  #     - elasticsearch_vol:/usr/share/elasticsearch/data
-  #     - elasticsearch_certs:/usr/share/elasticsearch/config/certs
-  #   ports:
-  #     - "9200:9200"
-  #   networks:
-  #     - transcendence
-  #   restart: always
-  #   attach: true
-
-
-  # logstash:
-  #   image: docker.elastic.co/logstash/logstash:8.17.2
-  #   container_name: logstash
-  #   environment:
-  #     - LS_JAVA_OPTS=-Xms512m -Xmx512m
-  #     - discovery.type=single-node
-  #     - "ELASTICSEARCH_HOSTS=https://elasticsearch:9200"
-  #   volumes:
-  #     # - ./srcs/requirements/logstash/config:/usr/share/logstash/config
-  #     - ./srcs/requirements/logstash/pipeline:/usr/share/logstash/pipeline
-  #     - elasticsearch_certs:/usr/share/logstash/config/certs
-  #   ports:
-  #     - "5044:5044"
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - elasticsearch
-  #   restart: always
-  #   attach: false
-
-  # kibana:
-  #   image: kibana
-  #   container_name: kibana
-  #   build:
-  #     context: ./
-  #     dockerfile: srcs/requirements/kibana/Dockerfile
-  #   env_file:
-  #     - ./srcs/.env
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
-  #     - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME}
-  #     - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
-  #     - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/certs/ca.crt
-  #     - ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
-  #   volumes:
-  #     - elasticsearch_certs:/usr/share/kibana/config/certs
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - transcendence
-  #   depends_on:
-  #     - elasticsearch
-  #   restart: always
-
   setup_elk:
     container_name: setup_elk
     image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
@@ -338,6 +271,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    attach: false
 
   kibana:
     container_name: kibana
@@ -375,6 +309,7 @@ services:
       - transcendence
     ports:
       - "5601:5601"
+    attach: false
 
   logstash:
     container_name: logstash
@@ -396,6 +331,30 @@ services:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://elasticsearch:9200
+    networks:
+      - transcendence
+    attach: false
+
+  filebeat:
+    container_name: filebeat
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    image: docker.elastic.co/beats/filebeat:8.7.1
+    user: root
+    volumes:
+      - certs_vol:/usr/share/filebeat/certs
+      - filebeat_vol:/usr/share/filebeat/data
+      - ./srcs/requirements/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://elasticsearch:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash:9600
+    command: ["/bin/sh", "-c", "chmod go-w /usr/share/filebeat/filebeat.yml && filebeat -e"]
     networks:
       - transcendence
 
@@ -537,7 +496,14 @@ volumes:
       o: bind
       type: none
       device: /home/${USER}/data/logstash
-
+  
+  filebeat_vol:
+    name: filebeat_vol
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/filebeat
+  
   certs_vol:
     name: certs_vol
     driver_opts:

@@ -16,6 +16,7 @@ if [ ! -d "/home/${USER}/data" ]; then
         mkdir /home/${USER}/data/es
         mkdir /home/${USER}/data/kibana
         mkdir /home/${USER}/data/logstash
+        mkdir /home/${USER}/data/filebeat
         mkdir /home/${USER}/data/certs
         sudo chmod -R 777 /home/${USER}/data
 fi
