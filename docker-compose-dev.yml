@@ -336,16 +336,18 @@ services:
     attach: false
 
   filebeat:
+    image: filebeat
     container_name: filebeat
+    build:
+      context: ./ #raiz do projeto
+      dockerfile: srcs/requirements/elk/Dockerfile
     depends_on:
       elasticsearch:
         condition: service_healthy
-    image: docker.elastic.co/beats/filebeat:8.7.1
     user: root
     volumes:
       - certs_vol:/usr/share/filebeat/certs
       - filebeat_vol:/usr/share/filebeat/data
-      - ./srcs/requirements/elk/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
@@ -354,7 +356,6 @@ services:
       - ELASTIC_HOSTS=https://elasticsearch:9200
       - KIBANA_HOSTS=http://kibana:5601
       - LOGSTASH_HOSTS=http://logstash:9600
-    command: ["/bin/sh", "-c", "chmod go-w /usr/share/filebeat/filebeat.yml && filebeat -e"]
     networks:
       - transcendence
 
