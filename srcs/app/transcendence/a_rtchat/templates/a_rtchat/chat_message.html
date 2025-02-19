@@ -60,14 +60,14 @@
     <div class="">
       <div class="mr-2 row">
         <a href="{% url 'profile' message.author.username %}">
-          <div class="relative">
+          <div class="relative d-flex">
             <div id="user-{{ message.author.id }}"></div>
             <img src="{{ message.author.profile.avatar }}" alt="{{ message.author.username }}" class="profile-pic mr-2" />
+            <div class="username align-self-end">{{ message.author.username }}</div>
           </div>
         </a>
       </div>
-      <div class="message-content">
-        <div class="username">{{ message.author.username }}</div>
+      <div class="message-content mt-2">
         <div class="message received">{{ message.body }}</div>
         <div class="message-time">{{ message.created|date:'H:i' }}</div>
       </div>
