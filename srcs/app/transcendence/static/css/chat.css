@@ -170,9 +170,9 @@ body, html {
 
 /* Estilos para a div de emojis */
 .emojis {
-    display: none; /* Inicialmente oculta */
-    position: absolute;
-    bottom: 60px; /* Ajuste conforme necessário */
+    /* display: none; Inicialmente oculta */
+    /*position: absolute;
+    bottom: 60px;  Ajuste conforme necessário */
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;

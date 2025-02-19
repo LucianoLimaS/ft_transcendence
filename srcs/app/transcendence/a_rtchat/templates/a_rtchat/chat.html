@@ -57,13 +57,13 @@
 
       <!-- CHAT 2 -->
 
-      <!--  <div id='chat_container' class="overflow-auto">
+      <!--   <div id='chat_container' class="overflow-auto">
             <ul id='chat_messages' class="d-flex flex-column justify-content-end gap-3 p-3">
                 {% for message in chat_messages reversed %}
                 {% include 'a_rtchat/chat_message.html' %}
                 {% endfor %}
             </ul>
-        </div>  -->
+        </div>   -->
 
       <div class="sticky-bottom p-3 bg-secondary rounded">
         <div class="d-flex flex-column gap-2 align-items-center">
@@ -73,8 +73,8 @@
           </form>
           <form id="chat_file_form" enctype="multipart/form-data" class="d-flex align-items-center w-100" hx-post="{% url 'chat-file-upload' chat_group.group_name %}" hx-target="#chat_messages" hx-swap="beforeend" _="on htmx:beforeSend reset() me">
             {% csrf_token %}
-            <!--  <input type="file" name="file" id="id_file" class="bg-transparent text-muted">
-                    <button type="submit" class="btn btn-secondary">Submit File</button>  -->
+            <!--   <input type="file" name="file" id="id_file" class="bg-transparent text-muted">
+                    <button type="submit" class="btn btn-secondary">Submit File</button>   -->
           </form>
         </div>
       </div>
@@ -197,13 +197,13 @@
           <div class="message-list" id="message-list">
             <div id="chat_container" hx-swap-oob="true">
               <ul id="chat_messages">
-                    {% for message in chat_messages reversed %}
-                    <!-- Usando o template para renderizar mensagens -->
-                    <div id="message-{{ message.id }}">
-                        {% include 'a_rtchat/chat_message.html' %}
-                    </div>
-                    {% endfor %}
-                </ul>
+                {% for message in chat_messages reversed %}
+                  <!-- Usando o template para renderizar mensagens -->
+                  <div id="message-{{ message.id }}">
+                    {% include 'a_rtchat/chat_message.html' %}
+                  </div>
+                {% endfor %}
+              </ul>
             </div>
           </div>
 
@@ -211,7 +211,27 @@
             <div class="input-group row w-100 d-flex justify-content-center p-0 m-0">
               <form id="chat_message_form" class="w-100 bg-secondary p-2 rounded" hx-ext="ws" ws-connect="/ws/chatroom/{{ chatroom_name }}" ws-send _="on htmx:wsAfterSend reset() me">
                 {% csrf_token %}
-                {{ form }}
+
+                {% comment %} Emoji List {% endcomment %}
+                <div class="container bg-white text-white position-absolute emojis d-none" id="emojiShow"  style="top: -8.5em; left: 0px; width: auto">
+                    <span>😃</span> <span>😁</span> <span>😅</span> <span>🤣</span> <span>😉</span> 
+                    <span>😊</span> <span>😇</span> <span>😲</span> <span>😳</span> <span>😥</span> 
+                    <span>🥰</span> <span>😍</span> <span>😘</span> <span>😜</span> <span>🤫</span>
+                    <span>🤤</span> <span>😈</span> <span>😻</span> <span>🙈</span> <span>🙊</span> 
+                    <span>💘</span> <span>💕</span> <span>💞</span> <span>💌</span> <span>💑</span> 
+                    <span>💐</span> <span>🌹</span> <span>🎀</span> <span>🍨</span> <span>🍭</span> 
+                    <span>💃</span> <span>🏄</span> <span>🛀</span> <span>🏩</span> <span>👑</span> 
+                    <span>🦁</span> <span>🦄</span> <span>🎠</span> <span>🧸</span> <span>💍</span>
+                </div>
+                {% comment %}INPUT{% endcomment %}
+                <div class="d-flex row p-0 m-0">
+
+                  <button style="width: 45px" onclick="showEmoji()" class="btn btn-light text-center col"><i class="fas fa-smile"></i></button>
+
+                  {{ form.body }}
+
+                  <button type="submit" style="width: 45px" class="btn btn-light text-center col"><i class="fas fa-paper-plane"></i></button>
+                </div>
               </form>
             </div>
           </div>
@@ -238,5 +258,17 @@
     labels.forEach((label) => {
       label.classList.add('d-none')
     })
+
+    function showEmoji() {
+      const emojiShow = document.getElementById('emojiShow')
+
+      if (emojiShow.classList.contains('d-none')) {
+        emojiShow.classList.remove('d-none')
+      } else {
+        emojiShow.classList.add('d-none')
+      }
+
+    }
+
   </script>
 {% endblock %}
