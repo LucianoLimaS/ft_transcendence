@@ -431,119 +431,119 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/app
+      device: /home/camuri/data/app
 
   postgres_vol:
     name: postgres_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/postgres
+      device: /home/camuri/data/postgres
 
   pgadmin_vol:
     name: pgadmin_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/pgadmin
+      device: /home/camuri/data/pgadmin
 
   grafana_vol:
     name: grafana_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/grafana
+      device: /home/camuri/data/grafana
 
   prometheus_vol:
     name: prometheus_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/prometheus
+      device: /home/camuri/data/prometheus
 
   selenium_vol:
     name: selenium_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/selenium
+      device: /home/camuri/data/selenium
 
   minio_vol:
     name: minio_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/minio
+      device: /home/camuri/data/minio
   
   nginx_vol:
     name: nginx_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/nginx
+      device: /home/camuri/data/nginx
 
   static_vol:
     name: static_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/staticfiles
+      device: /home/camuri/data/staticfiles
 
   portainer_vol:
     name: portainer_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/portainer
+      device: /home/camuri/data/portainer
 
   redis_vol:
     name: redis_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/redis
+      device: /home/camuri/data/redis
   
   elasticsearch_vol:
     name: elasticsearch_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/elasticsearch
+      device: /home/camuri/data/elasticsearch
 
   es_vol:
     name: es_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/es
+      device: /home/camuri/data/es
 
   kibana_vol:
     name: kibana_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/kibana
+      device: /home/camuri/data/kibana
 
   logstash_vol:
     name: logstash_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/logstash
+      device: /home/camuri/data/logstash
   
   filebeat_vol:
     name: filebeat_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/filebeat
+      device: /home/camuri/data/filebeat
   
   certs_vol:
     name: certs_vol
     driver_opts:
       o: bind
       type: none
-      device: /home/${USER}/data/certs
+      device: /home/camuri/data/certs
 
 networks:
     transcendence:

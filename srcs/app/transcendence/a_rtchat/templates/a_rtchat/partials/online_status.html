@@ -1,52 +1,116 @@
-<div id="online-user-count">
-  {% if online_users %}
-    <span class="bg-danger rounded-lg pt-1 pb-2 px-2 text-white text-sm ml-4">{{ online_users.count }} online</span>
-  {% endif %}
-</div>
-
-<div id="online-in-chats">
+{% comment %} <div id="online-in-chats">
   {% if online_in_chats %}
-    {% comment %} BOLINHA QUE FICA DO LADO DO TEXTO DO MENU CHATS {% endcomment %}
     <div class="green-dot position-absolute top-0" style="left: 5px;"></div>
   {% endif %}
-</div>
-<ul id="chats-list" class="hoverlist [&>li>a]:justify-end">
-  <li class="relative">
-      {% if public_chat_users %}
-      <div class="green-dot absolute top-1 left-1"></div>
-      {% else %}
-      <div class="graylight-dot absolute top-1 left-1"></div>
-      {% endif %}
-      <a href="{% url 'home' %}">Public Chat</a>
-  </li>
+</div> {% endcomment %}
+
+{% comment %} <ul id="chats-list" class="hoverlist [&>li>a]:justify-end">
   {% for chatroom in user.chat_groups.all %}
-  {% if chatroom.groupchat_name %}
-  <li class="relative">
-      {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+    {% if chatroom.groupchat_name %}
+      <li class="relative">
+        {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
           <div class="green-dot absolute top-1 left-1"></div>
-      {% else %}
+        {% else %}
           <div class="graylight-dot absolute top-1 left-1"></div>
-      {% endif %}    
-      <a class="leading-5 text-right" href="{% url 'chatroom' chatroom.group_name %}">
-          {{ chatroom.groupchat_name|slice:":30" }}
-      </a>
-  </li>
-  {% endif %}
+        {% endif %}
+        <a class="leading-5 text-right" href="{% url 'chatroom' chatroom.group_name %}">{{ chatroom.groupchat_name|slice:':30' }}</a>
+      </li>
+    {% endif %}
   {% endfor %}
   {% for chatroom in user.chat_groups.all %}
-      {% if chatroom.is_private %}
-          {% for member in chatroom.members.all %}
-              {% if member != user %}
-              <li class="relative">
-                  {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
-                      <div class="green-dot absolute top-1 left-1"></div>
+    {% if chatroom.is_private %}
+      {% for member in chatroom.members.all %}
+        {% if member != user %}
+          <li class="relative">
+            {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+              <div class="green-dot absolute top-1 left-1"></div>
+            {% else %}
+              <div class="graylight-dot absolute top-1 left-1"></div>
+            {% endif %}
+            <a href="{% url 'chatroom' chatroom.group_name %}">{{ member.profile.name }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+</ul> {% endcomment %}
+<ul id="chats-list" class="hoverlist [&>li>a]:justify-end">
+  {% for chatroom in user.chat_groups.all %}
+    {% if chatroom.groupchat_name %}
+      <!-- Grupo de Chat -->
+      <li class="relative">
+        {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+          <div class="green-dot absolute top-1 left-1"></div>
+        {% else %}
+          <div class="graylight-dot absolute top-1 left-1"></div>
+        {% endif %}
+
+        <a class="d-flex justify-content-start ml-3 link-list-chats" href="{% url 'chatroom' chatroom.group_name %}">
+          <div class="d-flex align-items-center">
+            <img src="{% if chatroom.avatar %}
+                {{ chatroom.avatar }}
+              {% else %}
+                {{ '/images/galaxy_lobby_1.png' }}
+              {% endif %}"
+              alt="Group avatar"
+              class="avatar mr-3" />
+
+            <div>
+              <h6 class="mb-0">{{ chatroom.groupchat_name|slice:':30' }}</h6>
+              <small class="text-muted">Group Chat</small>
+            </div>
+
+            <small class="text-muted ml-auto">10:30 AM</small>
+          </div>
+        </a>
+
+        <!-- Dropdown para grupos -->
+        <div id="chat-{{ chatroom.id }}" class="dropdown">
+          <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ chatroom.groupchat_name }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+        </div>
+      </li>
+    {% endif %}
+  {% endfor %}
+
+  {% for chatroom in user.chat_groups.all %}
+    {% if chatroom.is_private %}
+      <!-- Chat Privado -->
+      {% for member in chatroom.members.all %}
+        {% if member != user %}
+          <li class="relative">
+            {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+              <div class="green-dot absolute top-1 left-1"></div>
+            {% else %}
+              <div class="graylight-dot absolute top-1 left-1"></div>
+            {% endif %}
+
+            <a class="d-flex justify-content-start ml-3 link-list-chats" href="{% url 'chatroom' chatroom.group_name %}">
+              <div class="d-flex align-items-center">
+                <!-- Avatar do membro -->
+                <img src="{% if member.profile.avatar %}
+                    {{ member.profile.avatar }}
                   {% else %}
-                      <div class="graylight-dot absolute top-1 left-1"></div>
-                  {% endif %}
-                  <a href="{% url 'chatroom' chatroom.group_name %}">{{ member.profile.name }}</a>
-              </li>
-              {% endif %}
-          {% endfor %}
-      {% endif %}
-  {% endfor %}    
+                    {{ '/images/galaxy_lobby_1.png' }}
+                  {% endif %}"
+                  alt="{{ member.username }}'s avatar"
+                  class="avatar mr-3" />
+
+                <div>
+                  <h6 class="mb-0">{{ member.username }}</h6>
+                  <small class="text-muted">Last message preview</small>
+                </div>
+
+                <small class="text-muted ml-auto">10:30 AM</small>
+              </div>
+            </a>
+
+            <!-- Dropdown para chat privado -->
+            <div id="chat-{{ chatroom.id }}" class="dropdown">
+              <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ chatroom.groupchat_name }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+            </div>
+          </li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
 </ul>

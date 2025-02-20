@@ -571,7 +571,7 @@ Este é o serviço principal da aplicação.
 Este serviço fornece o banco de dados PostgreSQL.
 
 - **Image**: A imagem utilizada é `postgres:16.4-alpine3.20`, uma versão leve e estável do Postgres.
-- **Volumes**: Os dados do Postgres são persistidos no diretório local `/home/${USER}/data/postgres`, que é montado como `/var/lib/postgresql/data/` no contêiner.
+- **Volumes**: Os dados do Postgres são persistidos no diretório local `/home/camuri/data/postgres`, que é montado como `/var/lib/postgresql/data/` no contêiner.
 - **Ports**: O Postgres está acessível na porta `5432`, mapeada para a porta `5432` do host.
 - **Variáveis de ambiente**: As variáveis são carregadas do mesmo arquivo `.env` utilizado no serviço `ft_transcendence`.
 - **Network**: Conectado à rede `transcendence`.
@@ -589,7 +589,7 @@ O `Grafana` é uma plataforma de visualização de métricas.
 
 - **Image**: A imagem utilizada é `grafana/grafana:latest`.
 - **Ports**: O Grafana está acessível na porta `3000` do host, mapeada para a porta `3000` do contêiner.
-- **Volumes**: Os dados do Grafana são armazenados no diretório local `/home/${USER}/data/grafana`, montado em `/var/lib/grafana` no contêiner, garantindo persistência.
+- **Volumes**: Os dados do Grafana são armazenados no diretório local `/home/camuri/data/grafana`, montado em `/var/lib/grafana` no contêiner, garantindo persistência.
 - **User**: O contêiner é executado com as permissões definidas por `$UID` e `$GID`, variáveis que podem ser configuradas no `.env`.
 - **Network**: Conectado à rede `transcendence`.
 
@@ -597,7 +597,7 @@ O `Grafana` é uma plataforma de visualização de métricas.
 O `Prometheus` é uma ferramenta de monitoramento e alertas.
 
 - **Image**: A imagem utilizada é `prom/prometheus`.
-- **Volumes**: As configurações do Prometheus são montadas no diretório local `/home/${USER}/data/prometheus`, acessível dentro do contêiner em `/etc/prometheus/`.
+- **Volumes**: As configurações do Prometheus são montadas no diretório local `/home/camuri/data/prometheus`, acessível dentro do contêiner em `/etc/prometheus/`.
 - **Ports**: O Prometheus está acessível na porta `9090`, mapeada para a porta `9090` do host.
 - **Network**: Conectado à rede `transcendence`.
 

@@ -1,22 +1,22 @@
 #!/bin/bash
-if [ ! -d "/home/${USER}/data" ]; then
-        mkdir /home/${USER}/data
-        mkdir /home/${USER}/data/app
-        mkdir /home/${USER}/data/grafana
-        mkdir /home/${USER}/data/minio
-        mkdir /home/${USER}/data/pgadmin
-        mkdir /home/${USER}/data/postgres
-        mkdir /home/${USER}/data/prometheus
-        mkdir /home/${USER}/data/selenium
-        mkdir /home/${USER}/data/nginx
-        mkdir /home/${USER}/data/staticfiles
-        mkdir /home/${USER}/data/portainer
-        mkdir /home/${USER}/data/redis
-        mkdir /home/${USER}/data/elasticsearch
-        mkdir /home/${USER}/data/es
-        mkdir /home/${USER}/data/kibana
-        mkdir /home/${USER}/data/logstash
-        mkdir /home/${USER}/data/filebeat
-        mkdir /home/${USER}/data/certs
-        sudo chmod -R 777 /home/${USER}/data
+if [ ! -d "/home/camuri/data" ]; then
+        mkdir /home/camuri/data
+        mkdir /home/camuri/data/app
+        mkdir /home/camuri/data/grafana
+        mkdir /home/camuri/data/minio
+        mkdir /home/camuri/data/pgadmin
+        mkdir /home/camuri/data/postgres
+        mkdir /home/camuri/data/prometheus
+        mkdir /home/camuri/data/selenium
+        mkdir /home/camuri/data/nginx
+        mkdir /home/camuri/data/staticfiles
+        mkdir /home/camuri/data/portainer
+        mkdir /home/camuri/data/redis
+        mkdir /home/camuri/data/elasticsearch
+        mkdir /home/camuri/data/es
+        mkdir /home/camuri/data/kibana
+        mkdir /home/camuri/data/logstash
+        mkdir /home/camuri/data/filebeat
+        mkdir /home/camuri/data/certs
+        sudo chmod -R 777 /home/camuri/data
 fi
