@@ -224,6 +224,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    attach: false
 
   elasticsearch:
     container_name: elasticsearch
@@ -271,6 +272,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    restart: always
     attach: false
 
   kibana:
@@ -309,7 +311,8 @@ services:
       - transcendence
     ports:
       - "5601:5601"
-    attach: false
+    restart: always
+    attach: true
 
   logstash:
     container_name: logstash
@@ -333,6 +336,7 @@ services:
       - ELASTIC_HOSTS=https://elasticsearch:9200
     networks:
       - transcendence
+    restart: always
     attach: false
 
   filebeat:
@@ -358,6 +362,8 @@ services:
       - LOGSTASH_HOSTS=http://logstash:9600
     networks:
       - transcendence
+    restart: always
+    attach: false
 
   django-worker:
     container_name: django-worker
