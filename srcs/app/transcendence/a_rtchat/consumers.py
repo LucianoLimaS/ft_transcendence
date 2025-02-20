@@ -14,9 +14,15 @@ class ChatroomConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(
             self.chatroom_name, self.channel_name
         )
+
+        # Verifique o parâmetro 'add_user' na URL
+        query_string = self.scope['query_string'].decode()
+        add_user = True  # Valor padrão
+        if 'add_user' in query_string:
+            add_user = query_string.split('add_user=')[1].split('&')[0] == 'true'
         
         # add and update online users
-        if self.user not in self.chatroom.users_online.all():
+        if add_user and  self.user not in self.chatroom.users_online.all():
             self.chatroom.users_online.add(self.user)
             self.update_online_count()
         
@@ -36,9 +42,17 @@ class ChatroomConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         body = text_data_json['body']
         
+        # Verifique se 'system_notification' está presente no dicionário
+        sistem_notification = text_data_json.get('system_notification', False)
+
+        print(f"\033[43m{sistem_notification}\033[0m")
+        author = self.user
+        if sistem_notification:
+            author = get_object_or_404(User, username="notificação do sistema")
+
         message = GroupMessage.objects.create(
             body = body,
-            author = self.user, 
+            author = author, 
             group = self.chatroom 
         )
         event = {

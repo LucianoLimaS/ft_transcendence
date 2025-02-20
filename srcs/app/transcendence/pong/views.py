@@ -15,6 +15,10 @@ from .forms import PongRoomForm, TournamentForm
 from .models import GameMode, Match, PongRoom, Tournament, TournamentParticipant
 from django.contrib.auth.models import User
 
+import asyncio
+import websockets
+import json
+
 logger = logging.getLogger(__name__)
 
 class PongSelectGameMode(LoginRequiredMixin, TemplateView):
@@ -70,12 +74,38 @@ class PongEnterView(LoginRequiredMixin, TemplateView):
             return render(request, "pong/enter.html", self.get_context_data(**kwargs))
         return self.render_to_response(self.get_context_data(**kwargs))
 
+    async def send_websocket_message(self, message):
+        uri = "ws://localhost:8000/ws/chatroom/public-chat?add_user=false"
+        async with websockets.connect(uri) as websocket:
+            await websocket.send(message)
+            response = await websocket.recv()
+            return response
+
     def post(self, request, *args, **kwargs):
         game_mode = kwargs.get("game_mode")
 
+        # Prepare the message to send to the WebSocket
+        name = request.POST.get("name")
+        message = json.dumps({
+            "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
+            "body": f"Foi criado a sala {name}, corre pra jogar!",
+            "system_notification": True,  # Adiciona a chave system_notification
+            "HEADERS": {
+            "HX-Request": "true",
+            "HX-Trigger": "chat_message_form",
+            "HX-Trigger-Name": None,
+            "HX-Target": "chat_message_form",
+            "HX-Current-URL": "http://localhost:8000/",
+            "X-CSRFToken": request.POST.get("csrfmiddlewaretoken")
+            }
+        })
+
+                # Send the message to the WebSocket
+        response = asyncio.run(self.send_websocket_message(message))
+        logger.info(f"WebSocket response: {response}")
+
         logger.info(f"PongEnterView POST game_mode: {game_mode}")
         logger.info(f"PongEnterView POST data: {request.POST}")
-
         if game_mode == GameMode.TOURNAMENT.value:
             form = TournamentForm(request.POST)
             max_players = request.POST.get("max_players")
