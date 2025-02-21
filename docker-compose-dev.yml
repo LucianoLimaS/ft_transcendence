@@ -208,6 +208,7 @@ services:
     volumes:
       - certs_vol:/usr/share/elasticsearch/config/certs
       - ./srcs/requirements/elk/elksetup.sh:/usr/local/bin/elksetup.sh
+      - ./srcs/requirements/elk/kibana_export.ndjson:/usr/share/kibana/kibana_export.ndjson
     user: root
     env_file:
       - ./srcs/.env
@@ -224,6 +225,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    attach: true
 
   elasticsearch:
     container_name: elasticsearch
@@ -271,6 +273,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    restart: always
     attach: false
 
   kibana:
@@ -309,6 +312,7 @@ services:
       - transcendence
     ports:
       - "5601:5601"
+    restart: always
     attach: false
 
   logstash:
@@ -333,6 +337,7 @@ services:
       - ELASTIC_HOSTS=https://elasticsearch:9200
     networks:
       - transcendence
+    restart: always
     attach: false
 
   filebeat:
@@ -358,6 +363,8 @@ services:
       - LOGSTASH_HOSTS=http://logstash:9600
     networks:
       - transcendence
+    restart: always
+    attach: false
 
   django-worker:
     container_name: django-worker
