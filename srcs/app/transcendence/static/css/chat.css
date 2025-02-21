@@ -134,6 +134,15 @@ body, html {
     border-top-left-radius: 0;
 }
 
+
+.message.received.system-message {
+    background-color: #ff0000;
+    border-top-left-radius: 0;
+    color: white !important;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
 .message.sent {
     background-color: #bad4f7;
     border-top-right-radius: 0;

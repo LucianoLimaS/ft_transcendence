@@ -59,6 +59,14 @@
   <div class="chat-message received">
     <div class="">
       <div class="mr-2 row">
+      
+        {%if message.author.username == 'notificação do sistema' %}
+        {% comment %} CASO SEJA MENSAGEM DO SISTEMA {% endcomment %}
+            <img src="../../static/images/alert.png" style="" alt="{{ message.author.username }}" class="profile-pic mr-2" />
+            <div class="username align-self-end">{{ message.author.profile.name }}</div>
+            
+        {% comment %} CASO NÃO SEJA {% endcomment %}
+        {% else %}
         <a href="{% url 'profile' message.author.username %}">
           <div class="position-relative d-flex">
             <div class="m-0 p-0 position-absolute" style="top: 0 !important; left: -50px !important" id="user-{{ message.author.id }}"></div>
@@ -66,13 +74,19 @@
             <div class="username align-self-end">{{ message.author.profile.name }}</div>
           </div>
         </a>
+        {% endif %}
+
+
       </div>
       <div class="message-content mt-2">
-        <div class="message received">{{ message.body }}</div>
-        <div class="message-time">{{ message.created|date:'H:i' }}</div>
+        {%if message.author.username == 'notificação do sistema' %}
+          <div class="message received system-message w-100">{{ message.body }}</div>
+          <div class="message-time">{{ message.created|date:'H:i' }}</div>
+        {% else %}
+          <div class="message received">{{ message.body }}</div>
+          <div class="message-time">{{ message.created|date:'H:i' }}</div>
+        {% endif %}
       </div>
-
-    <!-- Usando o perfil para pegar o avatar -->
     
     
   </div>
