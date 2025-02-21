@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     volumes:
       - ./srcs/app/transcendence:/ft_transcendence
-      - /home/camuri/data/staticfiles:/ft_transcendence/staticfiles
+      - /home/${USER}/data/staticfiles:/ft_transcendence/staticfiles
     networks:
       - transcendence
     depends_on:
@@ -32,7 +32,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /home/camuri/data/postgres:/var/lib/postgresql/data
+      - /home/${USER}/data/postgres:/var/lib/postgresql/data
     networks:
       - transcendence
     restart: always
@@ -60,7 +60,7 @@ services:
     ports:
       - "5050:80"
     volumes:
-      - /home/camuri/data/pgadmin:/var/lib/pgadmin
+      - /home/${USER}/data/pgadmin:/var/lib/pgadmin
     networks:
       - transcendence
     depends_on:
@@ -79,7 +79,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - /home/camuri/data/grafana:/var/lib/grafana
+      - /home/${USER}/data/grafana:/var/lib/grafana
       - ./srcs/requirements/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./srcs/requirements/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./srcs/requirements/grafana/dashboards:/etc/grafana/dashboards
@@ -96,7 +96,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - /home/camuri/data/prometheus:/prometheus
+      - /home/${USER}/data/prometheus:/prometheus
       - ./srcs/requirements/prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml
     networks:
       - transcendence
@@ -117,7 +117,7 @@ services:
       - "9001:9001"
       - "9002:9000"  # Porta 9000 mapeada para a API S3
     volumes:
-      - /home/camuri/data/minio:/data
+      - /home/${USER}/data/minio:/data
     networks:
       - transcendence
     depends_on:
@@ -132,7 +132,7 @@ services:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
-      - /home/camuri/data/selenium:/var/log/selenium
+      - /home/${USER}/data/selenium:/var/log/selenium
       # - chrome_profiles:/tmp/chrome
     networks:
       - transcendence
@@ -153,8 +153,8 @@ services:
     volumes:
       - ./srcs/requirements/nginx/nginx-dev.conf:/etc/nginx/nginx.conf  # Configuração personalizada do Nginx
       - ./srcs/requirements/certs:/etc/nginx/certs
-      - /home/camuri/data/staticfiles:/static  # Arquivos estáticos com volume persistente
-      - /home/camuri/data/nginx:/var/log/nginx # Logs do nginx
+      - /home/${USER}/data/staticfiles:/static  # Arquivos estáticos com volume persistente
+      - /home/${USER}/data/nginx:/var/log/nginx # Logs do nginx
     networks:
       - transcendence
     depends_on:
@@ -182,7 +182,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - /home/camuri/data/redis:/data
+      - /home/${USER}/data/redis:/data
     networks:
       - transcendence
     restart: always
@@ -206,7 +206,7 @@ services:
     container_name: setup_elk
     image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
     volumes:
-      - /home/camuri/data/certs:/usr/share/elasticsearch/config/certs
+      - /home/${USER}/data/certs:/usr/share/elasticsearch/config/certs
       - ./srcs/requirements/elk/elksetup.sh:/usr/local/bin/elksetup.sh
     user: root
     env_file:
@@ -234,8 +234,8 @@ services:
     labels:
       co.elastic.logs/module: elasticsearch
     volumes:
-      - /home/camuri/data/certs:/usr/share/elasticsearch/config/certs
-      - /home/camuri/data/es:/usr/share/elasticsearch/data
+      - /home/${USER}/data/certs:/usr/share/elasticsearch/config/certs
+      - /home/${USER}/data/es:/usr/share/elasticsearch/data
     env_file:
       - ./srcs/.env
     environment:
@@ -282,8 +282,8 @@ services:
     labels:
       co.elastic.logs/module: kibana
     volumes:
-      - /home/camuri/data/certs:/usr/share/kibana/config/certs
-      - /home/camuri/data/kibana:/usr/share/kibana/data
+      - /home/${USER}/data/certs:/usr/share/kibana/config/certs
+      - /home/${USER}/data/kibana:/usr/share/kibana/data
     env_file:
       - ./srcs/.env
     environment:
@@ -322,8 +322,8 @@ services:
       co.elastic.logs/module: logstash
     user: root
     volumes:
-      - /home/camuri/data/certs:/usr/share/logstash/certs
-      - /home/camuri/data/logstash:/usr/share/logstash/data
+      - /home/${USER}/data/certs:/usr/share/logstash/certs
+      - /home/${USER}/data/logstash:/usr/share/logstash/data
       - ./srcs/requirements/elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     environment:
       - xpack.monitoring.enabled=false
@@ -344,8 +344,8 @@ services:
         condition: service_healthy
     user: root
     volumes:
-      - /home/camuri/data/certs:/usr/share/filebeat/certs
-      - /home/camuri/data/filebeat:/usr/share/filebeat/data
+      - /home/${USER}/data/certs:/usr/share/filebeat/certs
+      - /home/${USER}/data/filebeat:/usr/share/filebeat/data
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
@@ -382,7 +382,7 @@ services:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/camuri/data/portainer:/data 
+      - /home/${USER}/data/portainer:/data 
     networks:
       - transcendence
     depends_on:
