@@ -45,7 +45,6 @@ class ChatroomConsumer(WebsocketConsumer):
         # Verifique se 'system_notification' está presente no dicionário
         sistem_notification = text_data_json.get('system_notification', False)
 
-        print(f"\033[43m{sistem_notification}\033[0m")
         author = self.user
         if sistem_notification:
             author = get_object_or_404(User, username="notificação do sistema")

@@ -74,8 +74,8 @@ class PongEnterView(LoginRequiredMixin, TemplateView):
             return render(request, "pong/enter.html", self.get_context_data(**kwargs))
         return self.render_to_response(self.get_context_data(**kwargs))
 
-    async def send_websocket_message(self, message):
-        uri = "ws://localhost:8000/ws/chatroom/public-chat?add_user=false"
+    async def send_websocket_message(self, message, request):
+        uri = f"ws://{request.get_host()}/ws/chatroom/public-chat?add_user=false"
         async with websockets.connect(uri) as websocket:
             await websocket.send(message)
             response = await websocket.recv()
@@ -95,13 +95,13 @@ class PongEnterView(LoginRequiredMixin, TemplateView):
             "HX-Trigger": "chat_message_form",
             "HX-Trigger-Name": None,
             "HX-Target": "chat_message_form",
-            "HX-Current-URL": "http://localhost:8000/",
+            "HX-Current-URL": "http://{request.get_host()}/",
             "X-CSRFToken": request.POST.get("csrfmiddlewaretoken")
             }
         })
 
                 # Send the message to the WebSocket
-        response = asyncio.run(self.send_websocket_message(message))
+        response = asyncio.run(self.send_websocket_message(message, request))
         logger.info(f"WebSocket response: {response}")
 
         logger.info(f"PongEnterView POST game_mode: {game_mode}")
