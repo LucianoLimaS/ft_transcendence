@@ -175,13 +175,48 @@
 
 {% block javascript %}
   <script>
-    function scrollToBottom(time = 0) {
-      setTimeout(function () {
-        const container = document.getElementById('message-list')
-        container.scrollTop = container.scrollHeight
-      }, time)
-    }
-    scrollToBottom()
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const emojiContainer = document.getElementById("emojiShow");
+      const inputMessage = document.getElementById("form-input-message");
+  
+      // Verifica se o container existe
+      if (emojiContainer && inputMessage) {
+          emojiContainer.addEventListener("click", function (event) {
+              if (event.target.tagName === "SPAN") {
+                  const emoji = event.target.textContent;
+                  inputMessage.value += emoji; // Adiciona o emoji no input
+                  inputMessage.focus(); // Mantém o foco no input
+              }
+          });
+      }
+  });
+
+  function scrollToBottom(time = 0) {
+    setTimeout(function () {
+        const container = document.getElementById('message-list');
+        container.scrollTop = container.scrollHeight;
+    }, time);
+}
+
+// Observa mudanças no #message-list
+const observer = new MutationObserver(function (mutationsList) {
+    // Verifica se algum novo nó foi adicionado
+    mutationsList.forEach(function (mutation) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            scrollToBottom(); // Chama a função para rolar para o fundo
+        }
+    });
+});
+
+// Configuração para observar a adição de nós dentro de #message-list
+const config = { childList: true, subtree: true };
+
+// Começa a observação
+const container = document.getElementById('message-list');
+if (container) {
+    observer.observe(container, config);
+}
     
     const labels = document.querySelectorAll('label')
     
