@@ -68,9 +68,9 @@ docker:
 		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $$(. /etc/os-release && echo "$$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
 		sudo apt-get update > /dev/null 2>&1; \
 		sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1; \
-		echo "🔧 Adding ${USER} to the Docker group..."; \
-		sudo usermod -aG docker ${USER} > /dev/null 2>&1; \
-		echo "✅ ${USER} has been added to the Docker group."; \
+		echo "🔧 Adding camuri to the Docker group..."; \
+		sudo usermod -aG docker camuri > /dev/null 2>&1; \
+		echo "✅ camuri has been added to the Docker group."; \
 		echo "💀 The system will reboot in 10 seconds..."; \
 		sleep 10; \
 		sudo reboot; \

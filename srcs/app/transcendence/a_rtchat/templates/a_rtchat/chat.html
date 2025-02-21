@@ -217,57 +217,41 @@
       }
   }
 
-    function showDropdownMenu(button, contactName, id) {
-      //Remove caso tenha algum em tela
-      let showingMenu = document.querySelector('.dropdown-menu');
-      if(showingMenu != null) {
-          showingMenu.remove();
-      }
-  
-      // Criar o elemento do menu dropdown
-      const dropdownMenu = document.createElement('div');
-      dropdownMenu.className = 'dropdown-menu';
-      dropdownMenu.classList.add('custom-dropdown-menu', 'show');
-  
-      // Calcular a posição do menu em relação ao botão dentro do contêiner
-      const rect = button.getBoundingClientRect();
-      dropdownMenu.style.top = `${rect.bottom + window.scrollY}px`; // Posicionar abaixo do botão
-      dropdownMenu.style.left = `${rect.left + window.scrollX}px`;
-  
-      // Conteúdo do menu com ações
-      dropdownMenu.innerHTML = `
-          <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">View profile</a>
-          <a class="dropdown-item" href="#" onclick="addFriend('${contactName} ${id}')">Add friend</a>
-          <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName} ${id}')">Delete friend</a>
-          <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName} ${id}')">Challenge to match</a>
-      `;
-  
-      document.body.appendChild(dropdownMenu);
-  
-      // Remover o menu ao clicar em uma opção ou sair com o mouse
-      dropdownMenu.addEventListener('mouseleave', removeDropdownMenu);
-      dropdownMenu.addEventListener('click', removeDropdownMenu);
-  }
-
-  function removeDropdownMenu() {
-    const existingMenu = document.querySelector('.dropdown-menu');
+  function showDropdownMenu(button, contactName, id) {
+    // Remove apenas o dropdown do usuário específico
+    let existingMenu = document.querySelector(`#dropdown-${contactName}-${id}`);
     if (existingMenu) {
         existingMenu.remove();
     }
 
-    function sendMessage() {
-      try {
-          var messageText = $('#message-input').val().trim();
-          if (messageText !== '') {
-              var newMessage = $('<div class="message-container sent"><div class="message sent">' + messageText + '</div></div>');
-              $('#message-list').append(newMessage);
-              $('#message-input').val('');
-              $('#message-list').scrollTop($('#message-list')[0].scrollHeight);
-          }
-      } catch (error) {
-          console.error('Error sending message:', error);
-      }
-  }
+    // Criar o novo menu
+    const dropdownMenu = document.createElement('div');
+    dropdownMenu.className = 'dropdown-menu custom-dropdown-menu show';
+    dropdownMenu.id = `dropdown-${contactName}-${id}`;
+
+    const rect = button.getBoundingClientRect();
+    dropdownMenu.style.top = `${rect.bottom + window.scrollY}px`;
+    dropdownMenu.style.left = `${rect.left + window.scrollX}px`;
+
+    dropdownMenu.innerHTML = `
+        <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">View profile</a>
+        <a class="dropdown-item" href="#" onclick="addFriend('${contactName}', '${id}')">Add friend</a>
+        <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName}', '${id}')">Delete friend</a>
+        <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName}', '${id}')">Challenge to match</a>
+    `;
+
+    document.body.appendChild(dropdownMenu);
+
+    // Remover ao sair com o mouse ou clicar em uma opção
+    dropdownMenu.addEventListener('mouseleave', () => removeDropdownMenu(contactName, id));
+    dropdownMenu.addEventListener('click', () => removeDropdownMenu(contactName, id));
+}
+
+function removeDropdownMenu(contactName, id) {
+    const existingMenu = document.querySelector(`#dropdown-${contactName}-${id}`);
+    if (existingMenu) {
+        existingMenu.remove();
+    }
   
 
 }
