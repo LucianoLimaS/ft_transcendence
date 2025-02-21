@@ -208,6 +208,7 @@ services:
     volumes:
       - certs_vol:/usr/share/elasticsearch/config/certs
       - ./srcs/requirements/elk/elksetup.sh:/usr/local/bin/elksetup.sh
+      - ./srcs/requirements/elk/kibana_export.ndjson:/usr/share/kibana/kibana_export.ndjson
     user: root
     env_file:
       - ./srcs/.env
@@ -224,7 +225,7 @@ services:
       retries: 120
     networks:
       - transcendence
-    attach: false
+    attach: true
 
   elasticsearch:
     container_name: elasticsearch
@@ -312,7 +313,7 @@ services:
     ports:
       - "5601:5601"
     restart: always
-    attach: true
+    attach: false
 
   logstash:
     container_name: logstash

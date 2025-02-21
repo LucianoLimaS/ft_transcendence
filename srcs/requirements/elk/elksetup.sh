@@ -16,7 +16,7 @@ if [ ! -f /usr/share/elasticsearch/config/certs/ca.zip ]; then
 fi
 
 if [ ! -f /usr/share/elasticsearch/config/certs/certs.zip ]; then
-  echo "Creating certs"
+  echo "Creating certificates"
   echo -ne \
     "instances:\n"\
     "  - name: elasticsearch\n"\
@@ -41,10 +41,55 @@ chown -R root:root /usr/share/elasticsearch/config/certs
 find /usr/share/elasticsearch/config/certs -type d -exec chmod 750 {} \;
 find /usr/share/elasticsearch/config/certs -type f -exec chmod 640 {} \;
 
+# Wait for Elasticsearch to be ready
 echo "Waiting for Elasticsearch availability"
-until curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://elasticsearch:9200 | grep -q "missing authentication credentials"; do sleep 30; done
+until curl -s -X GET --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt \
+  -u "elastic:${ELASTIC_PASSWORD}" "https://elasticsearch:9200/_cluster/health" | grep -q '"status":"green"'; do
+  echo "Elasticsearch still initializing..."
+  sleep 10
+done
 
 echo "Setting kibana_system password"
-until curl -s -X POST --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done
+until curl -s -X POST --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do 
+  echo "Waiting for Elasticsearch to allow password change..."
+  sleep 10
+done
+
+# Wait for Kibana to be ready
+echo "Waiting for Kibana availability"
+until curl -s -X GET --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt \
+  -u "elastic:${ELASTIC_PASSWORD}" "http://kibana:5601/api/status" | grep -q '"overall":{"level":"available"'; do
+  echo "Kibana still initializing..."
+  sleep 10
+done
+
+# Import dashboards
+max_retries=5
+attempt=0
+success=false
+
+while [ $attempt -lt $max_retries ]; do
+  echo "Attempt $(($attempt + 1)) to import the dashboard..."
+  response=$(curl -v -s -X POST "http://kibana:5601/api/saved_objects/_import" \
+    -u "elastic:${ELASTIC_PASSWORD}" \
+    --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt \
+    -H "kbn-xsrf: true" \
+    -H "Content-Type: multipart/form-data" \
+    -F "file=@/usr/share/kibana/kibana_export.ndjson")
+
+  if echo "$response" | grep -q "success"; then
+    echo "Dashboard imported successfully!"
+    success=true
+    break
+  else
+    echo "Failed to import dashboard: $response"
+    sleep 30
+  fi
+  attempt=$((attempt + 1))
+done
+
+if [ "$success" = false ]; then
+  echo "Failed to import dashboard after $max_retries attempts."
+fi
 
 echo "All done!"
