@@ -1,17 +1,144 @@
+
+
+ul {
+  list-style-type: none !important;
+}
+
 body {
-  background-image: url('../assets/spaceship-wallpaper.jpg'); /* Caminho da imagem */
-  background-size: cover; /* Faz a imagem cobrir toda a área da página */
-  background-position: center; /* Centraliza a imagem */
-  background-attachment: fixed; /* Faz com que a imagem fique fixa no fundo */
-  background-repeat: no-repeat; /* Evita que a imagem se repita */
+    background-image: url('../assets/spaceship-wallpaper.jpg');  /*Caminho da imagem */
+    background-size: cover; /* Faz a imagem cobrir toda a área da página */
+    background-position: center; /* Centraliza a imagem */
+    background-attachment: fixed; /* Faz com que a imagem fique fixa no fundo */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+  }
+  
+  .full-height {
+    height: 100vh; /* Define a altura como 100% da altura da viewport */
+  }
+  
+  .body-bg-color {
+    background-color: #1a1919;
+  }
+  
+  .card-glow {
+    width: 18rem;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); /* Sombra branca suave */
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .card-glow:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6); /* Efeito de brilho mais forte ao passar o mouse */
+  }
+  
+  .chat-glow {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); /* Sombra branca suave */
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .chat-glow:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6); /* Efeito de brilho mais forte ao passar o mouse */
+  }
+  
+  #registration_modal {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .bg_modal {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .form-control {
+    margin-bottom: 1rem; /* Espaçamento entre campos */
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .alert {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    z-index: 1050; /* Garante que o alerta está sobre o modal */
+  }
+  
+  .switch-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .btn {
+    width: 100%; /* Botões preenchendo a largura do card */
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+
+
+a {
+    text-decoration: none !important;
 }
 
-.full-height {
-  height: 100vh;
+input.box-text,
+input.box-text#id_body {
+    width: 100%;
+    background-color: rgb(236, 236, 236) !important;
+    border-radius: 10px;
+    padding-block: 0px;
+    padding-inline: 0px;
+    border-style: none;
+    outline: none;
+    /* Remove o outline padrão */
 }
 
-.body-bg-color {
-  background-color: #1a1919;
+input.box-text:focus,
+input.box-text#id_body:focus {
+    outline: none;
 }
 
+/* .div-lista-config ul{
+    z-index: 999 !important
+} */
 
+.div-lista-config ul li a {
+    color: black;
+    text-decoration: none;
+}
+
+.div-lista-config ul li a:hover {
+    color: #797979
+}
+
+.green-dot {
+    background-color: #10B981 !important;
+    border-radius: 50% !important;
+    height: 10px !important;
+    width: 10px !important;
+}
+
+.gray-dot {
+    background-color: #6d6d6d;
+    border-radius: 50%;
+    height: 10px;
+    width: 10px;
+}
+
+.graylight-dot {
+    background-color: #c0c0c0;
+    border-radius: 50%;
+    height: 10px;
+    width: 10px;
+}
+a.link-list-chats {
+    color: #3a3a3a;
+    font-weight: 600;
+    text-decoration: none !important;
+}
+a.link-list-chats:hover {
+    color: #198eac;
+}

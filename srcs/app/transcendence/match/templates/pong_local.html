@@ -2,37 +2,38 @@
 {% load i18n %}
 {% block content %}
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<div id="menu" class="d-flex flex-column align-items-center">
-    <button class="menu-button btn btn-light" id="singleplayerBtn">Single Player</button>
-    <button class="menu-button btn btn-light" id="multiplayerBtn">Multiplayer</button>
-    <div id="difficulty">
-        <div class="d-flex justify-content-between">
-            <button class="menu-button btn btn-light" id="easyBtn">Fácil</button>
-            <button class="menu-button btn btn-light" id="mediumBtn">Médio</button>
-            <button class="menu-button btn btn-light" id="hardBtn">Difícil</button>
+<div class="body">
+    <div id="menu" class="d-flex flex-column align-items-center">
+        <button class="menu-button btn btn-light" id="singleplayerBtn">Single Player</button>
+        <button class="menu-button btn btn-light" id="multiplayerBtn">Multiplayer</button>
+        <div id="difficulty">
+            <div class="d-flex justify-content-between">
+                <button class="menu-button btn btn-light" id="easyBtn">Fácil</button>
+                <button class="menu-button btn btn-light" id="mediumBtn">Médio</button>
+                <button class="menu-button btn btn-light" id="hardBtn">Difícil</button>
+            </div>
+            <br>
+            <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
+                divertido o jogo.</span>
         </div>
-        <br>
-        <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
-            divertido o jogo.</span>
+    </div>
+    <div id="scoreboardContainer">
+        <div class="players d-flex justify-content-between">
+            <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
+            <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+        </div>
+    </div>
+    <div id="countdown" class="d-flex justify-content-center align-items-center"></div>
+    <div id="pointCountdown" class="d-flex justify-content-center align-items-center"></div>
+    <div id="winner" class="d-flex flex-column align-items-center">
+        <p id="winnerText"></p>
+        <button id="restartBtn" class="btn btn-light">Reiniciar</button>
+        <button id="menuBtn" class="btn btn-light">Menu</button>
+    </div>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
     </div>
 </div>
-<div id="scoreboardContainer">
-    <div class="players d-flex justify-content-between">
-        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
-        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
-    </div>
-</div>
-<div id="countdown" class="d-flex justify-content-center align-items-center"></div>
-<div id="pointCountdown" class="d-flex justify-content-center align-items-center"></div>
-<div id="winner" class="d-flex flex-column align-items-center">
-    <p id="winnerText"></p>
-    <button id="restartBtn" class="btn btn-light">Reiniciar</button>
-    <button id="menuBtn" class="btn btn-light">Menu</button>
-</div>
-<div id="gameContainer">
-    <canvas id="gameCanvas"></canvas>
-</div>
-
 <script>
     initializePongLocal();
     function initializePongLocal() {
@@ -51,10 +52,10 @@
 
             // Ajusta o tamanho do canvas com base na proporção da janela
             if (windowWidth / windowHeight > aspectRatio) {
-                canvasHeight = windowHeight * 0.8; // 80% da altura da janela
+                canvasHeight = windowHeight * 0.7; // 70% da altura da janela
                 canvasWidth = canvasHeight * aspectRatio;
             } else {
-                canvasWidth = windowWidth * 0.8; // 80% da largura da janela
+                canvasWidth = windowWidth * 0.7; // 70% da largura da janela
                 canvasHeight = canvasWidth / aspectRatio;
             }
 
@@ -476,7 +477,7 @@
                 // Verifica colisão com a raquete esquerda
                 if (ball.x - ball.radius < leftPaddle.x + paddleWidth && ball.x - ball.radius > leftPaddle.x && ball.y > leftPaddle.y && ball.y < leftPaddle.y + paddleHeight) {
                     paddleHit = leftPaddle;
-                // Verifica colisão com a raquete direita
+                    // Verifica colisão com a raquete direita
                 } else if (ball.x + ball.radius > rightPaddle.x && ball.x + ball.radius < rightPaddle.x + paddleWidth && ball.y > rightPaddle.y && ball.y < rightPaddle.y + paddleHeight) {
                     paddleHit = rightPaddle;
                 }
@@ -645,15 +646,14 @@
     }
 </script>
 <style>
-    body {
-        margin: 0;
+    .body {
+        margin: 10px;
         padding: 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        background-color: #000;
+        height: 50%!important;
         font-family: 'Press Start 2P', cursive;
     }
 
