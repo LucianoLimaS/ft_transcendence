@@ -226,6 +226,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    attach: true
 
   elasticsearch:
     container_name: elasticsearch
@@ -313,6 +314,7 @@ services:
     restart: always
     ports:
       - "5601:5601"
+    attach: false
 
   logstash:
     container_name: logstash
@@ -337,7 +339,7 @@ services:
     networks:
       - transcendence
     restart: always
-    
+    attach: false    
 
   filebeat:
     image: filebeat
@@ -364,7 +366,7 @@ services:
     networks:
       - transcendence
     restart: always
-    
+    attach: false
 
   django-worker:
     container_name: django-worker
