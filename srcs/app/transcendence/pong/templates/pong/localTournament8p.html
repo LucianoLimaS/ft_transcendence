@@ -7,6 +7,7 @@
     data-tournament-id="{{ tournament.id }}"
     data-game-mode="tournament"
     data-username="{{ user.username }}">
+    <div class="shadow-div">
         <div class="col-tournament p-0 rounded-4">
             <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
                 <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Tournament</p>
@@ -45,6 +46,7 @@
                 </div>
                 </form>
             </div>
+        </div>
         </div>
     </div>
 
@@ -155,7 +157,7 @@
 </div>
 
 <div id="div-game" class="row app-row justify-content-center gap-4 gap-md-5 px-3 px-md-4 px-lg-5 d-none">
-    <div class="section_pong d-flex justify-content-center align-items-center flex-column"
+    <div class="section_pong d-flex justify-content-center align-items-center flex-column p-5"
     id="game-data"
     data-room-id="{{ room.id }}"
     data-game-mode="{{ game_mode }}">

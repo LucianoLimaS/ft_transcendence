@@ -12,6 +12,7 @@ services:
     volumes:
       - ./srcs/app/transcendence:/ft_transcendence
       - /home/${USER}/data/staticfiles:/ft_transcendence/staticfiles
+      - /home/${USER}/data/logs:/ft_transcendence/logs
     networks:
       - transcendence
     depends_on:
@@ -208,6 +209,7 @@ services:
     volumes:
       - /home/${USER}/data/certs:/usr/share/elasticsearch/config/certs
       - ./srcs/requirements/elk/elksetup.sh:/usr/local/bin/elksetup.sh
+      - ./srcs/requirements/elk/kibana_export.ndjson:/usr/share/kibana/kibana_export.ndjson
     user: root
     env_file:
       - ./srcs/.env
@@ -224,6 +226,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    attach: true
 
   elasticsearch:
     container_name: elasticsearch
@@ -271,6 +274,7 @@ services:
       retries: 120
     networks:
       - transcendence
+    restart: always
     attach: false
 
   kibana:
@@ -307,8 +311,10 @@ services:
       retries: 120
     networks:
       - transcendence
+    restart: always
     ports:
       - "5601:5601"
+    attach: false
 
   logstash:
     container_name: logstash
@@ -332,6 +338,8 @@ services:
       - ELASTIC_HOSTS=https://elasticsearch:9200
     networks:
       - transcendence
+    restart: always
+    attach: false    
 
   filebeat:
     image: filebeat
@@ -348,6 +356,7 @@ services:
       - /home/${USER}/data/filebeat:/usr/share/filebeat/data
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/${USER}/data/logs:/usr/share/filebeat/logs:ro
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
@@ -356,6 +365,8 @@ services:
       - LOGSTASH_HOSTS=http://logstash:9600
     networks:
       - transcendence
+    restart: always
+    attach: false
 
   django-worker:
     container_name: django-worker
