@@ -1,43 +1,93 @@
-{% if message.author == user %}
-<li class="d-flex justify-content-end mb-4">
-    <div class="bg-success text-white rounded-start rounded-top p-3" style="max-width: 75%;">
-        <span>{{ message.body }}</span>
+{% comment %} {% if message.author == user %}
+  <li class="d-flex justify-content-end mb-3">
+    <div class="text-white rounded-left rounded-top-right p-3" style="max-width: 75%; background-color: #bbf7d0;">
+      <span class="text-dark">{{ message.body }}</span>
     </div>
-    <div class="d-flex align-items-end ms-2">
-        <svg height="13" width="8">
-            <path fill="#d1e7dd" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z" />
-        </svg>
+    <div class="d-flex align-items-end">
+      <svg height="13" width="8">
+        <path fill="#bbf7d0" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z" />
+      </svg>
     </div>
-    <div class="text-muted small py-1 ms-3">
-        <span class="fw-bold text-white">{{ message.author.profile.name }}</span>
-        <span class="text-secondary">@{{ message.author.username }}</span>
-        <span class="text-secondary">- {{ message.created|date:"d/m/y H:i" }}</span>
-    </div>
-</li>
+  </li>
+
+
 {% else %}
-<li>
+  <li>
     <div class="d-flex justify-content-start">
-        <div class="d-flex align-items-end me-2">
-            <a hx-get="{% url 'profile' message.author.username %}" hx-target="#content-div" hx-push-url="true">
-                <div class="position-relative">
-                    <div id="user-{{ message.author.id }}"></div>
-                    <img class="rounded-circle" src="{{ message.author.profile.avatar }}" alt="Avatar" style="width: 32px; height: 32px; object-fit: cover;">
-                </div>
-            </a>
-        </div>
-        <div class="d-flex align-items-end">
-            <svg height="13" width="8">
-                <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
-            </svg>
-        </div>
-        <div class="bg-white text-dark p-3 rounded-end rounded-top" style="max-width: 75%;">
-            <span>{{ message.body }}</span>
-        </div>
+      <div class="d-flex align-items-end mr-2">
+        <a href="{% url 'profile' message.author.username %}">
+          <div class="chat-message received">
+            <img alt="User" class="profile-pic" src="{{ message.author.profile.avatar }}" />
+            <div class="message-content row">
+              <div class="username col-2" id="user-{{ message.author.id }}"></div>
+              <div class="message received col"></div>
+              <div class="message-time col">13:48</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="d-flex align-items-end">
+        <svg height="13" width="8">
+          <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+        </svg>
+      </div>
+      <div class="bg-white text-dark p-3 rounded-right rounded-top-left" style="max-width: 75%;">
+        <span>{{ message.body }}</span>dasasdadsasd
+      </div>
     </div>
-    <div class="text-muted small py-1 ms-3">
-        <span class="fw-bold text-white">{{ message.author.profile.name }}</span>
-        <span class="text-secondary">@{{ message.author.username }}</span>
-        <span class="text-secondary">- {{ message.created|date:"d/m/y H:i" }}</span>
+    <div class="text-muted small py-1 ml-5">
+      <span class="text-secondary">{{ message.author.profile.name }}</span>
+      <span class="text-secondary">@{{ message.author.username }}</span>
     </div>
-</li>
+  </li>
+{% endif %} 
+{% endcomment %}
+
+
+
+
+
+{% if message.author == user %}
+  <div class="chat-message sent">
+    <div class="message-content">
+      <div class="message sent">{{ message.body }}</div>
+      <div class="message-time">{{ message.created|date:'H:i' }}</div>
+    </div>
+  </div>
+  
+{% else %}
+  <div class="chat-message received">
+    <div class="">
+      <div class="mr-2 row">
+      
+        {%if message.author.username == 'notificação do sistema' %}
+        {% comment %} CASO SEJA MENSAGEM DO SISTEMA {% endcomment %}
+            <img src="../../static/images/alert.png" style="" alt="{{ message.author.username }}" class="profile-pic mr-2" />
+            <div class="username align-self-end">{{ message.author.profile.name }}</div>
+            
+        {% comment %} CASO NÃO SEJA {% endcomment %}
+        {% else %}
+        <a href="{% url 'profile' message.author.username %}">
+          <div class="position-relative d-flex">
+            <div class="m-0 p-0 position-absolute" style="top: 0 !important; left: -50px !important" id="user-{{ message.author.id }}"></div>
+            <img src="{{ message.author.profile.avatar }}" alt="{{ message.author.username }}" class="profile-pic mr-2" />
+            <div class="username align-self-end">{{ message.author.profile.name }}</div>
+          </div>
+        </a>
+        {% endif %}
+
+
+      </div>
+      <div class="message-content mt-2">
+        {%if message.author.username == 'notificação do sistema' %}
+          <div class="message received system-message w-100">{{ message.body }}</div>
+          <div class="message-time">{{ message.created|date:'H:i' }}</div>
+        {% else %}
+          <div class="message received">{{ message.body }}</div>
+          <div class="message-time">{{ message.created|date:'H:i' }}</div>
+        {% endif %}
+      </div>
+    
+    
+  </div>
 {% endif %}

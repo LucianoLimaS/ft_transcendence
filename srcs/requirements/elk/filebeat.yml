@@ -1,0 +1,15 @@
+filebeat.inputs:
+  - type: filestream
+    id: django-log
+    paths:
+      - /usr/share/filebeat/logs/django.log
+
+# Não é necessário configurar o autodiscover ou add_docker_metadata se for somente o log do Django
+
+setup.kibana:
+  host: ${KIBANA_HOSTS}
+  username: ${ELASTIC_USER}
+  password: ${ELASTIC_PASSWORD}
+
+output.logstash:
+  hosts: ["logstash:5044"]

@@ -1,0 +1,22 @@
+{% extends 'layouts/blank.html' %}
+
+{% block content %}
+
+<div class="container-fluid bg-dark mt-5 p-5" style="width: 75%; border-radius: 10px">
+    <div class="mx-auto text-center">
+        <img class="rounded-circle img-thumbnail mb-4" style="width: 140px; height: 140px; object-fit: cover;"
+            src="{{ profile.avatar }}" alt="User Avatar">
+        <div>
+            <h1 class="text-white">{{ profile.name }}</h1>
+            <div class="text-white">@{{ profile.user.username }}</div>
+        </div>
+        {% if profile.info %}
+        <div class="mt-4 text-justify text-break text-white">{{ profile.info|linebreaksbr }}</div>
+        {% endif %}
+        {% if profile.user != user %}
+        <a class="btn btn-primary mt-4" style="width: 150px" href="{% url 'start-chat' profile.user.username %}">Chat with me</a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

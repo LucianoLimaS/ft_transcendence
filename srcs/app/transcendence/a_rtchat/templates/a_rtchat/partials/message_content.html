@@ -1,12 +1,10 @@
 {% if message.body %}
-    <span>{{ message.body }}</span>
+  <span>{{ message.body }}</span>
 {% elif message.file %}
-    {% if message.is_image %}
-        <img class="img-fluid" style="max-width: 18rem; min-width: 2rem;" src="{{ message.file.url }}" alt="Message Image" />
-    {% else %}
-        &#x1F4CE; 
-        <a class="text-decoration-none fst-italic link-primary" href="{{ message.file.url }}" download>
-            {{ message.filename }}
-        </a>
-    {% endif %}
+  {% if message.is_image %}
+    <img class="img-fluid max-w-72 min-w-8" src="{{ message.file.url }}" />
+  {% else %}
+    <i class="fas fa-paperclip"></i>
+    <a class="cursor-pointer text-muted font-italic hover:underline" href="{{ message.file.url }}" download>{{ message.filename }}</a>
+  {% endif %}
 {% endif %}
