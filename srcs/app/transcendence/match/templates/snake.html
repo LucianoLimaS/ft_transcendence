@@ -1,0 +1,297 @@
+{% load static %}
+{% load i18n %}
+{% block content %}
+<style>
+    #gameCanvas {
+        border: 3px solid #28a745;
+        border-radius: 10px;
+        background: #000;
+        box-shadow: 0 0 20px rgba(40,167,69,0.3);
+    }
+    .snake-cell {
+        transition: all 0.1s ease;
+    }
+    .matrix-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        opacity: 0.1;
+    }
+    .game-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 20px 30px;
+        border-radius: 10px;
+        border: 2px solid #dc3545;
+        text-align: center;
+        display: none;
+        z-index: 1000;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: translate(-50%, -50%) scale(1); }
+        50% { transform: translate(-50%, -50%) scale(1.05); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    .player1-score { color: #28a745; }
+    .player2-score { color: #17a2b8; }
+</style>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card bg-dark border-success mb-3" style="position: relative;">
+                <div id="gameMessage" class="game-message text-success">
+                </div>
+                <div class="card-body">
+                    <canvas id="gameCanvas" width="600" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card bg-dark border-success mb-3">
+                <div class="card-header bg-success text-dark">
+                    <h3 class="mb-0">Controls</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button id="startButton" class="btn btn-success mb-3">Start Game</button>
+                        <button id="modeToggle" class="btn btn-success mb-3">Switch to Multiplayer</button>
+                        <div class="text-center mb-3">
+                            <span class="badge player1-score me-2">Player 1: <span id="score1">0</span></span>
+                            <span class="badge player2-score" id="score2Container" style="display: none;">Player 2: <span id="score2">0</span></span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-success" onclick="changeDirection(1, 'UP')">↑</button>
+                            <button class="btn btn-outline-success" onclick="changeDirection(1, 'LEFT')">←</button>
+                            <button class="btn btn-outline-success" onclick="changeDirection(1, 'DOWN')">↓</button>
+                            <button class="btn btn-outline-success" onclick="changeDirection(1, 'RIGHT')">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="multiplayerPanel" class="card bg-dark border-success" style="display: none;">
+                <div class="card-header bg-success text-dark">
+                    <h5 class="mb-0">Controls</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-success">Player 1 (Green): Arrow Keys</div>
+                    <div class="text-primary">Player 2 (Blue): WASD</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let canvas = document.getElementById('gameCanvas');
+    let ctx = canvas.getContext('2d');
+    let gridSize = 20;
+    let gameLoop;
+    let gameState = {
+        snake1: [{x: 10, y: 10}],
+        snake2: [{x: 15, y: 15}],
+        direction1: 'RIGHT',
+        direction2: 'UP',
+        food: {x: 15, y: 15},
+        score1: 0,
+        score2: 0,
+        isMultiplayer: false
+    };
+
+    // Game functions
+    function drawGame() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Player 1 (Green)
+        gameState.snake1.forEach((segment, index) => {
+            ctx.fillStyle = index === 0 ? '#28a745' : `hsl(${120 - index*2}, 100%, 50%)`;
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize-2, gridSize-2);
+        });
+
+        // Draw Player 2 (Blue) if multiplayer
+        if(gameState.isMultiplayer) {
+            gameState.snake2.forEach((segment, index) => {
+                ctx.fillStyle = index === 0 ? '#17a2b8' : `hsl(190 - index*2, 100%, 50%)`;
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize-2, gridSize-2);
+            });
+        }
+
+        // Draw food
+        ctx.fillStyle = '#dc3545';
+        ctx.beginPath();
+        ctx.arc(
+            gameState.food.x * gridSize + gridSize/2,
+            gameState.food.y * gridSize + gridSize/2,
+            gridSize/2 - 2, 0, Math.PI*2
+        );
+        ctx.fill();
+    }
+
+    function changeDirection(playerNumber, newDir) {
+        const oppositeDirs = {
+            UP: 'DOWN', DOWN: 'UP',
+            LEFT: 'RIGHT', RIGHT: 'LEFT'
+        };
+        const currentDir = playerNumber === 1 ? gameState.direction1 : gameState.direction2;
+        if(oppositeDirs[newDir] !== currentDir) {
+            if(playerNumber === 1) gameState.direction1 = newDir;
+            else gameState.direction2 = newDir;
+        }
+    }
+
+    // Update keyboard controls
+    document.addEventListener('keydown', e => {
+        const directions = {
+            arrowup: [1, 'UP'],
+            arrowdown: [1, 'DOWN'],
+            arrowleft: [1, 'LEFT'],
+            arrowright: [1, 'RIGHT'],
+            w: [2, 'UP'],
+            s: [2, 'DOWN'],
+            a: [2, 'LEFT'],
+            d: [2, 'RIGHT']
+        };
+        
+        const key = e.key.toLowerCase();
+        if(directions[key]) {
+            const [player, dir] = directions[key];
+            if(gameState.isMultiplayer || player === 1) {
+                changeDirection(player, dir);
+                e.preventDefault();
+            }
+        }
+    });
+
+    function checkCollision(head, snake) {
+        if(head.x < 0 || head.x >= canvas.width/gridSize || 
+           head.y < 0 || head.y >= canvas.height/gridSize) return true;
+        return snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
+    }
+
+    function gameStep() {
+        // Player 1 movement
+        let head1 = {...gameState.snake1[0]};
+        switch(gameState.direction1) {
+            case 'UP': head1.y--; break;
+            case 'DOWN': head1.y++; break;
+            case 'LEFT': head1.x--; break;
+            case 'RIGHT': head1.x++; break;
+        }
+
+        if(checkCollision(head1, gameState.snake1)) return gameOver(1);
+        
+        gameState.snake1.unshift(head1);
+        if(head1.x === gameState.food.x && head1.y === gameState.food.y) {
+            gameState.score1 += 10;
+            document.getElementById('score1').textContent = gameState.score1;
+            spawnFood();
+        } else {
+            gameState.snake1.pop();
+        }
+
+        // Player 2 movement (only in multiplayer)
+        if(gameState.isMultiplayer) {
+            let head2 = {...gameState.snake2[0]};
+            switch(gameState.direction2) {
+                case 'UP': head2.y--; break;
+                case 'DOWN': head2.y++; break;
+                case 'LEFT': head2.x--; break;
+                case 'RIGHT': head2.x++; break;
+            }
+
+            if(checkCollision(head2, gameState.snake2)) return gameOver(2);
+            
+            gameState.snake2.unshift(head2);
+            if(head2.x === gameState.food.x && head2.y === gameState.food.y) {
+                gameState.score2 += 10;
+                document.getElementById('score2').textContent = gameState.score2;
+                spawnFood();
+            } else {
+                gameState.snake2.pop();
+            }
+
+            // Check snakes collision with each other
+            if(gameState.snake1.some(seg => seg.x === head2.x && seg.y === head2.y) ||
+               gameState.snake2.some(seg => seg.x === head1.x && seg.y === head1.y)) {
+                gameOver(3);
+            }
+        }
+
+        drawGame();
+    }
+
+    function gameOver(losingPlayer) {
+        clearInterval(gameLoop);
+        let message = 'Game Over!';
+        if(gameState.isMultiplayer) {
+            message = losingPlayer === 3 ? 'Both players crashed!' : `Player ${losingPlayer} crashed!`;
+        }
+        document.getElementById('gameMessage').innerHTML = `
+            <h3 class="mb-3">${message}</h3>
+            ${gameState.isMultiplayer ? 
+                `<p>Player 1 Score: ${gameState.score1}</p>
+                 <p>Player 2 Score: ${gameState.score2}</p>` : 
+                `<p>Score: ${gameState.score1}</p>`}
+            <button class="btn btn-success" id="restartButton">Play Again</button>`;
+        document.getElementById('gameMessage').style.display = 'block';
+        document.getElementById('startButton').disabled = false;
+    }
+
+    function spawnFood() {
+        gameState.food = {
+            x: Math.floor(Math.random() * (canvas.width/gridSize)),
+            y: Math.floor(Math.random() * (canvas.height/gridSize))
+        };
+    }
+
+    // Update mode toggle
+    document.getElementById('modeToggle').addEventListener('click', function() {
+        gameState.isMultiplayer = !gameState.isMultiplayer;
+        this.textContent = gameState.isMultiplayer ? 'Switch to Single Player' : 'Switch to Multiplayer';
+        document.getElementById('multiplayerPanel').style.display = gameState.isMultiplayer ? 'block' : 'none';
+        document.getElementById('score2Container').style.display = gameState.isMultiplayer ? 'inline-block' : 'none';
+        resetGame();
+    });
+
+    // Modified reset function
+    function resetGame() {
+        gameState.snake1 = [{x: 10, y: 10}];
+        gameState.snake2 = [{x: 15, y: 15}];
+        gameState.direction1 = 'RIGHT';
+        gameState.direction2 = 'LEFT'; 
+        gameState.score1 = 0;
+        gameState.score2 = 0;
+        document.getElementById('score1').textContent = '0';
+        document.getElementById('score2').textContent = '0';
+        spawnFood();
+        document.getElementById('gameMessage').style.display = 'none';
+        if(gameLoop) clearInterval(gameLoop);
+        gameLoop = setInterval(gameStep, 100);
+        drawGame();
+        document.getElementById('startButton').disabled = true;
+    }
+
+    // Add start button handler
+    document.getElementById('startButton').addEventListener('click', resetGame);
+
+    // Fixed restart button handling using event delegation
+    document.getElementById('gameMessage').addEventListener('click', function(e) {
+        if(e.target && e.target.id === 'restartButton') {
+            resetGame();
+        }
+    });
+
+    // Initialize game without starting
+    spawnFood();
+    drawGame();
+</script>
+
+{% endblock %}

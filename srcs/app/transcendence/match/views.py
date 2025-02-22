@@ -12,12 +12,20 @@ def pong(request, game_id):
         return render(request, 'pong.html', {'game_id': game_id})
     else:
         return render(request, 'pong.html', {'game_id': game_id})
-    
+
+@login_required    
 def pongLocal(request):
     if request.htmx:
         return render(request, 'pong_local.html')
     else:
         return render(request, 'pong_local_full.html')
+
+@login_required    
+def snake(request):
+    if request.htmx:
+        return render(request, 'snake.html')
+    else:
+        return render(request, 'snake_full.html')
     
 @login_required
 def tournament_list(request):
