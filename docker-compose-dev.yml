@@ -355,6 +355,7 @@ services:
       - filebeat_vol:/usr/share/filebeat/data
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./srcs/app/transcendence/logs:/usr/share/filebeat/logs:ro
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}

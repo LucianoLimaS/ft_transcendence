@@ -271,6 +271,9 @@ clean-migrations:
 clean-staticfiles:
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles/ > /dev/null 2>&1
 
+clean-logs:
+	@> ./srcs/app/transcendence/logs/django.log
+
 # ======================
 # Auxiliary Commands
 # ======================
