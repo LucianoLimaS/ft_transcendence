@@ -12,6 +12,7 @@ services:
     volumes:
       - ./srcs/app/transcendence:/ft_transcendence
       - /home/${USER}/data/staticfiles:/ft_transcendence/staticfiles
+      - /home/${USER}/data/logs:/ft_transcendence/logs
     networks:
       - transcendence
     depends_on:
@@ -353,6 +354,7 @@ services:
       - /home/${USER}/data/filebeat:/usr/share/filebeat/data
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/${USER}/data/logs:/usr/share/filebeat/logs:ro
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
