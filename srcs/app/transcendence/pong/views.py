@@ -75,11 +75,32 @@ class PongEnterView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     async def send_websocket_message(self, message, request):
+
+        '''Aqui deveria ser verificado se está em desenvolvimento ou produção para definir a uri,
+        mas como estamos com pressa para entregar o projeto, vou deixar assim por enquanto,
+        chama a primeira, se der erro chama a segunda.'''
+
         uri = f"ws://{request.get_host()}/ws/chatroom/public-chat?add_user=false"
-        async with websockets.connect(uri) as websocket:
-            await websocket.send(message)
-            response = await websocket.recv()
-            return response
+        try:
+            async with websockets.connect(uri) as websocket:
+                await websocket.send(message)
+                response = await websocket.recv()
+                return response
+        except Exception as e:
+            logger.error(f"Error sending WebSocket message: {e}")
+        
+        uri = f"ws://daphne:8001/ws/chatroom/public-chat?add_user=false"
+        try:
+            async with websockets.connect(uri) as websocket:
+                await websocket.send(message)
+                response = await websocket.recv()
+                return response
+        except Exception as e:
+            logger.error(f"Error sending WebSocket message: {e}")
+        
+        return None
+        
+
 
     def post(self, request, *args, **kwargs):
         game_mode = kwargs.get("game_mode")
