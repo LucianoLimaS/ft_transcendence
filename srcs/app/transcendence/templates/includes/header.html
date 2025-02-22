@@ -1,25 +1,76 @@
 {% load static %}
 <header class="d-flex align-items-center justify-content-between bg-dark text-white sticky-top px-4 py-1" style="z-index: 2">
   <div class="d-flex align-items-center">
-    <a class="d-flex align-items-center text-decoration-none text-white mr-4" href="/">
-      <img class="mr-2 img-fluid" style="max-height: 55px;" src="{% static 'images/logo.png' %}" alt="Logo" />
-    </a>
+    <a class="text-decoration-none text-white" style="width: 55px" href="/"><img class="mr-2" style="max-height: 55px; height: 55px; width: 55px" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
 
-    <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="flex-direction: row;">
-      <li class="nav-item m-2"><a href="{% url 'home' %}" class="nav-link">Chat</a></li>
-      <li class="nav-item m-2"><a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a></li>
-      <li class="nav-item m-2"><a href="{% url 'snake' %}" class="nav-link">Snake</a></li>
-      <li class="nav-item m-2"><a href="/play/" class="nav-link">Torneio</a></li>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-md-flex" style="flex-direction: row;">
+      <li class="nav-item m-2">
+        <a href="{% url 'home' %}" class="nav-link">Chat</a>
+      </li>
+      <li class="nav-item m-2">
+        <a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a>
+      </li>
+      <li class="nav-item m-2">
+        <a href="{% url 'snake' %}" class="nav-link">Snake</a>
+      </li>
+      <li class="nav-item m-2">
+        <a href="/play/" class="nav-link">Torneio</a>
+      </li>
     </ul>
 
+    <button class="btn btn-light m-3 p-0 ml-5 d-block d-md-none pt-1 pb-1 pr-2 pl-2 " id="button-active-menu"><i class="fas fa-bars text-black"></i></button>
+    <ul class="d-none position-absolute navbar-nav me-auto mb-2 mb-lg-0 bg-dark p-2" style="max-width: 500px;" id="menu-header-hamburguer">
+      <li class="nav-item">
+        <a href="{% url 'home' %}" class="nav-link">Chat</a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'snake' %}" class="nav-link">Snake</a>
+      </li>
+      <li class="nav-item">
+        <a href="/play/" class="nav-link">Torneio</a>
+      </li>
+    </ul>
+
+    <script>
+      $('#button-active-menu').click(function () {
+        // Pega o botão que foi pressionado
+        var button = $(this)
+      
+        // Pega a posição do botão usando getBoundingClientRect()
+        var buttonRect = button[0].getBoundingClientRect()
+      
+        // Pega o menu que você quer exibir
+        var menu = $('#menu-header-hamburguer')
+
+        if (menu.hasClass('d-inline')) {
+          menu.removeClass('d-inline')
+          menu.addClass('d-none')
+        } else {
+          menu.removeClass('d-none')
+          menu.addClass('d-inline')
+        }
+      
+        // Posiciona o menu no local correto, com top ajustado para 60px
+        menu.css('position', 'absolute')
+        menu.css('top', buttonRect.top + window.scrollY + 40 + 'px') // Calcula a posição com base na posição do botão
+        menu.css('left', buttonRect.left + window.scrollX + 'px') // Alinha à esquerda do botão
+      
+        // Define o display do menu para 'flex' e empilha os itens verticalmente
+        menu.css('display', 'flex')
+        menu.css('flex-direction', 'column')
+      
+        
+      })
+    </script>
+
     <div id="online-user-count" class="ml-3"></div>
-
-
   </div>
   <nav class="position-relative">
     <ul class="nav">
       {% if request.user.is_authenticated %}
-
         <li class="nav-item dropdown">
           <a class="nav-link text-white dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <img class="rounded-circle mr-2" style="width: 40px; height: 40px; object-fit: cover;" src="{{ request.user.profile.avatar }}" alt="Avatar" />

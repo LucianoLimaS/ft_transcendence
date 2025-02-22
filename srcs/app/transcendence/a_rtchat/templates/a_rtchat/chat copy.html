@@ -83,7 +83,7 @@
     <div class="container-fluid h-100" id="chat_window">
       <div class="row chat-container bg_modal chat-glow">
         {% comment %}Container da esquerda (MENSAGENS, GRUPOS E PUBLIC CHAT){% endcomment %}
-        <div class="col-md-4 col-xl-4 chat-list p-0">
+        <div class="col-md-4 col-xl-4 chat-list p-0" style="height: auto !important;">
           <a href="{% url 'home' %}" class="link-list-chats">
             <div class="chat-header d-flex align-items-center">
               <img src="../../../static/images/galaxy_lobby_1.png" alt="User avatar" class="avatar mr-2" />
@@ -96,7 +96,91 @@
           <div class="chat-item active" style="z-index: 1" data-contact="Alice Johnson">
             {% comment %}Mensagens privadas LIST{% endcomment %}
             
-            {% include 'a_rtchat/partials/online_status.html' %}
+            {% for chatroom in user.chat_groups.all %}
+              {% if chatroom.groupchat_name %}
+                <!-- Grupo de Chat -->
+                <li class="m-2 row">
+                  <div class="col-12 d-flex">
+                    {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+                      <div class="green-dot position-relative top-1 left-1"></div>
+                    {% else %}
+                      <div class="graylight-dot position-relative top-1 left-1"></div>
+                    {% endif %}
+                    <a class="d-flex justify-content-start ml-3 link-list-chats" href="{% url 'chatroom' chatroom.group_name %}">
+                      <div class="d-flex align-items-center">
+                        <img src="{% if chatroom.avatar %}
+                            {{ chatroom.avatar }}
+                          {% else %}
+                            {{ '/images/galaxy_lobby_1.png' }}
+                          {% endif %}"
+                          alt="Group avatar"
+                          class="avatar mr-3" />
+                        <div>
+                          <h6 class="mb-0">{{ chatroom.groupchat_name|slice:':30' }}</h6>
+                          <small class="text-muted">Group Chat</small>
+                        </div>
+                        <small class="text-muted ml-auto">10:30 AM</small>
+                      </div>
+                    </a>
+                    {% comment %} <div id="chat-{{ chatroom.id }}" class="dropdown">
+                      <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ chatroom.groupchat_name }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+                    </div> {% endcomment %}
+                  </div>
+                </li>
+              {% endif %}
+            {% endfor %}
+            <ul class="chats-list m-0 p-0">
+              {% for chatroom in user.chat_groups.all %}
+              {% if chatroom.is_private %}
+                <!-- Chat Privado -->
+                {% for member in chatroom.members.all %}
+
+                  {% if member != user %}
+                    <li class="m-2 row">
+                      <div class="col-12 m-0 p-0 d-flex">
+                        {% if chatroom.users_online.all and user not in chatroom.users_online.all or chatroom.users_online.count > 1 %}
+                          <div class="green-dot position-relative top-1 left-1"></div>
+                        {% else %}
+                          <div class="graylight-dot position-relative top-1 left-1"></div>
+                        {% endif %}
+
+                        <a class="text-right d-flex justify-content-start ml-3 link-list-chats" href="{% url 'chatroom' chatroom.group_name %}">
+                          <div class="d-flex align-items-center">
+
+                            {% comment %} AVATAR {% endcomment %}
+                            <img src="{% if member.profile.avatar %}
+                                {{ member.profile.avatar }}
+                              {% else %}
+                                {{ '/images/galaxy_lobby_1.png' }}
+                              {% endif %}"
+                              alt="{{ member.username }}'s avatar"
+                              class="avatar mr-3" />
+
+                            <div class="">
+                              <div class="d-flex justify-content-start">
+                                <h6 class="mb-0">{{ member.username }}</h6>
+                              </div>
+
+
+                              <small class="text-muted">Last message preview</small>
+                            </div>
+                            <small class="text-muted ml-auto">10:30 AM</small>
+                          </div>
+                        </a>
+
+                        <div id="chat-{{ chatroom.id }}" class="dropdown d-flex justify-content-end">
+                          <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ member.username }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+                        </div>
+
+                      </div>
+                    </li>
+                  {% endif %}
+
+
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            </ul>
             
             {% comment %}Mensagens privadas LIST (FIM){% endcomment %}
             {% comment %}Container da esquerda (MENSAGENS, GRUPOS E PUBLIC CHAT) FIM{% endcomment %}
@@ -143,7 +227,7 @@
                 {% csrf_token %}
 
                 {% comment %} Emoji List {% endcomment %}
-                <div class="container bg-white text-white emojis d-none" id="emojiShow" >
+                <div class="container bg-white text-white position-absolute emojis d-none" id="emojiShow"  style="top: -8.5em; left: 0px; width: auto">
                     <span>😃</span> <span>😁</span> <span>😅</span> <span>🤣</span> <span>😉</span> 
                     <span>😊</span> <span>😇</span> <span>😲</span> <span>😳</span> <span>😥</span> 
                     <span>🥰</span> <span>😍</span> <span>😘</span> <span>😜</span> <span>🤫</span>
@@ -175,48 +259,13 @@
 
 {% block javascript %}
   <script>
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const emojiContainer = document.getElementById("emojiShow");
-      const inputMessage = document.getElementById("form-input-message");
-  
-      // Verifica se o container existe
-      if (emojiContainer && inputMessage) {
-          emojiContainer.addEventListener("click", function (event) {
-              if (event.target.tagName === "SPAN") {
-                  const emoji = event.target.textContent;
-                  inputMessage.value += emoji; // Adiciona o emoji no input
-                  inputMessage.focus(); // Mantém o foco no input
-              }
-          });
-      }
-  });
-
-  function scrollToBottom(time = 0) {
-    setTimeout(function () {
-        const container = document.getElementById('message-list');
-        container.scrollTop = container.scrollHeight;
-    }, time);
-}
-
-// Observa mudanças no #message-list
-const observer = new MutationObserver(function (mutationsList) {
-    // Verifica se algum novo nó foi adicionado
-    mutationsList.forEach(function (mutation) {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-            scrollToBottom(); // Chama a função para rolar para o fundo
-        }
-    });
-});
-
-// Configuração para observar a adição de nós dentro de #message-list
-const config = { childList: true, subtree: true };
-
-// Começa a observação
-const container = document.getElementById('message-list');
-if (container) {
-    observer.observe(container, config);
-}
+    function scrollToBottom(time = 0) {
+      setTimeout(function () {
+        const container = document.getElementById('message-list')
+        container.scrollTop = container.scrollHeight
+      }, time)
+    }
+    scrollToBottom()
     
     const labels = document.querySelectorAll('label')
     
@@ -252,41 +301,57 @@ if (container) {
       }
   }
 
-  function showDropdownMenu(button, contactName, id) {
-    // Remove apenas o dropdown do usuário específico
-    let existingMenu = document.querySelector(`#dropdown-${contactName}-${id}`);
+    function showDropdownMenu(button, contactName, id) {
+      //Remove caso tenha algum em tela
+      let showingMenu = document.querySelector('.dropdown-menu');
+      if(showingMenu != null) {
+          showingMenu.remove();
+      }
+  
+      // Criar o elemento do menu dropdown
+      const dropdownMenu = document.createElement('div');
+      dropdownMenu.className = 'dropdown-menu';
+      dropdownMenu.classList.add('custom-dropdown-menu', 'show');
+  
+      // Calcular a posição do menu em relação ao botão dentro do contêiner
+      const rect = button.getBoundingClientRect();
+      dropdownMenu.style.top = `${rect.bottom + window.scrollY}px`; // Posicionar abaixo do botão
+      dropdownMenu.style.left = `${rect.left + window.scrollX}px`;
+  
+      // Conteúdo do menu com ações
+      dropdownMenu.innerHTML = `
+          <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">View profile</a>
+          <a class="dropdown-item" href="#" onclick="addFriend('${contactName} ${id}')">Add friend</a>
+          <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName} ${id}')">Delete friend</a>
+          <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName} ${id}')">Challenge to match</a>
+      `;
+  
+      document.body.appendChild(dropdownMenu);
+  
+      // Remover o menu ao clicar em uma opção ou sair com o mouse
+      dropdownMenu.addEventListener('mouseleave', removeDropdownMenu);
+      dropdownMenu.addEventListener('click', removeDropdownMenu);
+  }
+
+  function removeDropdownMenu() {
+    const existingMenu = document.querySelector('.dropdown-menu');
     if (existingMenu) {
         existingMenu.remove();
     }
 
-    // Criar o novo menu
-    const dropdownMenu = document.createElement('div');
-    dropdownMenu.className = 'dropdown-menu custom-dropdown-menu show';
-    dropdownMenu.id = `dropdown-${contactName}-${id}`;
-
-    const rect = button.getBoundingClientRect();
-    dropdownMenu.style.top = `${rect.bottom + window.scrollY}px`;
-    dropdownMenu.style.left = `${rect.left + window.scrollX}px`;
-
-    dropdownMenu.innerHTML = `
-        <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">View profile</a>
-        <a class="dropdown-item" href="#" onclick="addFriend('${contactName}', '${id}')">Add friend</a>
-        <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName}', '${id}')">Delete friend</a>
-        <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName}', '${id}')">Challenge to match</a>
-    `;
-
-    document.body.appendChild(dropdownMenu);
-
-    // Remover ao sair com o mouse ou clicar em uma opção
-    dropdownMenu.addEventListener('mouseleave', () => removeDropdownMenu(contactName, id));
-    dropdownMenu.addEventListener('click', () => removeDropdownMenu(contactName, id));
-}
-
-function removeDropdownMenu(contactName, id) {
-    const existingMenu = document.querySelector(`#dropdown-${contactName}-${id}`);
-    if (existingMenu) {
-        existingMenu.remove();
-    }
+    function sendMessage() {
+      try {
+          var messageText = $('#message-input').val().trim();
+          if (messageText !== '') {
+              var newMessage = $('<div class="message-container sent"><div class="message sent">' + messageText + '</div></div>');
+              $('#message-list').append(newMessage);
+              $('#message-input').val('');
+              $('#message-list').scrollTop($('#message-list')[0].scrollHeight);
+          }
+      } catch (error) {
+          console.error('Error sending message:', error);
+      }
+  }
   
 
 }

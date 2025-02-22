@@ -3,59 +3,39 @@
     {% include 'a_rtchat/chat_message.html' %}
   </div>
 
-  <style>
-    @keyframes fadeInAndUp {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0px);
-      }
-    }
-    .fade-in-up {
-      animation: fadeInAndUp 0.6s ease;
-    }
-  </style>
 
-  <script>
-    function scrollToBottom(time = 0) {
-      setTimeout(function () {
-        const container = document.getElementById('chat_container')
-        container.scrollTop = container.scrollHeight
-      }, time)
-    }
-    scrollToBottom()
-  </script>
 </div>
 
-{% with user=message.author %}
-  {% if user in chat_group.users_online.all %}
-    <div id="user-{{ user.id }}" class="green-dot border-2 border-gray-800 absolute -bottom-1 -right-1"></div>
-  {% else %}
-    <div id="user-{{ user.id }}" class="gray-dot border-2 border-gray-800 absolute -bottom-1 -right-1"></div>
-  {% endif %}
-{% endwith %}
 {% for message in chat_messages %}
-  <!-- Mensagem Recebida -->
-  {% if message.author != user %}
-    <div class="chat-message received">
-      <!-- Usando o perfil para pegar o avatar -->
-      <img src="{{ message.author.profile.avatar }}" alt="{{ message.author.username }}" class="profile-pic mr-2" />
-      <div class="message-content">
-        <div class="username">{{ message.author.username }}</div>
-        <div class="message received">{{ message.body }}</div>
-        <div class="message-time">{{ message.created|date:'H:i' }}</div>
-      </div>
+{% if message.author == user %}
+<div class="chat-message sent">
+  <div class="message-content">
+    <div class="message sent">{{ message.body }}</div>
+    <div class="message-time">{{ message.created|date:'H:i' }}</div>
+  </div>
+</div>
+
+{% else %}
+<div class="chat-message received">
+  <div class="">
+    <div class="mr-2 row">
+      <a href="{% url 'profile' message.author.username %}">
+        <div class="position-relative d-flex">
+          <div class="m-0 p-0 position-absolute" style="top: 0 !important; left: -50px !important" id="user-{{ message.author.id }}"></div>
+          <img src="{{ message.author.profile.avatar }}" alt="{{ message.author.username }}" class="profile-pic mr-2" />
+          <div class="username align-self-end">{{ message.author.profile.name }}</div>
+        </div>
+      </a>
     </div>
-    <!-- Mensagem Enviada -->
-  {% else %}
-    <div class="chat-message sent">
-      <div class="message-content">
-        <div class="message sent">{{ message.body }}</div>
-        <div class="message-time">{{ message.created|date:'H:i' }}</div>
-      </div>
+    <div class="message-content mt-2">
+      <div class="message received">{{ message.body }}</div>
+      <div class="message-time">{{ message.created|date:'H:i' }}</div>
     </div>
-  {% endif %}
+
+  <!-- Usando o perfil para pegar o avatar -->
+  
+  
+</div>
+{% endif %}
+
 {% endfor %}
