@@ -282,7 +282,7 @@ function removeDropdownMenu(contactName, id) {
 }
 
 function viewProfile(contactName, userId) {
-  var URL_BASE = "http://localhost:8000"
+  var URL_BASE = window.location.origin
   const url = `${URL_BASE}/profile/public-profile/${userId}`;
     console.log(url)
   fetch(url)
@@ -316,6 +316,15 @@ function generateProfileModal(userId, data) {
                                         <img src="${data.profileImageSrc}" class="rounded-circle" height="150" alt="User Photo">
                                     </div>
                                     <h2 class="mt-3">${data.username}</h2>
+                                    <div>
+                                      <div class="row">
+                                        <div class="col-md-4">
+                                          <div id="btnBlock"></div>  
+                                        </div>
+                                        <div class="col-md-4">
+                                          <div id="btnFriend"></div>
+                                        </div>    
+                                    </div>
                                 </div>
                         
                                 <div class="container">
@@ -401,6 +410,8 @@ function generateProfileModal(userId, data) {
     publicProfileEl.innerHTML = publicProfileModal;
     let profileModal = document.querySelector("#profileModal")
     profileModal.style.display = 'block';
+
+    renderActionButtonsPublicProfile(data)
 }
 
 function fecharPublicProfile() {
@@ -425,6 +436,99 @@ function generateMatchHistoryFromPublicprofile(history) {
 
       });
       return matchElements;
+}
+
+function renderActionButtonsPublicProfile(data) {
+  // Variáveis de estado
+  let statusFriend = data.statusFriend; // Pode ser 'accepted' ou 'no_friendship'
+  let isBlocked = data.isBlocked; // Pode ser true ou false
+
+  const btnBlockContainer = document.querySelector('#btnBlock');
+  const btnFriendContainer = document.querySelector('#btnFriend');
+
+  btnBlockContainer.innerHTML = '';
+  btnFriendContainer.innerHTML = '';
+
+  // Cria as strings HTML para os botões
+  const blockButtonHtml = `
+      <button class="btn ${isBlocked ? 'btn-danger' : 'btn-warning'} btn-block mb-2" onclick="btnBlockAction('${data.userId}', '${isBlocked}')">
+          ${isBlocked ? 'Desbloquear' : 'Bloquear'}
+      </button>
+  `
+  
+  const friendButtonHtml = `
+      <button class="btn ${statusFriend === 'accepted' ? 'btn-danger' : 'btn-success'} btn-block mb-2" onclick="btnFriendAction('${data.userId}', '${statusFriend}')">
+          ${statusFriend === 'accepted' ? 'Desfazer Amizade' : 'Adicionar como Amigo'}
+      </button>
+  `
+
+  // Define o conteúdo HTML das divs
+  if(statusFriend === 'accepted') {
+    btnBlockContainer.innerHTML = blockButtonHtml;
+  }
+  btnFriendContainer.innerHTML = friendButtonHtml;
+    
+}
+
+
+
+//1 = add amigo
+//2 = cancela amizade
+//3 = bloqueia usuario
+//4 = desbloqueia usuario
+
+//${isBlocked ? 'Desbloquear' : 'Bloquear'}
+function btnBlockAction(userId, isBlocked) {
+  var URL_BASE = window.location.origin
+  let action = isBlocked ? 4 : 3
+  const url = `${URL_BASE}/profile/friends-change-status/'${userId}'/'${action}'`;
+    console.log(url)
+  fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error fetching profile");
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Atualiza as variáveis de estado com base na resposta do servidor
+        statusFriend = data.statusFriend;
+        isBlocked = data.isBlocked === 'blocked';
+
+        data.userId = userId;
+
+        renderActionButtonsPublicProfile(data)
+    })
+    .catch(error => {
+        console.error(error);
+    })
+}
+
+//${statusFriend === 'accepted' ? 'accepted' : 'no_friendship'}
+function btnFriendAction(userId, statusFriend) {
+  var URL_BASE = window.location.origin
+  let action = statusFriend === 'accepted' ? 2 : 1
+  const url = `${URL_BASE}/profile/friends-change-status/'${userId}'/'${action}'`;
+    console.log(url)
+  fetch(url)
+  .then(response => {
+        if (!response.ok) {
+            throw new Error("Error fetching profile");
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Atualiza as variáveis de estado com base na resposta do servidor
+        statusFriend = data.statusFriend;
+        isBlocked = data.isBlocked === 'blocked';
+
+        data.userId = userId;
+
+        renderActionButtonsPublicProfile(data)
+    })
+    .catch(error => {
+        console.error(error);
+    })
 }
 
   </script>
