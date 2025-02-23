@@ -176,7 +176,7 @@ msgid "Player 2"
 msgstr "Jogador 2"
 
 msgid "Single Player"
-msgstr "Jogador Solo"
+msgstr "Single Player"
 
 msgid "Multiplayer"
 msgstr "Multiplayer"
@@ -191,6 +191,8 @@ msgstr "Iniciar Jogo"
 msgid "Switch to Multiplayer"
 msgstr "Mudar para Multiplayer"
 
+msgid "Switch to Single Player"
+msgstr "Mudar para Single Player"
 
 #: Torneio
 msgid "Online Game"
@@ -239,3 +241,6 @@ msgstr "Reiniciar"
 
 msgid "Menu"
 msgstr "Menu"
+
+msgid "Play Again"
+msgstr "Jogar Novamente"
