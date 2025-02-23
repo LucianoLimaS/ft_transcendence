@@ -35,19 +35,17 @@ setup: sudoers env certs docker
 remove-setup: remove-certs remove-env remove-sudoers
 
 sudoers:
-	@echo -ne "✅ Checking sudo... " && \
-	if sudo -v; then \
-		echo "OK!"; \
-		if ! sudo grep -q "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" /etc/sudoers.d/$(USER)-permissions 2>/dev/null; then \
-			echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions > /dev/null; \
-			echo "✅ Sudoers configuration added for $(USER)"; \
-		else \
-			echo "🟡 Sudoers configuration for $(USER) already exists."; \
-		fi; \
-	else \
+	@echo -ne "✅ Checking sudo... " && sudo -v && echo -ne "OK!\n" || { \
 		echo "🟡 Sudo check failed! Please ensure you have sudo privileges."; \
 		exit 1; \
-	fi
+	}; \
+	if ! sudo grep -q "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" /etc/sudoers.d/$(USER)-permissions 2>/dev/null; then \
+		echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions > /dev/null; \
+		echo "✅ Sudoers configuration added for $(USER)"; \
+	else \
+		echo "🟡 Sudoers configuration for $(USER) already exists."; \
+	fi;
+
 
 remove-sudoers:
 	@if [ -f /etc/sudoers.d/$(USER)-permissions ]; then \
@@ -61,18 +59,28 @@ docker:
 	@if ! command -v docker >/dev/null 2>&1; then \
 		echo "🟡 Docker is not installed. Installing..."; \
 		sudo apt-get update > /dev/null 2>&1; \
-		sudo apt-get install -y ca-certificates curl make > /dev/null 2>&1; \
+		sudo apt-get install -y ca-certificates curl make gnupg lsb-release > /dev/null 2>&1; \
 		sudo install -m 0755 -d /etc/apt/keyrings > /dev/null 2>&1; \
-		if grep -qi "ubuntu" /etc/os-release; then \
+		DISTRO=$$(lsb_release -si); \
+		if [ "$$DISTRO" = "Ubuntu" ] || [ "$$DISTRO" = "Linuxmint" ]; then \
 			DOCKER_REPO="https://download.docker.com/linux/ubuntu"; \
-		else \
+			CODENAME=$$(lsb_release -c | awk '{print $$2}'); \
+			if [ "$$CODENAME" = "xia" ]; then \
+				CODENAME="jammy"; \
+			fi; \
+		elif [ "$$DISTRO" = "Debian" ]; then \
 			DOCKER_REPO="https://download.docker.com/linux/debian"; \
+			CODENAME=$$(lsb_release -c | awk '{print $$2}'); \
+		else \
+			echo "❌ Unsupported distribution: $$DISTRO"; \
+			exit 1; \
 		fi; \
-		sudo curl -fsSL $$DOCKER_REPO/gpg -o /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
+		sudo mkdir -p /etc/apt/keyrings; \
+		curl -fsSL $$DOCKER_REPO/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
 		sudo chmod a+r /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
-		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $$DOCKER_REPO $$(. /etc/os-release && echo "$$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
+		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $$DOCKER_REPO $$CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
 		sudo apt-get update > /dev/null 2>&1; \
-		sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1; \
+		sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose > /dev/null 2>&1; \
 		echo "🔧 Adding ${USER} to the Docker group..."; \
 		sudo usermod -aG docker ${USER} > /dev/null 2>&1; \
 		echo "✅ ${USER} has been added to the Docker group."; \
@@ -82,6 +90,36 @@ docker:
 	else \
 		echo "🟡 Docker is already installed."; \
 	fi;
+
+remove-docker:
+	@echo "🔧 Checking if Docker is installed..."
+	@if systemctl list-units --type=service --all | grep -q docker > /dev/null 2>&1; then \
+		echo "🛑 Stopping Docker services..."; \
+		sudo systemctl stop docker docker.socket containerd > /dev/null 2>&1 || true; \
+	fi; \
+	# Remove Docker packages (APT)  
+	@if dpkg -l | grep -q docker; then \
+		echo "🔧 Removing Docker packages..."; \
+		sudo apt-get purge -y docker-ce docker-ce-cli containerd.io docker-compose docker-compose-plugin docker-buildx-plugin > /dev/null 2>&1; \
+	fi; \
+	# Remove Snap package (if applicable)  
+	@if command -v snap > /dev/null 2>&1 && snap list | grep -q docker; then \
+		echo "🔧 Removing Docker from Snap..."; \
+		sudo snap remove docker > /dev/null 2>&1; \
+	fi; \
+	# Clean up dependencies  
+	@echo "🔧 Cleaning up leftover packages..."; \
+	sudo apt-get autoremove -y > /dev/null 2>&1; \
+	sudo apt-get autoclean > /dev/null 2>&1; \
+	# Remove Docker files and directories  
+	@echo "🔧 Removing Docker files..."; \
+	sudo rm -rf /var/lib/docker > /dev/null 2>&1; \
+	sudo rm -rf /var/lib/containerd > /dev/null 2>&1; \
+	sudo rm -rf /etc/docker > /dev/null 2>&1; \
+	sudo rm -rf $$HOME/.docker > /dev/null 2>&1; \
+	sudo rm -f /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
+	sudo rm -f /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
+	echo "✅ Docker has been completely removed from your system."
 
 # ======================
 # SSL Certificates
