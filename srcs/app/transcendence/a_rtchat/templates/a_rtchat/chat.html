@@ -408,6 +408,7 @@ function generateProfileModal(userId, data) {
     let profileModal = document.querySelector("#profileModal")
     profileModal.style.display = 'block';
 
+    //#54 #62 #63
     renderActionButtonsPublicProfile(data)
 }
 
@@ -436,34 +437,31 @@ function generateMatchHistoryFromPublicprofile(history) {
 }
 
 function renderActionButtonsPublicProfile(data) {
-  // Variáveis de estado
-  let statusFriend = data.statusFriend; // Pode ser 'accepted' ou 'no_friendship'
-  let isBlocked = data.isBlocked; // Pode ser true ou false
-
   const btnBlockContainer = document.querySelector('#btnBlock');
   const btnFriendContainer = document.querySelector('#btnFriend');
 
+  // Limpa o conteúdo anterior
   btnBlockContainer.innerHTML = '';
   btnFriendContainer.innerHTML = '';
 
-  // Cria as strings HTML para os botões
-  const blockButtonHtml = `
-      <button class="btn ${isBlocked ? 'btn-danger' : 'btn-warning'} btn-block mb-2" onclick="btnBlockAction('${data.userId}', '${isBlocked}')">
-          ${isBlocked ? 'Desbloquear' : 'Bloquear'}
-      </button>
-  `
-  
-  const friendButtonHtml = `
-      <button class="btn ${statusFriend === 'accepted' ? 'btn-danger' : 'btn-success'} btn-block mb-2" onclick="btnFriendAction('${data.userId}', '${statusFriend}')">
-          ${statusFriend === 'accepted' ? 'Desfazer Amizade' : 'Adicionar como Amigo'}
-      </button>
-  `
+  // Cria os elementos HTML para os botões
+  const blockButton = document.createElement('button');
+  blockButton.className = `btn ${data.isBlocked === true ? 'btn-danger' : 'btn-warning'} btn-block mb-2`;
+  blockButton.textContent = data.isBlocked === true ? 'Desbloquear' : 'Bloquear';
+  blockButton.addEventListener('click', (event) => btnBlockAction(event, data.userId, data.isBlocked === true));
 
+  const friendButton = document.createElement('button');
+  friendButton.className = `btn ${data.statusFriend === 'accepted' ? 'btn-danger' : 'btn-success'} btn-block mb-2`;
+  friendButton.textContent = data.statusFriend === 'accepted' ? 'Desfazer Amizade' : 'Adicionar como Amigo';
+  friendButton.addEventListener('click', (event) => btnFriendAction(event, data.userId, data.statusFriend));
+
+  // Adiciona os botões nas divs
+  
   // Define o conteúdo HTML das divs
-  if(statusFriend === 'accepted') {
-    btnBlockContainer.innerHTML = blockButtonHtml;
+  if(data.statusFriend === 'accepted') {
+    btnBlockContainer.appendChild(blockButton);
   }
-  btnFriendContainer.innerHTML = friendButtonHtml;
+  btnFriendContainer.appendChild(friendButton);
     
 }
 
@@ -475,10 +473,11 @@ function renderActionButtonsPublicProfile(data) {
 //4 = desbloqueia usuario
 
 //${isBlocked ? 'Desbloquear' : 'Bloquear'}
-function btnBlockAction(userId, isBlocked) {
+function btnBlockAction(event, userId, isBlocked) {
+  event.preventDefault();
   var URL_BASE = window.location.origin
   let action = isBlocked ? 4 : 3
-  const url = `${URL_BASE}/profile/friends-change-status/'${userId}'/'${action}'`;
+  const url = `${URL_BASE}/profile/friends-change-status/${userId}/${action}`;
     console.log(url)
   fetch(url)
     .then(response => {
@@ -490,7 +489,7 @@ function btnBlockAction(userId, isBlocked) {
     .then(data => {
         // Atualiza as variáveis de estado com base na resposta do servidor
         statusFriend = data.statusFriend;
-        isBlocked = data.isBlocked === 'blocked';
+        isBlocked = data.isBlocked === true;
 
         data.userId = userId;
 
@@ -502,10 +501,11 @@ function btnBlockAction(userId, isBlocked) {
 }
 
 //${statusFriend === 'accepted' ? 'accepted' : 'no_friendship'}
-function btnFriendAction(userId, statusFriend) {
+function btnFriendAction(event, userId, statusFriend) {
+  event.preventDefault();
   var URL_BASE = window.location.origin
   let action = statusFriend === 'accepted' ? 2 : 1
-  const url = `${URL_BASE}/profile/friends-change-status/'${userId}'/'${action}'`;
+  const url = `${URL_BASE}/profile/friends-change-status/${userId}/${action}`;
     console.log(url)
   fetch(url)
   .then(response => {
@@ -517,7 +517,7 @@ function btnFriendAction(userId, statusFriend) {
     .then(data => {
         // Atualiza as variáveis de estado com base na resposta do servidor
         statusFriend = data.statusFriend;
-        isBlocked = data.isBlocked === 'blocked';
+        isBlocked = data.isBlocked === true;
 
         data.userId = userId;
 
