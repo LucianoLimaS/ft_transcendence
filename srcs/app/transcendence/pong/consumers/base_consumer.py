@@ -229,6 +229,7 @@ class BasePongConsumer(AsyncWebsocketConsumer):
 
     # Methods to send messages to the worker
     async def worker_initialize_game(self) -> None:
+        print("----    PASSEI AQUI    ----    [03]")
         """
         Sends a message to the worker to initialize the game. Its purpose is to draw the game without starting it.
         """

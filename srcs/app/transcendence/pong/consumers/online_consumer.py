@@ -108,6 +108,7 @@ class OnlinePongConsumer(BasePongConsumer):
 
     # abstract methods
     async def handle_join_room(self, data: ClientMessage) -> None:
+        print("----    PASSEI AQUI    ----    [05]")
         """
         Handles the 'join_room' message from the client.
 

@@ -31,6 +31,7 @@ class LocalPongConsumer(BasePongConsumer):
         self.ready_lock = asyncio.Lock()
 
     async def handle_join_room(self, data: ClientMessage) -> None:
+        print("----    PASSEI AQUI    ----    [04]")
         """
         Handles the 'join_room' message from the client.
 

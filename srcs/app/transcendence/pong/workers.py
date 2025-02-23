@@ -30,6 +30,7 @@ class PongGameWorker(AsyncConsumer):
         self.sessions: Dict[str, GameSession] = {}
 
     async def initialize_game(self, message: dict) -> None:
+        print("----    PASSEI AQUI    ----    [01]")
         """
         Initializes a new game session and sends the initial game state to the clients.
 
@@ -43,6 +44,7 @@ class PongGameWorker(AsyncConsumer):
             height: int = message["height"]
 
             if room_id not in self.sessions:
+                print("----    PASSEI AQUI    ----    [02]")
                 # Criando o Lock para a sessão
                 lock = asyncio.Lock()
                 # local

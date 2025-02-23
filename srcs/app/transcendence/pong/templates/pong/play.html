@@ -1,5 +1,77 @@
 {% extends 'pong/base_app.html' %}
 {% load static %}
+
+
+<!--
+    
+    # clicar no botão e abrir modal de modo de jogo
+    #clicar no botão de modo de jogo e abrir outra modal ou abrir o jogo
+    #se abrir outra modal -> escolhar dificuldade e depois abrir o jogo
+
+-->
+
+{% block javascript %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Botão "Match"
+    const matchButton = document.querySelector(".play-mode-btn");
+    const btExibeModal = document.querySelector("#btExibeModal");
+    const difficultyModal = document.querySelector("#difficultyModal");
+
+    // Botões do modal de modo de jogo
+    const singlePlayerButton = document.querySelector("#singlePlayerButton");
+    const multiPlayerButton = document.querySelector("#multiPlayerButton");
+
+    // Botões do modal de dificuldade
+    const easyButton = document.querySelector("#easyButton");
+    const moderateButton = document.querySelector("#moderateButton");
+    const hardButton = document.querySelector("#hardButton");
+
+    // Escolha do modo de jogo
+    btExibeModal.addEventListener("click", function () {
+        console.log("entrei aqui")
+        //$("#gameModeModal").modal("show");
+        document.querySelector("#gameModeModal").style.display = 'block';
+    });
+
+    // Escolha do modo de jogo
+    singlePlayerButton.addEventListener("click", function () {
+        $("#gameModeModal").modal("hide");
+        $("#difficultyModal").modal("show"); // Abre o modal de dificuldade
+    });
+
+    multiPlayerButton.addEventListener("click", function () {
+        $("#gameModeModal").modal("hide");
+        iniciarJogo("multiplayer"); // Inicia o jogo diretamente
+    });
+
+    // Escolha da dificuldade (caso seja single player)
+    function iniciarJogo(dificuldade) {
+        console.log("Iniciando jogo com dificuldade:", dificuldade);
+        // Aqui você pode redirecionar para o jogo ou enviar um request ao backend
+        alert("Jogo iniciado com dificuldade: " + dificuldade);
+    }
+
+    easyButton.addEventListener("click", function () {
+        $("#difficultyModal").modal("hide");
+        iniciarJogo("fácil");
+    });
+
+    moderateButton.addEventListener("click", function () {
+        $("#difficultyModal").modal("hide");
+        iniciarJogo("moderado");
+    });
+
+    hardButton.addEventListener("click", function () {
+        $("#difficultyModal").modal("hide");
+        iniciarJogo("difícil");
+    });
+});
+
+</script>
+{% endblock %}
+
+
 {% block content %}
 <div class="row app-row justify-content-center gap-2 gap-md-5 px-1 px-md-2 px-lg-3 gap-2 mb-5">
     <div class="col-play-mode col col-12 col-lg-5 p-0 mx-2 d-flex flex-column rounded-4 mb-4 mb-md-0">
@@ -7,38 +79,20 @@
         <div class="mode d-flex flex-column flex-lg-row justify-content-center py-1 py-md-1">
             <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
             id="gameModeForm" method="post" formType="localGameForm" api-link>
-          {% csrf_token %}
-          <input type="hidden" name="game_mode" value="{{ GameMode.LOCAL }}">
-          <!-- Botão "Match" abre o modal -->
-          <button class="play-mode-btn rounded-4 col-11 col-sm-9" type="button" data-toggle="modal" data-target="#difficultyModal">
-              <p class="d-flex justify-content-center m-0">Match</p>
-          </button>
-      </form>
-      
-      <!-- Modal de Dificuldade -->
-      <div class="modal fade" id="difficultyModal" tabindex="-1" role="dialog" aria-labelledby="difficultyModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title" id="difficultyModalLabel">Escolha a Dificuldade</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                          <span aria-hidden="true">&times;</span>
-                      </button>
-                  </div>
-                  <div class="modal-body">
-                      <button id="easyButton" class="btn btn-primary btn-block mb-2">Fácil</button>
-                      <button id="moderateButton" class="btn btn-warning btn-block mb-2">Moderado</button>
-                      <button id="hardButton" class="btn btn-danger btn-block mb-2">Difícil</button>
-                  </div>
-              </div>
-          </div>
-      </div>
-            <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
-                <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none"
-                    href="/enter/localtournament/" data-link>
-                    Tournament
-                </a>
-            </div>
+                {% csrf_token %}
+                <input type="hidden" name="game_mode" value="{{ GameMode.LOCAL }}">
+                <!-- #68 Botão "Match" abre o modal -->
+                <button id="btExibeModal" class="play-mode-btn rounded-4 col-11 col-sm-9" type="button">
+                    <p class="d-flex justify-content-center m-0">Match</p>
+                </button>
+            </form>
+
+        <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
+            <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none"
+                href="/enter/localtournament/" data-link>
+                Tournament
+            </a>
+        </div>
         </div>
     </div>
 </div>
@@ -61,5 +115,42 @@
         </div>
     </div>
 </div>
+</div>
+
+<!--#68 Modal de Dificuldade -->
+<div class="modal fade" id="difficultyModal" tabindex="-1" role="dialog" aria-labelledby="difficultyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="difficultyModalLabel">Escolha a Dificuldade</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button id="easyButton" class="btn btn-primary btn-block mb-2">Fácil</button>
+                <button id="moderateButton" class="btn btn-warning btn-block mb-2">Moderado</button>
+                <button id="hardButton" class="btn btn-danger btn-block mb-2">Difícil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--#68 Modal de modo de jogo -->
+<div class="modal fade" id="gameModeModal" tabindex="-1" role="dialog" aria-labelledby="gameModeModalLabel" style="display:none">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gameModeModalLabel">Escolher Modo de Jogo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button id="singlePlayerButton" class="btn btn-primary btn-block mb-2">Single Player</button>
+                <button id="multiPlayerButton" class="btn btn-warning btn-block mb-2">Multiplayer</button>
+            </div>
+        </div>
+    </div>
 </div>
     {% endblock %}
