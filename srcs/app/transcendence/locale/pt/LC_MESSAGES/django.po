@@ -129,8 +129,89 @@ msgstr "Usuário já cadastrado"
 msgid "First name:"
 msgstr "Nome:"
 
+#: Menu
+msgid "My Profile"
+msgstr "Meu Perfil"
+
+msgid "Edit Profile"
+msgstr "Editar Perfil"
+
+msgid "Create Chat"
+msgstr "Criar Bate-Papo"
+
+msgid "Settings"
+msgstr "Configurações"
+
+msgid "Sign Out"
+msgstr "Finalizar Sessão"
+
+#: Navbar
+msgid "Chat"
+msgstr "Bate-Papo"
+
+msgid "Quick Match"
+msgstr "Partida Rápida"
+
+msgid "Snake"
+msgstr "Cobrinha"
+
+msgid "Tournament"
+msgstr "Torneio"
+
+msgid "Match"
+msgstr "Partida"
+
+#: Chat
 msgid "Public Chat"
 msgstr "Bate-Papo Galáctico"
 
 msgid "Add message ..."
 msgstr "Digite a mensagem ..."
+
+#: Quick Match
+msgid "Player 1"
+msgstr "Jogador 1"
+
+msgid "Player 2"
+msgstr "Jogador 2"
+
+msgid "Single Player"
+msgstr "Jogador Solo"
+
+msgid "Multiplayer"
+msgstr "Multiplayer"
+
+#: Snake
+msgid "Controls"
+msgstr "Controles"
+
+msgid "Start Game"
+msgstr "Iniciar Jogo"
+
+msgid "Switch to Multiplayer"
+msgstr "Mudar para Multiplayer"
+
+
+#: Torneio
+msgid "Online Game"
+msgstr "Jogo Online"
+
+msgid "Local Game"
+msgstr "Jogo Local"
+
+#: Editar Perfil
+msgid "Submit"
+msgstr "Salvar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Add display name"
+msgstr "Nome de exibição"
+
+msgid "Add information"
+msgstr "Informações"
+
+#: Wrapper
+msgid "Logout"
+msgstr "Sair"

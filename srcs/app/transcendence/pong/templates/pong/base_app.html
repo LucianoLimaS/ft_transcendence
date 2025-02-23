@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -20,10 +21,10 @@
               </a>
           
               <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="flex-direction: row;">
-                <li class="nav-item m-2"><a href="{% url 'home' %}" class="nav-link">Chat</a></li>
-                <li class="nav-item m-2"><a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a></li>
-                <li class="nav-item m-2"><a href="{% url 'snake' %}" class="nav-link">Snake</a></li>
-                <li class="nav-item m-2"><a href="/play/" class="nav-link">Torneio</a></li>
+                <li class="nav-item m-2"><a href="{% url 'home' %}" class="nav-link">{% trans "Chat" %}</a></li>
+                <li class="nav-item m-2"><a href="{% url 'pong_local' %}" class="nav-link">{% trans "Quick Match" %}</a></li>
+                <li class="nav-item m-2"><a href="{% url 'snake' %}" class="nav-link">{% trans "Snake" %}</a></li>
+                <li class="nav-item m-2"><a href="/play/" class="nav-link">{% trans "Tournament" %}</a></li>
               </ul>
           
               <div id="online-user-count" class="ml-3"></div>
@@ -38,11 +39,11 @@
                       <span>{{ request.user.profile.name }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right bg-white text-dark shadow mt-0 mb-0 pt-0 pb-0" aria-labelledby="userDropdown">
-                      <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
-                      <a class="dropdown-item" href="{% url 'profile-edit' %}">Edit Profile</a>
-                      <a class="dropdown-item" href="{% url 'new-groupchat' %}">Create Chat</a>
-                      <a class="dropdown-item" href="{% url 'profile-settings' %}">Settings</a>
-                      <a class="dropdown-item" href="{% url 'signout' %}">Sign Out</a>
+                      <a class="dropdown-item" href="{% url 'profile' %}">{% trans "My Profile" %}</a>
+                      <a class="dropdown-item" href="{% url 'profile-edit' %}">{% trans "Editar Perfil" %}</a>
+                      <a class="dropdown-item" href="{% url 'new-groupchat' %}">{% trans "Create Chat" %}</a>
+                      <a class="dropdown-item" href="{% url 'profile-settings' %}">{% trans "Settings" %}</a>
+                      <a class="dropdown-item" href="{% url 'signout' %}">{% trans "Sign Out" %}</a>
                     </div>
                   </li>
                 {% else %}
