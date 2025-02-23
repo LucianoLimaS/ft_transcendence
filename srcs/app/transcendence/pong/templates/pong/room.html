@@ -1,5 +1,6 @@
 {% extends 'pong/base_app.html' %}
 {% load static %}
+{% load i18n %}
 {% block content %}
 <div class="row app-row justify-content-center gap-4 gap-md-5 px-3 px-md-4 px-lg-5">
     <div class="section_pong d-flex justify-content-center align-items-center flex-column shadow-div" id="game-data"
@@ -7,17 +8,17 @@
 
         <div class="d-flex flex-row justify-content between align-items-center">
             <div class="d-flex flex-column text-center">
-                <p id="player1" class="d-none m-0 px-3">Player 1:</p>
+                <p id="player1" class="d-none m-0 px-3">{% trans "Player" %} 1:</p>
                 <p id="{{ room.id }}-p1" class="d-none m-0 px-3"></p>
             </div>
             <canvas id="pongCanvas" width="800" height="400" tabindex="0"></canvas>
             <div class="d-flex flex-column text-center">
-                <p id="player2" class="d-none m-0 px-3">Player 2:</p>
+                <p id="player2" class="d-none m-0 px-3">{% trans "Player" %} 2:</p>
                 <p id="{{ room.id }}-p2" class="d-none m-0 px-3"></p>
             </div>
         </div>
         <button id="startGame" class="btn btn-custom mt-2">
-            <p id="startGameText" class="btn-custom-play-name m-0">Play</p>
+            <p id="startGameText" class="btn-custom-play-name m-0">{% trans "Play" %}</p>
         </button>
         <div id="messageContainer" class="text-play m-0 mt-1"></div>
         <div id="alertContainer" class="text-play m-0 mt-1"></div>
