@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-#from allauth.account.utils import send_email_confirmation
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
@@ -8,6 +7,9 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib import messages
 from .forms import *
 from django.http import JsonResponse, HttpResponse
+from .models import Profile, Friendship, Block
+from pong.models import Match, TournamentParticipant, Tournament  # Adicione a importação do modelo Tournament
+from django.db import models
 
 def profile_view(request, username=None):
     if username:
@@ -21,37 +23,75 @@ def profile_view(request, username=None):
 
 def public_profile_view(request, userId=None):
     try:
-        #profile = request.user.profile
-        data = {
-        "profileImageSrc": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s",
-        "username": "Gamer123",
-        "userId": userId,
-        "numberOfFriends": 42,
-        "statusFriend": "pendente",
-        "matchStatistic": {
-            "totalGamesPlayed": 150,
-            "totalWins": 90,
-            "totalLosses": 60,
-            "winRatePercentage": 60
-        },
-        "tournamentStatistic": {
-            "totalTournamentParticipations": 20,
-            "totalTournamentWins": 5,
-            "totalTop3Finishes": 10
-        },
-        "badges": [
+        user = get_object_or_404(User, id=userId)
+        profile = get_object_or_404(Profile, user=user)
+
+        # Número de amigos
+        number_of_friends = Friendship.objects.filter(from_user=user, accepted=True).count()
+
+        # Status de amizade
+        friendship = Friendship.objects.filter(from_user=request.user, to_user=user).first()
+        if friendship:
+            status_friend = "accepted" if friendship.accepted else "pending"
+        else:
+            status_friend = "no_friendship"
+
+        # Verificar se o usuário está bloqueado
+        is_blocked = Block.objects.filter(blocker=request.user, blocked=user).exists()
+
+        # Estatísticas de partidas
+        total_games_played = Match.objects.filter(models.Q(player1=user) | models.Q(player2=user)).count()
+        total_wins = Match.objects.filter(winner=user).count()
+        total_losses = total_games_played - total_wins
+        win_rate_percentage = (total_wins / total_games_played) * 100 if total_games_played > 0 else 0
+
+        # Estatísticas de torneios
+        total_tournament_participations = TournamentParticipant.objects.filter(player=user).count()
+        total_tournament_wins = Tournament.objects.filter(winner=user).count()
+        total_top3_finishes = TournamentParticipant.objects.filter(player=user, is_eliminated=False).count()
+
+        # Insígnias (badges) - Exemplo estático, ajuste conforme necessário
+        badges = [
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s",
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s"
-        ],
-        "matchHistory": [
-            {"opponentName": "Player1", "status": "victory", "score": "3-1"},
-            {"opponentName": "Player2", "status": "Defeat", "score": "2-3"},
-            {"opponentName": "Player3", "status": "victory", "score": "3-0"},
-            {"opponentName": "Player4", "status": "victory", "score": "3-2"},
-            {"opponentName": "Player5", "status": "Defeat", "score": "1-3"}
         ]
-    }
+
+        # Histórico de partidas
+        matches = Match.objects.filter(models.Q(player1=user) | models.Q(player2=user))
+        match_history = []
+        for match in matches:
+            opponent = match.player2 if match.player1 == user else match.player1
+            status = "victory" if match.winner == user else "Defeat"
+            score = "N/A"  # Ajuste conforme necessário
+            match_history.append({
+                "opponentName": opponent.username if opponent else "N/A",
+                "status": status,
+                "score": score
+            })
+
+        data = {
+            "profileImageSrc": profile.avatar,
+            "username": user.username,
+            "displayname": profile.displayname,
+            "userId": userId,
+            "numberOfFriends": number_of_friends,
+            "statusFriend": status_friend,
+            "isBlocked": is_blocked,
+            "matchStatistic": {
+                "totalGamesPlayed": total_games_played,
+                "totalWins": total_wins,
+                "totalLosses": total_losses,
+                "winRatePercentage": win_rate_percentage
+            },
+            "tournamentStatistic": {
+                "totalTournamentParticipations": total_tournament_participations,
+                "totalTournamentWins": total_tournament_wins,
+                "totalTop3Finishes": total_top3_finishes
+            },
+            "badges": badges,
+            "matchHistory": match_history
+        }
 
         return JsonResponse(data, status=200)
     except Exception as e:
