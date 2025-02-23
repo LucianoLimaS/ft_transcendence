@@ -92,3 +92,7 @@ def profile_delete_view(request):
         return redirect('home')
     
     return render(request, 'users/profile_delete.html')
+
+@login_required
+def navBadge_view(request):
+    return render(request, 'users/badges.html')
