@@ -1,13 +1,14 @@
 from django.forms import ModelForm
 from django import forms
 from .models import *
+from django.utils.translation import gettext as getTranslated
 
 class ChatmessageCreateForm(ModelForm):
     class Meta:
         model = GroupMessage
         fields = ['body']
         widgets = {
-            'body' : forms.TextInput(attrs={'placeholder': 'Add message ...', 'class': 'p-2 text-black w-100 col-10', 'id': 'form-input-message', 'maxlength' : '300', 'autofocus': True, 'required' : True  }),
+            'body' : forms.TextInput(attrs={'placeholder': '', 'class': 'p-2 text-black w-100 col-10', 'id': 'form-input-message', 'maxlength' : '300', 'autofocus': True, 'required' : True  }),
         }
         
         

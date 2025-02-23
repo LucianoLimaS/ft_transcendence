@@ -128,3 +128,9 @@ msgstr "Usuário já cadastrado"
 
 msgid "First name:"
 msgstr "Nome:"
+
+msgid "Public Chat"
+msgstr "Bate-Papo Galáctico"
+
+msgid "Add message ..."
+msgstr "Digite a mensagem ..."

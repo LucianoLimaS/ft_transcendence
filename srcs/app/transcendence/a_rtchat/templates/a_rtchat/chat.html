@@ -1,5 +1,5 @@
 {% extends 'layouts/blank.html' %}
-
+{% load i18n %}
 {% block content %}
   {% if chat_group.members.exists %}
     <a href="{% url 'chatroom-leave' chat_group.group_name %}">{% include 'a_rtchat/partials/modal_chat_leave.html' %}</a>
@@ -88,7 +88,7 @@
             <div class="chat-header d-flex align-items-center">
               <img src="../../../static/images/galaxy_lobby_1.png" alt="User avatar" class="avatar mr-2" />
               <div>
-                <h6 class="mb-0">Public Chat</h6>
+                <h6 class="mb-0">{% trans "Public Chat" %}</h6>
               </div>
             </div>
           </a>
@@ -120,7 +120,7 @@
               {% endif %}
             {% else %}
               <img src="../../../static/images/galaxy_lobby_1.png" style="width: 40px" alt="" />
-              <h6 class="mb-0 ml-2" id="current-chat-name">Public Chat</h6>
+              <h6 class="mb-0 ml-2" id="current-chat-name">{% trans "Public Chat" %}</h6>
             {% endif %}
           </div>
 
