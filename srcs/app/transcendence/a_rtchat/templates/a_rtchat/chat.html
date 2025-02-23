@@ -283,7 +283,7 @@ function removeDropdownMenu(contactName, id) {
 
 function viewProfile(contactName, userId) {
   var URL_BASE = "http://localhost:8000"
-  const url = `${URL_BASE}/profile/public-profile?id=${userId}`;
+  const url = `${URL_BASE}/profile/public-profile/${userId}`;
     console.log(url)
   fetch(url)
     .then(response => {
@@ -389,24 +389,7 @@ function generateProfileModal(userId, data) {
                         
                                     <div class="row mt-4">
                                         <div class="col-12">
-                                            <h4>Match History</h4>`
-    
-    /*let HistoryItens = "";
-    data.matchHistory.forEach((match) => {
-        
-        HistoryItens += `<div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>Opponent:</strong> ${match.opponentName}
-                            </div>
-                            <div>
-                                <span class="badge ${match.status === 'victory' ? 'badge-success' : 'badge-danger'}">
-                                    ${match.status === 'victory' ? 'Victory' : 'Defeat'}
-                                </span>
-                                <span class="ml-2">${match.score}</span>
-                            </div>
-                        </div>`
-    });*/
-                                            
+                                            <h4>Match History</h4>`                                            
     publicProfileModal += generateMatchHistoryFromPublicprofile(data.matchHistory)
     publicProfileModal +=                  `</div>
                                         </div>
@@ -436,7 +419,6 @@ function generateMatchHistoryFromPublicprofile(history) {
                     <span class="badge ${match.status === 'victory' ? 'badge-success' : 'badge-danger'}">
                         ${match.status === 'victory' ? 'Victory' : 'Defeat'}
                     </span>
-                    <span class="ml-2">${match.score}</span>
                 </div>
             </div>
         `;

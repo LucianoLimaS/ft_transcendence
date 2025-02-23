@@ -52,9 +52,8 @@ def public_profile_view(request, userId=None):
 
         # Insígnias (badges) - Exemplo estático, ajuste conforme necessário
         badges = [
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSZmIuaRfZgN-nCpwp6rmPmhYrpz9ajvUN-w&s"
+            "/static/assets/cow_savior_icon.png",
+            "/static/assets/towel_icon.png",
         ]
 
         # Histórico de partidas
