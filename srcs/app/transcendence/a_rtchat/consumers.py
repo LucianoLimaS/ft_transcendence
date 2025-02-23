@@ -3,7 +3,11 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from asgiref.sync import async_to_sync
 import json
-from .models import *
+from .models import ChatGroup, GroupMessage
+from users.models import Block
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Q
 
 class ChatroomConsumer(WebsocketConsumer):
     def connect(self):
@@ -71,7 +75,19 @@ class ChatroomConsumer(WebsocketConsumer):
             'chat_group': self.chatroom
         }
         html = render_to_string("a_rtchat/partials/chat_message_p.html", context=context)
-        self.send(text_data=html)
+
+        is_blocked = False
+        if self.chatroom_name != "public-chat":
+            users = self.chatroom.members.all()
+            user1, user2 = users[:2]
+            # Verificar se o usuário está bloqueado
+            is_blocked = Block.objects.filter(
+                models.Q(blocker=user1, blocked=user2) | 
+                models.Q(blocker=user2, blocked=user1)
+            ).exists()
+
+        if is_blocked == False:
+            self.send(text_data=html)
         
         
     def update_online_count(self):
