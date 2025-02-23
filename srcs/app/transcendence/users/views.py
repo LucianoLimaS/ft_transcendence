@@ -14,12 +14,16 @@ from django.db import models
 def profile_view(request, username=None):
     if username:
         profile = get_object_or_404(User, username=username).profile
+        is_blocked = Block.objects.filter(
+            models.Q(blocker=request.user, blocked=profile.user) | 
+            models.Q(blocker=profile.user, blocked=request.user)
+        ).exists()
     else:
         try:
             profile = request.user.profile
         except:
             return redirect_to_login(request.get_full_path())
-    return render(request, 'users/profile.html', {'profile':profile})
+    return render(request, 'users/profile.html', {'profile':profile, "is_blocked":is_blocked})
 
 def public_profile_view(request, userId=None):
     try:
@@ -37,7 +41,10 @@ def public_profile_view(request, userId=None):
             status_friend = "no_friendship"
 
         # Verificar se o usuário está bloqueado
-        is_blocked = Block.objects.filter(blocker=request.user, blocked=user).exists()
+        is_blocked = Block.objects.filter(
+            models.Q(blocker=request.user, blocked=user) | 
+            models.Q(blocker=user, blocked=request.user)
+        ).exists()
 
         # Estatísticas de partidas
         total_games_played = Match.objects.filter(models.Q(player1=user) | models.Q(player2=user)).count()
@@ -96,6 +103,61 @@ def public_profile_view(request, userId=None):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+def friends_change_status(request, userId, params):
+    print(params)
+    print(userId)
+    print("teste")
+    try:
+        user = get_object_or_404(User, id=userId)
+        request_user = request.user
+
+        if params == 1:
+            # Adicionar como amigo
+            Friendship.objects.create(from_user=request_user, to_user=user, accepted=True)
+            status_friend = "accepted"
+            status_block = False
+        elif params == 2:
+            # Cancelar a amizade
+            Friendship.objects.filter(from_user=request_user, to_user=user).delete()
+            is_blocked = Block.objects.filter(
+                models.Q(blocker=request.user, blocked=user) | 
+                models.Q(blocker=user, blocked=request.user)
+            ).exists()
+            if is_blocked:
+                status_block = True
+            else:
+                status_block = False
+            status_friend = "no_friendship"
+        elif params == 3:
+            # Bloquear usuário
+            Block.objects.create(blocker=request_user, blocked=user)
+            friendship = Friendship.objects.filter(from_user=request.user, to_user=user).first()
+            if friendship:
+                status_friend = "accepted" if friendship.accepted else "pending"
+            else:
+                status_friend = "no_friendship"
+            status_block = True
+        elif params == 4:
+            # Desbloquear usuário
+            Block.objects.filter(blocker=request_user, blocked=user).delete()
+            friendship = Friendship.objects.filter(from_user=request.user, to_user=user).first()
+            if friendship:
+                status_friend = "accepted" if friendship.accepted else "pending"
+            else:
+                status_friend = "no_friendship"
+            status_block = False
+        else:
+            return JsonResponse({'error': 'Invalid parameter'}, status=400)
+        
+        data = {
+            "statusFriend": status_friend,
+            "isBlocked": status_block,
+        }
+
+        return JsonResponse(data, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 def profile_edit_view(request):

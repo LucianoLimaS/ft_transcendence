@@ -10,4 +10,5 @@ urlpatterns = [
     path('emailchange/', profile_emailchange, name="profile-emailchange"),
     path('emailverify/', profile_emailverify, name="profile-emailverify"),
     path('delete/', profile_delete_view, name="profile-delete"),
+    path('friends-change-status/<int:userId>/<int:params>/', friends_change_status, name="friends-change-status"),
 ]
