@@ -6,13 +6,33 @@
         <p class="title title-play-mode rounded-top-4 text-center m-0 p-2 py-2">Local game</p>
         <div class="mode d-flex flex-column flex-lg-row justify-content-center py-1 py-md-1">
             <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
-                id="gameModeForm" method="post" formType="localGameForm" api-link>
-                {% csrf_token %}
-                <input type="hidden" name="game_mode" value="{{ GameMode.LOCAL }}">
-                <button class="play-mode-btn rounded-4 col-11 col-sm-9" type="submit" api-link>
-                    <p class="d-flex justify-content-center m-0">Match</p>
-                </button>
-            </form>
+            id="gameModeForm" method="post" formType="localGameForm" api-link>
+          {% csrf_token %}
+          <input type="hidden" name="game_mode" value="{{ GameMode.LOCAL }}">
+          <!-- Botão "Match" abre o modal -->
+          <button class="play-mode-btn rounded-4 col-11 col-sm-9" type="button" data-toggle="modal" data-target="#difficultyModal">
+              <p class="d-flex justify-content-center m-0">Match</p>
+          </button>
+      </form>
+      
+      <!-- Modal de Dificuldade -->
+      <div class="modal fade" id="difficultyModal" tabindex="-1" role="dialog" aria-labelledby="difficultyModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="difficultyModalLabel">Escolha a Dificuldade</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <button id="easyButton" class="btn btn-primary btn-block mb-2">Fácil</button>
+                      <button id="moderateButton" class="btn btn-warning btn-block mb-2">Moderado</button>
+                      <button id="hardButton" class="btn btn-danger btn-block mb-2">Difícil</button>
+                  </div>
+              </div>
+          </div>
+      </div>
             <div class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2">
                 <a class="play-mode-btn rounded-4 col-11 col-sm-9 d-flex align-items-center justify-content-center text-decoration-none"
                     href="/enter/localtournament/" data-link>
