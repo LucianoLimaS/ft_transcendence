@@ -322,6 +322,6 @@ re: fclean
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
 
 .PHONY : all build down re clean fclean dev info sudoers remove-sudoers \
-	certs env setup remove-setup docker remove-env \
+	certs env setup remove-setup docker remove-docker remove-env \
 	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles
 	restart-service restart win clean-logs
