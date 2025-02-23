@@ -20,6 +20,7 @@ class Profile(models.Model):
     
     @property
     def name(self):
+        self.displayname = self.user.first_name
         if self.displayname:
             return self.displayname
         return self.user.username 
