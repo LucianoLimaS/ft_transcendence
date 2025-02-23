@@ -215,3 +215,27 @@ msgstr "Informações"
 #: Wrapper
 msgid "Logout"
 msgstr "Sair"
+
+#: Rooms
+msgid "Player"
+msgstr "Jogador"
+
+msgid "Play"
+msgstr "Iniciar"
+
+#: Níveis
+msgid "Easy"
+msgstr "Fácil"
+
+msgid "Medium"
+msgstr "Médio"
+
+msgid "Hard"
+msgstr "Difícil"
+
+#:Pong
+msgid "Restart"
+msgstr "Reiniciar"
+
+msgid "Menu"
+msgstr "Menu"
