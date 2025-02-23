@@ -260,7 +260,7 @@ deepclean: fclean
 	@echo -e "\n💀 Removing all Docker configurations...\n"
 	@docker system prune --all
 
-clean-host: clean-dirs clean-migrations clean-staticfiles
+clean-host: clean-dirs clean-migrations clean-staticfiles clean-logs
 
 clean-dirs:
 	@sudo rm -rf ~/data > /dev/null 2>&1
@@ -270,6 +270,9 @@ clean-migrations:
 
 clean-staticfiles:
 	@sudo rm -rf ./srcs/app/transcendence/staticfiles/ > /dev/null 2>&1
+
+clean-logs:
+	@sudo rm -rf ./srcs/app/transcendence/logs/
 
 # ======================
 # Auxiliary Commands
@@ -283,4 +286,4 @@ re: fclean
 .PHONY : all build down re clean fclean dev info sudoers remove-sudoers \
 	certs env setup remove-setup docker remove-env \
 	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles
-	restart-service restart win
+	restart-service restart win clean-logs
