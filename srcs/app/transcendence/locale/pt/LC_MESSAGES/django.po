@@ -244,3 +244,31 @@ msgstr "Menu"
 
 msgid "Play Again"
 msgstr "Jogar Novamente"
+
+#: Torneios
+msgid "Local Tournament"
+msgstr "Torneio Local"
+
+msgid "Create Tournament"
+msgstr "Criar Torneio"
+
+msgid "Continue Tournament"
+msgstr "Continuar Torneio"
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Rooms"
+msgstr "Salas"
+
+msgid "Players"
+msgstr "Jogadores"
+
+msgid "Create a room"
+msgstr "Criar uma Sala"
+
+msgid "Create"
+msgstr "Criar"
+
+msgid "No active rooms found"
+msgstr "Nenhuma sala ativa encontrada"

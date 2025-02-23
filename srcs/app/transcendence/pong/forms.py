@@ -1,5 +1,5 @@
 from django import forms
-
+from django.utils.translation import gettext as getTranslated
 from .models import PongRoom, Tournament
 
 
