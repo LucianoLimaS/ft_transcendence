@@ -1,0 +1,61 @@
+{% extends 'layouts/box.html' %}
+
+{% block content %}
+
+<h1 class="mb-4">Account Settings</h1>
+
+<div class="table-responsive">
+    <table class="table table-borderless">
+        <tbody>
+            <tr>
+                <th scope="row" class="pt-3 pb-2 text-dark font-weight-bold">
+                    Email address
+                </th>
+                <td id="email-address" class="pt-3 pb-2 pl-3">
+                    {% if user.email %}{{ user.email }}{% else %}No Email{% endif %}
+                </td>
+                <td class="pt-3 pb-2 pl-3">
+                    <a id="email-edit" class="text-primary font-weight-medium"
+                        href="{% url 'profile-emailchange' %}"
+                        data-hx-get="{% url 'profile-emailchange' %}"
+                        data-hx-target="#email-address"
+                        data-hx-swap="innerHTML">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+            <tr class="border-bottom">
+                <th scope="row" class="pb-3 text-dark font-weight-bold">
+                </th>
+                <td class="pb-3 pl-3">
+                    {% if user.emailaddress_set.first.verified %}
+                    <span class="text-success">Verified</span>
+                    {% else %}
+                    <span class="text-warning">Not verified</span>
+                    {% endif %}
+                </td>
+                <td class="pb-3 pl-3">
+                    <a href="{% url 'profile-emailverify' %}" class="text-primary font-weight-medium">
+                        {% if not user.emailaddress_set.first.verified %}Verify{% endif %}
+                    </a>
+                </td>
+            </tr>
+
+            <tr class="border-bottom">
+                <th scope="row" class="py-3 text-dark font-weight-bold">
+                    Delete Account
+                </th>
+                <td class="py-3 pl-3">
+                    Once deleted, the account is gone. Forever.
+                </td>
+                <td class="py-3 pl-3">
+                    <a href="{% url 'profile-delete' %}" class="text-danger font-weight-medium">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

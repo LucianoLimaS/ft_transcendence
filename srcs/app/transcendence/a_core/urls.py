@@ -27,10 +27,10 @@ urlpatterns = [
     path('', include('a_rtchat.urls')),
     path('profile/', include('users.urls')),
     path('@<username>/', profile_view, name="profile"),
-    path('auth/', include('custom_auth.urls')),  # Inclua suas rotas de autenticação
+    path('', include('custom_auth.urls')),  # Inclua suas rotas de autenticação
     path('', include('django_prometheus.urls')),  # Monitoramento
     path('', include('match.urls')),  # Adicione isso para incluir as URLs do jogo
-    path("", include("pong.urls")),
+    path('', include("pong.urls")),
 ]
 
 # Only used when DEBUG=True, whitenoise can serve files when DEBUG=False

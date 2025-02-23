@@ -1,9 +1,3 @@
-@import url("https://fonts.cdnfonts.com/css/arcade");
-/* font-family: "Arcade Rounded", sans-serif; */
-
-@import url('https://fonts.cdnfonts.com/css/lt-galaxy-reverse');
-/* font-family: 'LT Galaxy Reverse', sans-serif; */
-
 :root {
     --cor-1: #ffffff;
     --cor-2: #c0c0c0;
@@ -24,8 +18,12 @@ body {
 }
 
 body {
-    background-color: var(--cor-2);
-    font-family: "Arcade Rounded", sans-serif;
+    background-image: url('../assets/spaceship-wallpaper.jpg');  /*Caminho da imagem */
+    background-size: cover; /* Faz a imagem cobrir toda a área da página */
+    background-position: center; /* Centraliza a imagem */
+    background-attachment: fixed; /* Faz com que a imagem fique fixa no fundo */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+
     font-weight: 400;
     font-size: 14px;
     margin: 0;
@@ -46,13 +44,6 @@ body {
     text-shadow: 2px 2px 4px #fff;
 }
 
-.nav-link:hover {
-    text-shadow:
-        -0.3px -0.3px 0.1em #fff,
-        0.3px -0.3px 0.1em #fff,
-        -0.3px 0.3px 0.1em #fff,
-        0.3px 0.3px 0.1em #fff;
-}
 
 .menu-profile-img {
     width: 50px;
@@ -100,7 +91,7 @@ body {
 }
 
 .app-container {
-    background-color: var(--cor-6);
+    /* background-color: rgba(224, 224, 224, 0.5); */
     min-height: calc(100vh - 182px);
     display: flex;
 }
@@ -128,7 +119,7 @@ body {
 }
 
 .title {
-    background-color: var(--cor-4);
+    background-color: rgba(0, 63, 105, 0.5);
     color: var(--cor-1);
     font-size: 13px;
 }
@@ -204,12 +195,23 @@ button {
     max-width: 340px;
 }
 
-.col-room {
-    background-color: var(--cor-2);
-    overflow: hidden;
-    height: 380px;
+.section_pong{
+    background-color: rgba(192, 192, 192, 0.5);
+    padding-top: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
+.col-room {
+    background-color: rgba(192, 192, 192, 0.5);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease-in-out;
+    /* height: 380px; */
+}
+
+.col-room:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6);
+}
 
 .col-room-tournament {
     background-color: var(--cor-2);
@@ -217,14 +219,29 @@ button {
 }
 
 .col-tournament {
-    background-color: var(--cor-2);
+    background-color: rgba(192, 192, 192, 0.5);
     overflow: hidden;
     min-width: 180px;
+    /* transition: box-shadow 0.3s ease-in-out; */
+}
+
+.shadow-div
+{
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.shadow-div:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6);
 }
 
 .col-matches {
-    background-color: var(--cor-2);
+    background-color: rgba(192, 192, 192, 0.5);
     overflow: hidden;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.col-matches:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6);
 }
 
 .col-profile {
@@ -245,9 +262,9 @@ button {
     height: 300px;
 }
 
-.search {
+/* .search {
     background-color: var(--cor-1);
-}
+} */
 
 .form-control {
     font-family: 'LT Galaxy Reverse', sans-serif;
@@ -459,7 +476,7 @@ button {
 }
 
 .form-title {
-    font-family: "Arcade Rounded", sans-serif;
+
     background-color: var(--cor-4);
     font-size: 16px;
     color: #fff;
@@ -487,19 +504,19 @@ button {
 
 .btn-custom-name {
     color: #fff;
-    font-family: "Arcade Rounded", sans-serif;
+
     font-size: 12px;
 }
 
 .btn-custom-name-enter {
     color: #fff;
-    font-family: "Arcade Rounded", sans-serif;
+
     font-size: 10px;
 }
 
 .btn-custom-name-enter:hover {
     color: #fff;
-    font-family: "Arcade Rounded", sans-serif;
+
     font-size: 10px;
     text-decoration: none;
 }
@@ -510,7 +527,7 @@ button {
 
 .btn-custom-play-name {
     color: #fff;
-    font-family: "Arcade Rounded", sans-serif;
+
     font-size: 13px;
 }
 
@@ -536,7 +553,13 @@ button {
 /* jogar */
 
 .col-play-mode {
-    background-color: var(--cor-2);
+    background-color: rgba(192, 192, 192, 0.5);
+    transition: box-shadow 0.3s ease-in-out;
+
+}
+
+.col-play-mode:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.6);
 }
 
 .title-play-mode {
@@ -566,7 +589,7 @@ button {
 }
 
 .enter-box-background {
-    background-color: var(--cor-6);
+    background-color: rgba(224, 224, 224, 0.5);
 }
 
 .enter-box {
@@ -622,7 +645,7 @@ button {
 }
 
 .create-room-box {
-    background-color: var(--cor-6);
+    background-color: rgba(224, 224, 224, 0.5);
 }
 
 #match-history {
@@ -736,7 +759,7 @@ button {
     }
 
     .col-room {
-        height: 420px;
+        height: 436px;
     }
 
     .col-friends.friends {

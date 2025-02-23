@@ -1,28 +1,19 @@
-<div>
-  <div class="modal fade" id="leaveChatModal" tabindex="-1" aria-labelledby="leaveChatModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="leaveChatModalLabel">Leave this chat?</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <form method="POST" action="{% url 'chatroom-leave' chat_group.group_name %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger mt-2">Yes, I want to leave</button>
-                      <button type="button" class="btn btn-secondary mt-2 ms-2" data-bs-dismiss="modal">No, I want to stay</button>
-                  </form>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <button 
-      type="button" 
-      class="btn btn-link text-muted p-0 m-2" 
-      data-bs-toggle="modal" 
-      data-bs-target="#leaveChatModal"
-  >
-      Leave Chat
-  </button>
+<div x-data="{ modal_open: false }">
+    <div x-show="modal_open" x-cloak>
+        <div class="z-50" style="inset: 0;  z-index: 50;"></div>
+        <div class="inset-0 z-50" style="inset: 0; z-index: 50;">
+            <div class="d-flex mt-5 justify-content-center align-items-center">
+                <div @click.away="modal_open = false" class="rounded-lg bg-white shadow-xl ml-5">
+                    <h1 class="text-dark text-center">Leave this chat?</h1>
+                    <form method="POST" action="{% url 'chatroom-leave' chat_group.group_name %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger ml-1 mb-1">Yes, I want to leave</button>
+                        <a class="btn btn-secondary ml-1 cursor-pointer" @click="modal_open = false">No, I want to stay</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button @click="modal_open = true" class="btn btn-link text-dark pt-5 position-absolute" style="padding: 0; margin: 10px; top:35px; font-weight: 600;">Leave Chat</button>
 </div>
