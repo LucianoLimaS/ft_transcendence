@@ -12,7 +12,7 @@ from pong.models import Match, TournamentParticipant, Tournament  # Adicione a i
 from django.db import models
 
 def profile_view(request, username=None):
-    print('profile_view')
+    is_blocked = False
     if username:
         profile = get_object_or_404(User, username=username).profile
         is_blocked = Block.objects.filter(
