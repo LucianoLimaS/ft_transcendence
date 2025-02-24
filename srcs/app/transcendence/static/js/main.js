@@ -1,3 +1,5 @@
+var URL_BASE = "http://localhost:8000"
+
 (function($) {
 
 	"use strict";

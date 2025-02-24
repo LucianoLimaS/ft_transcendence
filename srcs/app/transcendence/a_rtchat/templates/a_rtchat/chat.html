@@ -110,7 +110,6 @@
               <h6 class="mb-0" id="current-chat-name">Limão Boladão</h6>
               <small class="text-muted">Online</small>
             </div> {% endcomment %}
-
             {% if chat_group.is_private %}
               {% if other_user %}
                 <a href="{% url 'profile' other_user.username %}" class="d-flex">
@@ -232,15 +231,6 @@ if (container) {
       } else {
         emojiShow.classList.add('d-none')
       }
-
-    }
-
-    function viewProfile(contactName) {
-      try {
-          window.location.href = '/@' + contactName + '/';
-      } catch (error) {
-          console.error('Error viewing profile:', error);
-      }
   }
   
   function addFriend(contactName) {
@@ -269,10 +259,7 @@ if (container) {
     dropdownMenu.style.left = `${rect.left + window.scrollX}px`;
 
     dropdownMenu.innerHTML = `
-        <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">{% trans "View profile" %}</a>
-        <a class="dropdown-item" href="#" onclick="addFriend('${contactName}', '${id}')">{% trans "Add friend" %}</a>
-        <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName}', '${id}')">{% trans "Delete friend" %}</a>
-        <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName}', '${id}')">{% trans "Challenge to match" %}</a>
+        <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}', '${id}')">{% trans "View profile" %}</a>
     `;
 
     document.body.appendChild(dropdownMenu);
@@ -289,6 +276,256 @@ function removeDropdownMenu(contactName, id) {
     }
   
 
+}
+
+function viewProfile(contactName, userId) {
+  var URL_BASE = window.location.origin
+  const url = `${URL_BASE}/profile/public-profile/${userId}`;
+    console.log(url)
+  fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error fetching profile");
+        }
+        return response.json();
+    })
+    .then(data => {
+        generateProfileModal(userId, data);
+    })
+    .catch(error => {
+        console.error(error);
+    })
+}
+
+
+function generateProfileModal(userId, data) {
+    let publicProfile = `#public-profile-${userId}`;
+    let publicProfileEl = document.querySelector(publicProfile)
+
+    console.log(publicProfileEl)
+        
+    let publicProfileModal = `<div id="profileModal" class="publicProfile-modal" style="margin-top:50px">
+                            <div class="publicProfile-content">
+                                <button id="closeBtn" class="close-btn" title="Fechar" onclick="fecharPublicProfile()">&times;</button>
+                                
+                                <div class="publicProfile-header">
+                                    <div class="publicProfile-avatar">
+                                        <img src="${data.profileImageSrc}" class="rounded-circle" height="150" alt="User Photo">
+                                    </div>
+                                    <h2 class="mt-3">${data.username}</h2>
+                                    <div>
+                                      <div class="row">
+                                        <div class="col-md-4">
+                                          <div id="btnBlock"></div>  
+                                        </div>
+                                        <div class="col-md-4">
+                                          <div id="btnFriend"></div>
+                                        </div>    
+                                    </div>
+                                </div>
+                        
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="stats-card">
+                                                <h5 class="text-center"><strong>Matches</strong></h5>
+                                                <p>
+                                                    <span>Games:</span> 
+                                                    <span>${data.matchStatistic.totalGamesPlayed}</span>
+                                                </p>
+                                                <p>
+                                                    <span>Victories:</span>
+                                                    <span>${data.matchStatistic.totalWins}</span>
+                                                </p>
+                                                <p>
+                                                    <span>Defeats:</span>
+                                                    <span>${data.matchStatistic.totalLosses}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="stats-card">
+                                                <h5 class="text-center"><strong>Tournaments</strong></h5>
+                                                <p>
+                                                    <span>Participations:</span> 
+                                                    <span>
+                                                        ${data.tournamentStatistic.totalTournamentParticipations}
+                                                    </span>
+                                                </p>
+                                                <p>
+                                                    <span>Victories:</span>
+                                                    <span>
+                                                        ${data.tournamentStatistic.totalTournamentWins}
+                                                    </span>
+                                                </p>
+                                                <p>
+                                                    <span>Top 3:</span>
+                                                    <span>
+                                                        ${data.tournamentStatistic.totalTop3Finishes}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="stats-card text-center">
+                                                <h5><strong>Win Rate</strong></h5>
+                                                <span class="h2 text-center">${data.matchStatistic.winRatePercentage}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                        
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <h4>Achievements</h4>
+                                            <div class="d-flex flex-wrap justify-content-center">`
+                                            
+    let badgeItens = "";
+    data.badges.forEach((badgeSrc) => {
+        
+        badgeItens += `<div class="badge-item">
+                        <img class="badge-img" src="${badgeSrc}" title="First Contact">
+                    </div> `
+                            
+    });
+    
+    publicProfileModal += badgeItens
+    publicProfileModal +=                  `</div>
+                                        </div>
+                                    </div>
+                        
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <h4>Match History</h4>`                                            
+    publicProfileModal += generateMatchHistoryFromPublicprofile(data.matchHistory)
+    publicProfileModal +=                  `</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`
+    
+    publicProfileEl.innerHTML = publicProfileModal;
+    let profileModal = document.querySelector("#profileModal")
+    profileModal.style.display = 'block';
+
+    //#54 #62 #63
+    renderActionButtonsPublicProfile(data)
+}
+
+function fecharPublicProfile() {
+    $('#profileModal').hide()
+}
+
+function generateMatchHistoryFromPublicprofile(history) {
+    matchElements = "";
+    history.forEach(match => {
+        matchElements += `
+            <div class="d-flex justify-content-between align-items-center match-history-item p-3 bg-light">
+                <div>
+                    <strong>Opponent:</strong> ${match.opponentName}
+                </div>
+                <div>
+                    <span class="badge ${match.status === 'victory' ? 'badge-success' : 'badge-danger'}">
+                        ${match.status === 'victory' ? 'Victory' : 'Defeat'}
+                    </span>
+                </div>
+            </div>
+        `;
+
+      });
+      return matchElements;
+}
+
+function renderActionButtonsPublicProfile(data) {
+  const btnBlockContainer = document.querySelector('#btnBlock');
+  const btnFriendContainer = document.querySelector('#btnFriend');
+
+  // Limpa o conteúdo anterior
+  btnBlockContainer.innerHTML = '';
+  btnFriendContainer.innerHTML = '';
+
+  // Cria os elementos HTML para os botões
+  const blockButton = document.createElement('button');
+  blockButton.className = `btn ${data.isBlocked === true ? 'btn-danger' : 'btn-warning'} btn-block mb-2`;
+  blockButton.textContent = data.isBlocked === true ? 'Desbloquear' : 'Bloquear';
+  blockButton.addEventListener('click', (event) => btnBlockAction(event, data.userId, data.isBlocked === true));
+
+  const friendButton = document.createElement('button');
+  friendButton.className = `btn ${data.statusFriend === 'accepted' ? 'btn-danger' : 'btn-success'} btn-block mb-2`;
+  friendButton.textContent = data.statusFriend === 'accepted' ? 'Desfazer Amizade' : 'Adicionar como Amigo';
+  friendButton.addEventListener('click', (event) => btnFriendAction(event, data.userId, data.statusFriend));
+
+  // Adiciona os botões nas divs
+  
+  // Define o conteúdo HTML das divs
+  if(data.statusFriend === 'accepted') {
+    btnBlockContainer.appendChild(blockButton);
+  }
+  btnFriendContainer.appendChild(friendButton);
+    
+}
+
+
+
+//1 = add amigo
+//2 = cancela amizade
+//3 = bloqueia usuario
+//4 = desbloqueia usuario
+
+//${isBlocked ? 'Desbloquear' : 'Bloquear'}
+function btnBlockAction(event, userId, isBlocked) {
+  event.preventDefault();
+  var URL_BASE = window.location.origin
+  let action = isBlocked ? 4 : 3
+  const url = `${URL_BASE}/profile/friends-change-status/${userId}/${action}`;
+    console.log(url)
+  fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error fetching profile");
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Atualiza as variáveis de estado com base na resposta do servidor
+        statusFriend = data.statusFriend;
+        isBlocked = data.isBlocked === true;
+
+        data.userId = userId;
+
+        renderActionButtonsPublicProfile(data)
+    })
+    .catch(error => {
+        console.error(error);
+    })
+}
+
+//${statusFriend === 'accepted' ? 'accepted' : 'no_friendship'}
+function btnFriendAction(event, userId, statusFriend) {
+  event.preventDefault();
+  var URL_BASE = window.location.origin
+  let action = statusFriend === 'accepted' ? 2 : 1
+  const url = `${URL_BASE}/profile/friends-change-status/${userId}/${action}`;
+    console.log(url)
+  fetch(url)
+  .then(response => {
+        if (!response.ok) {
+            throw new Error("Error fetching profile");
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Atualiza as variáveis de estado com base na resposta do servidor
+        statusFriend = data.statusFriend;
+        isBlocked = data.isBlocked === true;
+
+        data.userId = userId;
+
+        renderActionButtonsPublicProfile(data)
+    })
+    .catch(error => {
+        console.error(error);
+    })
 }
 
   </script>

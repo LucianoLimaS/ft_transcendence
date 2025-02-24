@@ -200,3 +200,150 @@ body, html {
 .emojis.show {
     display: block;
 }
+
+
+/****************************************************************/
+.publicProfile-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.publicProfile-content {
+    margin: auto;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.8)!important;
+    transition: box-shadow 0.3s ease;
+    z-index: 1010;
+}
+
+.publicProfile-content:hover {
+    box-shadow: 0 0 35px rgba(255, 255, 255, 1)!important;; 
+}
+
+
+.publicProfile-header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.publicProfile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 48px;
+}
+
+.stats-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.7); 
+}
+
+.stats-card p {
+    display: flex;
+    justify-content: space-between;
+}
+
+.badge-item {
+    text-align: center;
+    margin: 10px;
+}
+
+.badge-icon {
+    font-size: 2em;
+    color: gold;
+}
+
+.match-history-item {
+    border-left: 4px solid;
+    margin-bottom: 10px;
+}
+
+.victory {
+    border-left-color: #28a745;
+}
+
+.defeat {
+    border-left-color: #dc3545;
+}
+
+.close-btn {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #dc3545;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+
+/*************************  EFEITO NO BADGE  ***********************/
+.badge-item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+.badge-img{
+    width: 128px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.7); 
+    border-radius: 20px;
+    animation: float 3s ease-in-out infinite; 
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.4)) 
+                drop-shadow(-2px -2px 3px rgba(255, 255, 255, 0.8));
+}
+
+
+@keyframes float {
+    0% {
+        transform: translateY(0); 
+    }
+    50% {
+        transform: translateY(-5); 
+        box-shadow: 20px 20px 15px rgba(0, 0, 0, 0.5); 
+    }
+    100% {
+        transform: translateY(0); 
+    }
+}
