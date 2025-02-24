@@ -1,5 +1,6 @@
 {% extends 'pong/base_app.html' %}
 {% load static %}
+{% load i18n %}
 {% block content %}
 <div id="div-status" class="app-row d-flex flex-column flex-md-row justify-content-center gap-2 gap-md-4 px-3 px-md-4 px-lg-5">
     <div class="col col-12 col-md-4 d-flex flex-row flex-md-column gap-3 d-flex justify-content-center"
@@ -10,19 +11,19 @@
     <div class="shadow-div">
         <div class="col-tournament p-0 rounded-4">
             <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
-                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Tournament</p>
+                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">{% trans "Tournament" %}</p>
             </div>
             <div class="p-3">
-                <p class="text-tournament m-0 text-nowrap" id="tourn-name">Name: </p>
-                <p class="text-tournament m-0 text-nowrap">Number of Players:
+                <p class="text-tournament m-0 text-nowrap" id="tourn-name">{% trans "Name:" %}</p>
+                <p class="text-tournament m-0 text-nowrap">{% trans "Number of Players" %}:
                     <span id="maxPlayersValue">8</span>
                 </p>
-                <p class="text-tournament m-0 text-nowrap" id="tourn-winner">Winner: </p>
+                <p class="text-tournament m-0 text-nowrap" id="tourn-winner">{% trans "Winner" %}: </p>
             </div>
         </div>
         <div class="col-tournament p-0 rounded-4">
             <div class="title rounded-top-4 d-flex flex-row align-items-center justify-content-center">
-                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">Players</p>
+                <p class="title rounded-top-4 text-center m-0 p-2 text-nowrap">{% trans "Players" %}</p>
             </div>
             <div class="p-2 px-md-3">
                 <form id="tournamentForm">
@@ -31,17 +32,17 @@
                     <label for="player-{{ i }}" id="player-name-{{ i }}"></label>
                     <input type="text" id="player-{{ i }}" name="player-{{ i }}" 
                         class="form-control form-player rounded-5 border-0 mr-2" 
-                        placeholder="Choose a name" 
+                        placeholder="..." 
                         title="player-name-{{ i }}" maxlength="20" required>
                 </div>
                 {% endfor %}
                 <p id="p-warn" class="text-tournament m-0 text-nowrap" style="color: red; text-align: center;"></p>
                 <div class="d-flex justify-content-center">
                     <p class="text-tournament status-game text-center m-0 d-none" id="startTournamentText">
-                        Tournament started!
+                        {% trans "Tournament started" %}!
                     </p>
                     <button id="startTournament" class="btn btn-custom">
-                        <p class="btn-custom-name-enter m-0">Start</p>
+                        <p class="btn-custom-name-enter m-0">{% trans "Players" %}</p>
                     </button>
                 </div>
                 </form>
@@ -62,13 +63,13 @@
                     <div class="create-room-box col col-5 rounded-4 px-2 d-flex justify-content-center">
                         <div class="d-flex flex-column py-1 rounded-3" id="Match{{ i }}">
                             <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p1">
-                                TBD
+                                {% trans "TBD" %}
                             </div>
                             <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p2">
-                                TBD
+                                {% trans "TBD" %}
                             </div>
                             <p class="text-tournament status-game text-center m-0" id="status-Match{{ i }}">
-                                waiting for game...
+                                {% trans "waiting for game" %}...
                             </p>
                             <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
                             id="gameModeForm"
@@ -80,7 +81,7 @@
                             {% csrf_token %}
                                 <input type="hidden" name="game_mode" value="local">
                                 <button id="btn-Match{{ i }}" class="btn btn-custom py-1 px-2 d-none" disabled="" type="submit" api-link>
-                                    <p class="btn-custom-name-enter m-0">start</p>
+                                    <p class="btn-custom-name-enter m-0">{% trans "Start" %}</p>
                                 </button>
                             </form>
                         </div>
@@ -95,13 +96,13 @@
                     <div class="create-room-box col col-5 rounded-4 px-2 d-flex justify-content-center">
                         <div class="d-flex flex-column py-1 rounded-3" id="Match{{ i }}">
                             <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p1">
-                                TBD
+                                {% trans "TBD" %}
                             </div>
                             <div class="text-tournament text-center m-0 text-nowrap" id="Match{{ i }}-p2">
-                                TBD
+                                {% trans "TBD" %}
                             </div>
                             <p class="text-tournament status-game text-center m-0" id="status-Match{{ i }}">
-                                waiting for game...
+                                {% trans "waiting for game" %}...
                             </p>
                             <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
                             id="gameModeForm"
@@ -113,7 +114,7 @@
                             {% csrf_token %}
                                 <input type="hidden" name="game_mode" value="local">
                                 <button id="btn-Match{{ i }}" class="btn btn-custom py-1 px-2 d-none" disabled="" type="submit" api-link>
-                                    <p class="btn-custom-name-enter m-0">start</p>
+                                    <p class="btn-custom-name-enter m-0">{% trans "Start" %}</p>
                                 </button>
                             </form>
                         </div>
@@ -127,13 +128,13 @@
                     <div class="create-room-box col col-6 rounded-4 px-2 d-flex justify-content-center">
                         <div class="d-flex flex-column py-1 rounded-3" id="Match7">
                             <div class="text-tournament text-center m-0 text-nowrap" id="Match7-p1">
-                                TBD
+                                {% trans "TBD" %}
                             </div>
                             <div class="text-tournament text-center m-0 text-nowrap" id="Match7-p2">
-                                TBD
+                                {% trans "TBD" %}
                             </div>
                             <p class="text-tournament status-game text-center m-0" id="status-Match7">
-                                waiting for game...
+                                {% trans "waiting for game" %}...
                             </p>
                             <form class="d-flex flex-column flex-lg-row justify-content-center align-items-center gap-2 px-1 py-2"
                             id="gameModeForm"
@@ -145,7 +146,7 @@
                             {% csrf_token %}
                                 <input type="hidden" name="game_mode" value="local">
                                 <button id="btn-Match7" class="btn btn-custom py-1 px-2 d-none" disabled="" type="submit" api-link>
-                                    <p class="btn-custom-name-enter m-0">start</p>
+                                    <p class="btn-custom-name-enter m-0">{% trans "Start" %}</p>
                                 </button>
                             </form>
                         </div>
@@ -166,7 +167,7 @@
         <canvas id="pongCanvas" width="800" height="400" tabindex="0"></canvas>
 
         <button id="startGame" class="btn btn-custom mt-2">
-            <p id="startGameText" class="btn-custom-play-name m-0">Play</p>
+            <p id="startGameText" class="btn-custom-play-name m-0">{% trans "Play" %}</p>
         </button>
         <div id="messageContainer" class="text-play m-0 mt-1"></div>
     </div>

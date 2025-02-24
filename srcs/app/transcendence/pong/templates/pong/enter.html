@@ -57,7 +57,7 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <p class="no-friend-msg my-2 text-nowrap d-flex justify-content-center">No active tournaments available!</p>
+                        <p class="no-friend-msg my-2 text-nowrap d-flex justify-content-center">{% trans "No active tournaments found" %}!</p>
                     {% endif %}
                 </div>
             </div>
@@ -97,7 +97,7 @@
             </div>
             <div>
             <div class="enter-box-background rounded-4 p-2 m-2">
-                <p class="enter-title m-0">Rooms</p>
+                <p class="enter-title m-0">{% trans "Rooms" %}</p>
                 <div class="enter-box d-flex flex-column justify-content-start overflow-y-auto rounded-4">
                     {% if rooms %}
                         {% for room in rooms %}
@@ -110,7 +110,7 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                    <p class="no-friend-msg my-2 text-nowrap d-flex justify-content-center">No active rooms found!</p>
+                    <p class="no-friend-msg my-2 text-nowrap d-flex justify-content-center">{% trans "No active rooms found" %}!</p>
                     {% endif %}
                 </div>
             </div>

@@ -14,7 +14,7 @@ class PongRoomForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "form-control rounded-5 border-0",
-                    "placeholder": "Choose a name",
+                    "placeholder": "...",
                     "title": "room-name.",
                     "maxlength": "50",
                 }
@@ -33,7 +33,7 @@ class TournamentForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "form-control rounded-5 border-0",
-                    "placeholder": "Choose a name",
+                    "placeholder": "...",
                     "title": "tournament-name",
                     "maxlength": "50",
                 }

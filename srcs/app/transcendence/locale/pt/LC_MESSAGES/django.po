@@ -270,5 +270,29 @@ msgstr "Criar uma Sala"
 msgid "Create"
 msgstr "Criar"
 
+msgid "Choose a name"
+msgstr "Digite um nome"
+
 msgid "No active rooms found"
-msgstr "Nenhuma sala ativa encontrada"
+msgstr "Nenhuma sala ativa foi encontrada"
+
+msgid "No active tournaments found"
+msgstr "Nenhum torneio ativo foi encontrado"
+
+msgid "Number of Players"
+msgstr "Quantidade de Jogadores"
+
+msgid "Winner"
+msgstr "Vencedor"
+
+msgid "Tournament started"
+msgstr "Torneio começou"
+
+msgid "Start"
+msgstr "Iniciar"
+
+msgid "TBD"
+msgstr "ASD"
+
+msgid "waiting for game"
+msgstr "aguardando o jogo"
