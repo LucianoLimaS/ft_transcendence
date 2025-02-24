@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 #from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, Friendship
 from django.db.models.signals import post_migrate
 from django.contrib.auth import get_user_model
 
@@ -14,24 +14,7 @@ def user_postsave(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(
             user = user,
-        )
-    #else:
-    #    # update allauth emailaddress if exists 
-    #    try:
-    #        email_address = EmailAddress.objects.get_primary(user)
-    #        if email_address.email != user.email:
-    #            email_address.email = user.email
-    #            email_address.verified = False
-    #            email_address.save()
-    #    except:
-    #        # if allauth emailaddress doesn't exist create one
-    #        EmailAddress.objects.create(
-    #            user = user,
-    #            email = user.email, 
-    #            primary = True,
-    #            verified = False
-    #        )
-        
+        )        
         
 @receiver(pre_save, sender=User)
 def user_presave(sender, instance, **kwargs):
@@ -78,3 +61,21 @@ def create_admin_user(sender, **kwargs):
                     password='teste',
                     first_name=f'Teste {i}',
                 )
+
+        admin_user = User.objects.get(username='admin')
+        teste1_user = User.objects.get(username='teste1')
+        teste2_user = User.objects.get(username='teste2')
+
+        # Verifique se os usuários admin, teste1 e teste2 são amigos
+        if (Friendship.objects.filter(from_user=admin_user, to_user=teste1_user, accepted=True).exists() or
+            Friendship.objects.filter(from_user=teste1_user, to_user=admin_user, accepted=True).exists()) and \
+        (Friendship.objects.filter(from_user=admin_user, to_user=teste2_user, accepted=True).exists() or
+            Friendship.objects.filter(from_user=teste2_user, to_user=admin_user, accepted=True).exists()):
+            print("Os usuários admin, teste1 e teste2 são amigos")
+        else:
+            print("Os usuários admin, teste1 e teste2 não são amigos")
+            # Adicionar como amigos se não forem
+            Friendship.objects.create(from_user=admin_user, to_user=teste1_user, accepted=True)
+            Friendship.objects.create(from_user=admin_user, to_user=teste2_user, accepted=True)
+            Friendship.objects.create(from_user=teste1_user, to_user=teste2_user, accepted=True)
+            print("Os usuários admin, teste1 e teste2 foram adicionados como amigos")
