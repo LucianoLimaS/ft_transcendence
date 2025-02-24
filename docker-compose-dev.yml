@@ -404,129 +404,57 @@ services:
 volumes:
   app_vol:
     name: app_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/app
 
   postgres_vol:
     name: postgres_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/postgres
 
   pgadmin_vol:
     name: pgadmin_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/pgadmin
 
   grafana_vol:
     name: grafana_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/grafana
 
   prometheus_vol:
     name: prometheus_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/prometheus
 
   selenium_vol:
     name: selenium_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/selenium
 
   minio_vol:
     name: minio_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/minio
   
   nginx_vol:
     name: nginx_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/nginx
 
   static_vol:
     name: static_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/staticfiles
 
   portainer_vol:
     name: portainer_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/portainer
 
   redis_vol:
     name: redis_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/redis
   
   elasticsearch_vol:
     name: elasticsearch_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/elasticsearch
 
   es_vol:
     name: es_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/es
 
   kibana_vol:
     name: kibana_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/kibana
 
   logstash_vol:
     name: logstash_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/logstash
   
   filebeat_vol:
     name: filebeat_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/filebeat
   
   certs_vol:
     name: certs_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/certs
   
   logs_vol:
     name: logs_vol
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/logs
 
 networks:
     transcendence:
