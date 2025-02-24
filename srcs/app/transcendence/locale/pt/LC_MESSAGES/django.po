@@ -205,6 +205,9 @@ msgstr "Jogo Local"
 msgid "Submit"
 msgstr "Salvar"
 
+msgid "Skip"
+msgstr "Pular"
+
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -296,3 +299,23 @@ msgstr "ASD"
 
 msgid "waiting for game"
 msgstr "aguardando o jogo"
+
+#: Edit Profile
+msgid "Complete Your Profile"
+msgstr "Complete seu Perfil"
+
+msgid "Edit Your Profile"
+msgstr "Edite seu Perfil"
+
+#: Menu Flutuante
+msgid "View profile"
+msgstr "Visualizar perfil"
+
+msgid "Add friend"
+msgstr "Adicionar Amigo"
+
+msgid "Delete friend"
+msgstr "Desfazer Amizade"
+
+msgid "Challenge to match"
+msgstr "Convidar para Duelo"

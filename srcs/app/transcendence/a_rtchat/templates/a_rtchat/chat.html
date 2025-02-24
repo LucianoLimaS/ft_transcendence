@@ -269,10 +269,10 @@ if (container) {
     dropdownMenu.style.left = `${rect.left + window.scrollX}px`;
 
     dropdownMenu.innerHTML = `
-        <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">View profile</a>
-        <a class="dropdown-item" href="#" onclick="addFriend('${contactName}', '${id}')">Add friend</a>
-        <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName}', '${id}')">Delete friend</a>
-        <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName}', '${id}')">Challenge to match</a>
+        <a class="dropdown-item" href="#" onclick="viewProfile('${contactName}')">{% trans "View profile" %}</a>
+        <a class="dropdown-item" href="#" onclick="addFriend('${contactName}', '${id}')">{% trans "Add friend" %}</a>
+        <a class="dropdown-item" href="#" onclick="deleteFriend('${contactName}', '${id}')">{% trans "Delete friend" %}</a>
+        <a class="dropdown-item" href="#" onclick="challengeToMatch('${contactName}', '${id}')">{% trans "Challenge to match" %}</a>
     `;
 
     document.body.appendChild(dropdownMenu);
