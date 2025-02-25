@@ -88,7 +88,7 @@
             <div class="chat-header d-flex align-items-center">
               <img src="../../../static/images/galaxy_lobby_1.png" alt="User avatar" class="avatar mr-2" />
               <div>
-                <h6 class="mb-0">Public Chat</h6>
+                <h6 class="mb-0">{% trans "Public Chat" %}</h6>
               </div>
             </div>
           </a>
@@ -123,9 +123,13 @@
                       </div>
                     </a>
                     {% comment %} <div id="chat-{{ chatroom.id }}" class="dropdown">
-                      <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ chatroom.groupchat_name }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+                      <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ chatroom.groupchat_name }}', '{{ member.id }}')"><i class="fas fa-ellipsis-v"></i></button>
                     </div> {% endcomment %}
-                  </div>
+                  <h1>
+                    public-profile-{{ chatroom.groupchat_name|default_if_none: member.username }}
+                  </h1>
+                  
+                </div>
                 </li>
               {% endif %}
             {% endfor %}
@@ -169,7 +173,7 @@
                         </a>
 
                         <div id="chat-{{ chatroom.id }}" class="dropdown d-flex justify-content-end">
-                          <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ member.username }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+                          <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ member.username }}', '{{ member.id }}')"><i class="fas fa-ellipsis-v"></i></button>
                         </div>
 
                       </div>
@@ -204,7 +208,7 @@
               {% endif %}
             {% else %}
               <img src="../../../static/images/galaxy_lobby_1.png" style="width: 40px" alt="" />
-              <h6 class="mb-0 ml-2" id="current-chat-name">Public Chat</h6>
+              <h6 class="mb-0 ml-2" id="current-chat-name">{% trans "Public Chat" %}</h6>
             {% endif %}
           </div>
 

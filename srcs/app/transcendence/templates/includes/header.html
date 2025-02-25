@@ -1,36 +1,38 @@
 {% load static %}
+{% load i18n %}
+
 <header class="d-flex align-items-center justify-content-between bg-dark text-white sticky-top px-4 py-1" style="z-index: 2">
   <div class="d-flex align-items-center">
     <a class="text-decoration-none text-white" style="width: 55px" href="/"><img class="mr-2" style="max-height: 55px; height: 55px; width: 55px" src="{% static 'images/logo.png' %}" alt="Logo" /></a>
 
     <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-none d-md-flex" style="flex-direction: row;">
       <li class="nav-item m-2">
-        <a href="{% url 'home' %}" class="nav-link">Chat</a>
+        <a href="{% url 'home' %}" class="nav-link">{% trans "Chat" %}</a>
       </li>
       <li class="nav-item m-2">
-        <a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a>
+        <a href="{% url 'pong_local' %}" class="nav-link">{% trans "Quick Match" %}</a>
       </li>
       <li class="nav-item m-2">
-        <a href="{% url 'snake' %}" class="nav-link">Snake</a>
+        <a href="{% url 'snake' %}" class="nav-link">{% trans "Snake" %}</a>
       </li>
       <li class="nav-item m-2">
-        <a href="/play/" class="nav-link">Torneio</a>
+        <a href="/play/" class="nav-link">{% trans "Tournament" %}</a>
       </li>
     </ul>
 
     <button class="btn btn-light m-3 p-0 ml-5 d-block d-md-none pt-1 pb-1 pr-2 pl-2 " id="button-active-menu"><i class="fas fa-bars text-black"></i></button>
     <ul class="d-none position-absolute navbar-nav me-auto mb-2 mb-lg-0 bg-dark p-2" style="max-width: 500px;" id="menu-header-hamburguer">
       <li class="nav-item">
-        <a href="{% url 'home' %}" class="nav-link">Chat</a>
+        <a href="{% url 'home' %}" class="nav-link">{% trans "Chat" %}</a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'pong_local' %}" class="nav-link">Partida rápida</a>
+        <a href="{% url 'pong_local' %}" class="nav-link">{% trans "Quick Match" %}</a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'snake' %}" class="nav-link">Snake</a>
+        <a href="{% url 'snake' %}" class="nav-link">{% trans "Snake" %}</a>
       </li>
       <li class="nav-item">
-        <a href="/play/" class="nav-link">Torneio</a>
+        <a href="/play/" class="nav-link">{% trans "Tournament" %}</a>
       </li>
     </ul>
 
@@ -77,11 +79,9 @@
             <span>{{ request.user.profile.name }}</span>
           </a>
           <div class="dropdown-menu dropdown-menu-right bg-white text-dark shadow mt-0 mb-0 pt-0 pb-0" aria-labelledby="userDropdown">
-            <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
-            <a class="dropdown-item" href="{% url 'profile-edit' %}">Edit Profile</a>
-            <a class="dropdown-item" href="{% url 'new-groupchat' %}">Create Chat</a>
-            <a class="dropdown-item" href="{% url 'profile-settings' %}">Settings</a>
-            <a class="dropdown-item" href="{% url 'signout' %}">Sign Out</a>
+            <a class="dropdown-item" href="{% url 'profile' %}">{% trans "My Profile" %}</a>
+            <a class="dropdown-item" href="{% url 'profile-edit' %}">{% trans "Edit Profile" %}</a>
+            <a class="dropdown-item" href="{% url 'signout' %}">{% trans "Sign Out" %}</a>
           </div>
         </li>
       {% else %}

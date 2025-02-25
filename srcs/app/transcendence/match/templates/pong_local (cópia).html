@@ -4,31 +4,31 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet?v={{ random_number }}">
 <div id="menu" class="d-flex flex-column align-items-center">
-    <button class="btn btn-light" id="singleplayerBtn">Single Player</button>
-    <button class="btn btn-light" id="multiplayerBtn">Multiplayer</button>
+    <button class="btn btn-light" id="singleplayerBtn">{% trans "Single Player" %}</button>
+    <button class="btn btn-light" id="multiplayerBtn">{% trans "Multiplayer" %}</button>
     <div id="difficulty">
         <div class="d-flex justify-content-between">
-            <button class="btn btn-light" id="easyBtn">Fácil</button>
-            <button class="btn btn-light" id="mediumBtn">Médio</button>
-            <button class="btn btn-light" id="hardBtn">Difícil</button>
+            <button class="btn btn-light" id="easyBtn">{% trans "Easy" %}</button>
+            <button class="btn btn-light" id="mediumBtn">{% trans "Medium" %}</button>
+            <button class="btn btn-light" id="hardBtn">{% trans "Hard" %}</button>
         </div>
         <br>
-        <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
-            divertido o jogo.</span>
+        <!-- <span>As opções Fácil e Médio cumprem os requisitos de ia do PDF, a opção Difícil deixei para ficar mais
+            divertido o jogo.</span> -->
     </div>
 </div>
 <div id="scoreboardContainer">
     <div class="players d-flex justify-content-between">
-        <div>Player 1: <span id="p1Lives">🐄🐄🐄</span></div>
-        <div>Player 2: <span id="p2Lives">🐄🐄🐄</span></div>
+        <div>{% trans "Player" %} 1: <span id="p1Lives" style="font-size: 26px">🐄🐄🐄</span></div>
+        <div>{% trans "Player" %} 2: <span id="p2Lives" style="font-size: 26px">🐄🐄🐄</span></div>
     </div>
 </div>
 <div id="countdown" class="d-flex justify-content-center align-items-center"></div>
 <div id="pointCountdown" class="d-flex justify-content-center align-items-center"></div>
 <div id="winner" class="d-flex flex-column align-items-center">
     <p id="winnerText"></p>
-    <button class="btn btn-light" id="restartBtn">Reiniciar</button>
-    <button class="btn btn-light" id="menuBtn">Menu</button>
+    <button id="restartBtn" class="btn btn-light">{% trans "Reiniciar" %}</button>
+    <button id="menuBtn" class="btn btn-light">{% trans "Menu" %}</button>
 </div>
 <div id="gameContainer">
     <canvas id="gameCanvas"></canvas>

@@ -56,6 +56,7 @@ def chat_view(request, chatroom_name='public-chat'):
 
 @login_required
 def get_or_create_chatroom(request, username):
+    print(username)
     if request.user.username == username:
         return redirect('home')
     

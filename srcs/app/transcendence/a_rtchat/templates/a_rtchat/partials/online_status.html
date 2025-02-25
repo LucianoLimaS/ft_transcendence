@@ -88,12 +88,13 @@
                           <h6 class="mb-0">{{ member.username }}</h6>
                           <small class="text-muted">Last message preview</small>
                       </div>
+                      <div id="public-profile-{{ member.id }}"></div>
                   </a>
 
                   <!-- Botão de Opções -->
                   <div class="dropdown">
                       <ul id="chat-{{ chatroom.id }}"  class="dropdown">
-                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ member.username }}', '{{ chatroom.id }}')"><i class="fas fa-ellipsis-v"></i></button>
+                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" onclick="showDropdownMenu(this, '{{ member.username }}', '{{ member.id }}')"><i class="fas fa-ellipsis-v"></i></button>
                       </ul>
                   </div>
               </li>

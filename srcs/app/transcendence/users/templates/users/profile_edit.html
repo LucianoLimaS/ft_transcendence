@@ -2,9 +2,9 @@
 
 {% block content %}
   {% if onboarding %}
-    <h1 class="mb-4 text-center">Complete Your Profile</h1>
+    <h1 class="mb-4 text-center">{% trans "Complete Your Profile" %}</h1>
   {% else %}
-    <h1 class="mb-4 text-center">Edit Your Profile</h1>
+    <h1 class="mb-4 text-center">{% trans "Edit Your Profile" %}</h1>
   {% endif %}
 
   <div class="text-center">
@@ -19,12 +19,12 @@
       {% csrf_token %}
       <div class="form-group col-12">{{ form.as_p }}</div>
       <div class="col-12">
-        <button type="submit" class="btn btn-primary ml-2 mb-1">Submit</button>
+        <button type="submit" class="btn btn-primary ml-2 mb-1">{% trans "Submit" %}</button>
 
         {% if onboarding %}
-          <a class="btn btn-secondary ml-2" href="{% url 'home' %}">Skip</a>
+          <a class="btn btn-secondary ml-2" href="{% url 'home' %}">{% trans "Skip" %}</a>
         {% else %}
-          <a class="btn btn-secondary ml-2" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+          <a class="btn btn-secondary ml-2" href="{{ request.META.HTTP_REFERER }}">{% trans "Cancel" %}</a>
         {% endif %}
       </div>
     </form>

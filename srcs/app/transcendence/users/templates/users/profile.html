@@ -14,7 +14,11 @@
         <div class="mt-4 text-justify text-break text-white">{{ profile.info|linebreaksbr }}</div>
         {% endif %}
         {% if profile.user != user %}
-        <a class="btn btn-primary mt-4" style="width: 150px" href="{% url 'start-chat' profile.user.username %}">Chat with me</a>
+            {% if is_blocked == False %}
+                <a class="btn btn-primary mt-4" style="width: 150px" href="{% url 'start-chat' profile.user.username %}">Chat with me</a>
+            {% else %}
+                <div class="mt-4 text-white">Usuário bloqueado</div>
+            {% endif %}
         {% endif %}
     </div>
 </div>

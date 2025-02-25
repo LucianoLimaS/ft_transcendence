@@ -30,3 +30,26 @@ class Profile(models.Model):
         if self.image:
             return self.image.url
         return f'{settings.STATIC_URL}images/avatar.svg'
+
+class Friendship(models.Model):
+    from_user = models.ForeignKey(User, related_name='friendships_sent', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='friendships_received', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+
+    def __str__(self):
+        return f'{self.from_user} -> {self.to_user} ({"Accepted" if self.accepted else "Pending"})'
+    
+class Block(models.Model):
+    blocker = models.ForeignKey(User, related_name='blocks_sent', on_delete=models.CASCADE)
+    blocked = models.ForeignKey(User, related_name='blocks_received', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('blocker', 'blocked')
+
+    def __str__(self):
+        return f'{self.blocker} bloqueou {self.blocked}'
