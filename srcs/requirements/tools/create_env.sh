@@ -10,17 +10,14 @@ if [ -f "$ENV_FILE" ]; then
 fi
 
 cat <<EOL > "$ENV_FILE"
-COMPOSE_BAKE="true"
-
 SECRET_KEY="django-insecure-hy0f)6#-mkp1kq9+4o2dh!(uv=oa07yy&eaamu*y@6(di22rm("
 
-DJANGO_SETTINGS_MODULE="a_core.settings"
+DJANGO_SETTINGS_MODULE=a_core.settings
 
 DEBUG="0"
 
 ALLOWED_HOSTS="transcendence, 127.0.0.1, localhost, app, *"
-CORS_ALLOWED_ORIGINS="https://localhost:8000, https://127.0.0.1:8000, http://192.168.68.107:8000"
-CSRF_TRUSTED_ORIGINS="https://localhost:8000, https://127.0.0.1:8000, http://192.168.68.107:8000"
+CSRF_TRUSTED_ORIGINS="https://localhost, https://127.0.0.1"
 
 DB_ENGINE="django_prometheus.db.backends.postgresql"
 POSTGRES_DB="transcendence"
@@ -37,7 +34,7 @@ PGADMIN_DEFAULT_PASSWORD="root"
 
 GF_SECURITY_ADMIN_USER="grafana"
 GF_SECURITY_ADMIN_PASSWORD="5432"
-GF_PATHS_PROVISIONING="/etc/grafana/provisioning"
+GF_PATHS_PROVISIONING=/etc/grafana/provisioning
 
 MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="87654321"
@@ -52,17 +49,17 @@ REDIS_HOST="redis"
 REDIS_PORT="6379"
 REDIS_ADDR="redis:6379"
 
-ES_JAVA_OPTS="-Xms512m -Xmx512m"
-ES_MEM_LIMIT="1073741824"
-KB_MEM_LIMIT="1073741824"
-LICENSE="basic"
-CLUSTER_NAME="es_cluster"
-ELASTIC_USER="elastic"
-ELASTIC_PASSWORD="must_be_string"
-ELASTIC_HOSTS="https://elasticsearch:9200"
+ES_JAVA_OPTS=-Xms512m -Xmx512m
+ES_MEM_LIMIT=1073741824
+KB_MEM_LIMIT=1073741824
+LICENSE=basic
+CLUSTER_NAME=es_cluster
+ELASTIC_USER=elastic
+ELASTIC_PASSWORD=must_be_string
+ELASTIC_HOSTS=https://elasticsearch:9200
 
-KIBANA_PASSWORD="must_be_string"
-ENCRYPTION_KEY="c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2"
+KIBANA_PASSWORD=must_be_string
+ENCRYPTION_KEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
 
 EOL
 
