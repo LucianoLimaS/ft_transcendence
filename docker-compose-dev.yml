@@ -159,8 +159,12 @@ services:
     networks:
       - transcendence
     depends_on:
-      - app
-      - django-worker
+      app:
+        condition: service_started
+      django-worker:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
     restart: always
     attach: false
 
