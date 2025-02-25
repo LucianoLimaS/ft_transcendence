@@ -28,10 +28,21 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    h.strip() for h in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    if h.strip()
+]
+
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+
 CSRF_TRUSTED_ORIGINS = [
     h.strip() for h in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
     if h.strip()
 ]
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 INTERNAL_IPS = (
     '127.0.0.1',
@@ -44,6 +55,7 @@ INSTALLED_APPS = [
     'django_prometheus',
     'daphne',
     'channels',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,19 +79,21 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+# Segurança
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_htmx.middleware.HtmxMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
+    'django.middleware.security.SecurityMiddleware',  # Segurança no topo
+    'corsheaders.middleware.CorsMiddleware',  # CORS
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Para sessões de usuário
+    'django.middleware.common.CommonMiddleware',  # Para o CommonMiddleware de Django
+    'django.middleware.csrf.CsrfViewMiddleware',  # Proteção contra CSRF
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Autenticação
+    'django.contrib.messages.middleware.MessageMiddleware',  # Mensagens flash
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Proteção contra Clickjacking
+    'django_htmx.middleware.HtmxMiddleware',  # Middleware HTMX (se aplicável)
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir arquivos estáticos otimizados
+    'django.middleware.locale.LocaleMiddleware',  # Localização
+    'django_prometheus.middleware.PrometheusAfterMiddleware',  # Monitoramento
 ]
 
 # CACHES = {

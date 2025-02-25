@@ -16,10 +16,11 @@ SECRET_KEY="django-insecure-hy0f)6#-mkp1kq9+4o2dh!(uv=oa07yy&eaamu*y@6(di22rm("
 
 DJANGO_SETTINGS_MODULE="a_core.settings"
 
-DEBUG="1"
+DEBUG="0"
 
 ALLOWED_HOSTS="transcendence, 127.0.0.1, localhost, app, *"
-CSRF_TRUSTED_ORIGINS="https://localhost, https://127.0.0.1"
+CORS_ALLOWED_ORIGINS="https://localhost:8000, https://127.0.0.1:8000, http://192.168.68.107:8000"
+CSRF_TRUSTED_ORIGINS="https://localhost:8000, https://127.0.0.1:8000, http://192.168.68.107:8000"
 
 DB_ENGINE="django_prometheus.db.backends.postgresql"
 POSTGRES_DB="transcendence"
