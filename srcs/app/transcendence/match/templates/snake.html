@@ -56,15 +56,15 @@
         <div class="col-md-4">
             <div class="card bg-dark border-success mb-3">
                 <div class="card-header bg-success text-dark">
-                    <h3 class="mb-0">Controls</h3>
+                    <h3 class="mb-0">{% trans "Controls" %}</h3>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <button id="startButton" class="btn btn-success mb-3">Start Game</button>
-                        <button id="modeToggle" class="btn btn-success mb-3">Switch to Multiplayer</button>
+                        <button id="startButton" class="btn btn-success mb-3">{% trans "Start Game" %}</button>
+                        <button id="modeToggle" class="btn btn-success mb-3">{% trans "Multiplayer" %}</button>
                         <div class="text-center mb-3">
-                            <span class="badge player1-score me-2">Player 1: <span id="score1">0</span></span>
-                            <span class="badge player2-score" id="score2Container" style="display: none;">Player 2: <span id="score2">0</span></span>
+                            <span class="badge player1-score me-2">{% trans "Player 1" %}: <span id="score1">0</span></span>
+                            <span class="badge player2-score" id="score2Container" style="display: none;">{% trans "Player 2" %}: <span id="score2">0</span></span>
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-outline-success" onclick="changeDirection(1, 'UP')">↑</button>
@@ -78,11 +78,11 @@
             
             <div id="multiplayerPanel" class="card bg-dark border-success" style="display: none;">
                 <div class="card-header bg-success text-dark">
-                    <h5 class="mb-0">Controls</h5>
+                    <h5 class="mb-0">{% trans "Controls" %}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="text-success">Player 1 (Green): Arrow Keys</div>
-                    <div class="text-primary">Player 2 (Blue): WASD</div>
+                    <div class="text-success">{% trans "Player 1" %} : ↑↓←→</div>
+                    <div class="text-primary">{% trans "Player 2" %} : WASD</div>
                 </div>
             </div>
         </div>
@@ -232,7 +232,7 @@
         clearInterval(gameLoop);
         let message = 'Game Over!';
         if(gameState.isMultiplayer) {
-            message = losingPlayer === 3 ? 'Both players crashed!' : `Player ${losingPlayer} crashed!`;
+            message = losingPlayer === 3 ? 'Game Over!' : `Player ${losingPlayer} 💥`;
         }
         document.getElementById('gameMessage').innerHTML = `
             <h3 class="mb-3">${message}</h3>
@@ -240,7 +240,7 @@
                 `<p>Player 1 Score: ${gameState.score1}</p>
                  <p>Player 2 Score: ${gameState.score2}</p>` : 
                 `<p>Score: ${gameState.score1}</p>`}
-            <button class="btn btn-success" id="restartButton">Play Again</button>`;
+            <button class="btn btn-success" id="restartButton">{% trans "Play Again" %}</button>`;
         document.getElementById('gameMessage').style.display = 'block';
         document.getElementById('startButton').disabled = false;
     }
@@ -255,7 +255,7 @@
     // Update mode toggle
     document.getElementById('modeToggle').addEventListener('click', function() {
         gameState.isMultiplayer = !gameState.isMultiplayer;
-        this.textContent = gameState.isMultiplayer ? 'Switch to Single Player' : 'Switch to Multiplayer';
+        this.textContent = gameState.isMultiplayer ? 'Single Player' : 'Multiplayer';
         document.getElementById('multiplayerPanel').style.display = gameState.isMultiplayer ? 'block' : 'none';
         document.getElementById('score2Container').style.display = gameState.isMultiplayer ? 'inline-block' : 'none';
         resetGame();

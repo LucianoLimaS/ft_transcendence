@@ -128,3 +128,194 @@ msgstr "Usuário já cadastrado"
 
 msgid "First name:"
 msgstr "Nome:"
+
+#: Menu
+msgid "My Profile"
+msgstr "Meu Perfil"
+
+msgid "Edit Profile"
+msgstr "Editar Perfil"
+
+msgid "Create Chat"
+msgstr "Criar Bate-Papo"
+
+msgid "Settings"
+msgstr "Configurações"
+
+msgid "Sign Out"
+msgstr "Finalizar Sessão"
+
+#: Navbar
+msgid "Chat"
+msgstr "Bate-Papo"
+
+msgid "Quick Match"
+msgstr "Partida Rápida"
+
+msgid "Snake"
+msgstr "Cobrinha"
+
+msgid "Tournament"
+msgstr "Torneio"
+
+msgid "Match"
+msgstr "Partida"
+
+#: Chat
+msgid "Public Chat"
+msgstr "Bate-Papo Galáctico"
+
+msgid "Add message ..."
+msgstr "Digite a mensagem ..."
+
+#: Quick Match
+msgid "Player 1"
+msgstr "Jogador 1"
+
+msgid "Player 2"
+msgstr "Jogador 2"
+
+msgid "Single Player"
+msgstr "Single Player"
+
+msgid "Multiplayer"
+msgstr "Multiplayer"
+
+#: Snake
+msgid "Controls"
+msgstr "Controles"
+
+msgid "Start Game"
+msgstr "Iniciar Jogo"
+
+msgid "Switch to Multiplayer"
+msgstr "Mudar para Multiplayer"
+
+msgid "Switch to Single Player"
+msgstr "Mudar para Single Player"
+
+#: Torneio
+msgid "Online Game"
+msgstr "Jogo Online"
+
+msgid "Local Game"
+msgstr "Jogo Local"
+
+#: Editar Perfil
+msgid "Submit"
+msgstr "Salvar"
+
+msgid "Skip"
+msgstr "Pular"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Add display name"
+msgstr "Nome de exibição"
+
+msgid "Add information"
+msgstr "Informações"
+
+#: Wrapper
+msgid "Logout"
+msgstr "Sair"
+
+#: Rooms
+msgid "Player"
+msgstr "Jogador"
+
+msgid "Play"
+msgstr "Iniciar"
+
+#: Níveis
+msgid "Easy"
+msgstr "Fácil"
+
+msgid "Medium"
+msgstr "Médio"
+
+msgid "Hard"
+msgstr "Difícil"
+
+#:Pong
+msgid "Restart"
+msgstr "Reiniciar"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Play Again"
+msgstr "Jogar Novamente"
+
+#: Torneios
+msgid "Local Tournament"
+msgstr "Torneio Local"
+
+msgid "Create Tournament"
+msgstr "Criar Torneio"
+
+msgid "Continue Tournament"
+msgstr "Continuar Torneio"
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Rooms"
+msgstr "Salas"
+
+msgid "Players"
+msgstr "Jogadores"
+
+msgid "Create a room"
+msgstr "Criar uma Sala"
+
+msgid "Create"
+msgstr "Criar"
+
+msgid "Choose a name"
+msgstr "Digite um nome"
+
+msgid "No active rooms found"
+msgstr "Nenhuma sala ativa foi encontrada"
+
+msgid "No active tournaments found"
+msgstr "Nenhum torneio ativo foi encontrado"
+
+msgid "Number of Players"
+msgstr "Quantidade de Jogadores"
+
+msgid "Winner"
+msgstr "Vencedor"
+
+msgid "Tournament started"
+msgstr "Torneio começou"
+
+msgid "Start"
+msgstr "Iniciar"
+
+msgid "TBD"
+msgstr "ASD"
+
+msgid "waiting for game"
+msgstr "aguardando o jogo"
+
+#: Edit Profile
+msgid "Complete Your Profile"
+msgstr "Complete seu Perfil"
+
+msgid "Edit Your Profile"
+msgstr "Edite seu Perfil"
+
+#: Menu Flutuante
+msgid "View profile"
+msgstr "Visualizar perfil"
+
+msgid "Add friend"
+msgstr "Adicionar Amigo"
+
+msgid "Delete friend"
+msgstr "Desfazer Amizade"
+
+msgid "Challenge to match"
+msgstr "Convidar para Duelo"

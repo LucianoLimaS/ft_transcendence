@@ -24,12 +24,12 @@ msgstr "ft_transcendence"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:9
 msgid "Invalid username or password!"
-msgstr "Nombre de usuario o contraseña no válidos!"
+msgstr "¡Nombre de usuario o contraseña inválidos!"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:21
 #: ft_transcendence/apps/custom_auth/templates/signin.html:41
 msgid "Login"
-msgstr "Inicio de sesión"
+msgstr "Iniciar sesión"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:30
 msgid "Username:"
@@ -44,15 +44,15 @@ msgstr "Contraseña:"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:48
 msgid "I forgot my password"
-msgstr "He olvidado mi contraseña"
+msgstr "Olvidé mi contraseña"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:57
 msgid "Not registered?"
-msgstr "¿No está registrado?"
+msgstr "¿No estás registrado?"
 
 #: ft_transcendence/apps/custom_auth/templates/signin.html:57
 msgid "Register"
-msgstr "Regístrese"
+msgstr "Registrarse"
 
 msgid "Already have an account? Login"
 msgstr "¿Ya tienes una cuenta? Iniciar sesión"
@@ -97,7 +97,7 @@ msgid "E-mail sent successfully."
 msgstr "Correo electrónico enviado con éxito."
 
 msgid "Invalid token."
-msgstr "Token no válido."
+msgstr "Token inválido."
 
 msgid "Reset password"
 msgstr "Restablecer contraseña"
@@ -128,3 +128,194 @@ msgstr "Usuario ya registrado"
 
 msgid "First name:"
 msgstr "Nombre:"
+
+#: Menu
+msgid "My Profile"
+msgstr "Mi perfil"
+
+msgid "Edit Profile"
+msgstr "Editar perfil"
+
+msgid "Create Chat"
+msgstr "Crear chat"
+
+msgid "Settings"
+msgstr "Configuraciones"
+
+msgid "Sign Out"
+msgstr "Cerrar sesión"
+
+#: Navbar
+msgid "Chat"
+msgstr "Chat"
+
+msgid "Quick Match"
+msgstr "Partida rápida"
+
+msgid "Snake"
+msgstr "Serpiente"
+
+msgid "Tournament"
+msgstr "Torneo"
+
+msgid "Match"
+msgstr "Partida"
+
+#: Chat
+msgid "Public Chat"
+msgstr "Chat Galactico"
+
+msgid "Add message ..."
+msgstr "Agregar mensaje ..."
+
+#: Quick Match
+msgid "Player 1"
+msgstr "Jugador 1"
+
+msgid "Player 2"
+msgstr "Jugador 2"
+
+msgid "Single Player"
+msgstr "Un jugador"
+
+msgid "Multiplayer"
+msgstr "Multijugador"
+
+#: Snake
+msgid "Controls"
+msgstr "Controles"
+
+msgid "Start Game"
+msgstr "Iniciar juego"
+
+msgid "Switch to Multiplayer"
+msgstr "Cambiar a multijugador"
+
+msgid "Switch to Single Player"
+msgstr "Cambiar a un jugador"
+
+#: Torneio
+msgid "Online Game"
+msgstr "Juego en línea"
+
+msgid "Local Game"
+msgstr "Juego local"
+
+#: Editar Perfil
+msgid "Submit"
+msgstr "Enviar"
+
+msgid "Skip"
+msgstr "Omitir"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Add display name"
+msgstr "Agregar nombre de visualización"
+
+msgid "Add information"
+msgstr "Agregar información"
+
+#: Wrapper
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+#: Rooms
+msgid "Player"
+msgstr "Jugador"
+
+msgid "Play"
+msgstr "Jugar"
+
+#: Níveis
+msgid "Easy"
+msgstr "Fácil"
+
+msgid "Medium"
+msgstr "Medio"
+
+msgid "Hard"
+msgstr "Difícil"
+
+#:Pong
+msgid "Restart"
+msgstr "Reiniciar"
+
+msgid "Menu"
+msgstr "Menú"
+
+msgid "Play Again"
+msgstr "Jugar de nuevo"
+
+#: Torneios
+msgid "Local Tournament"
+msgstr "Torneo local"
+
+msgid "Create Tournament"
+msgstr "Crear torneo"
+
+msgid "Continue Tournament"
+msgstr "Continuar torneo"
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Rooms"
+msgstr "Salas"
+
+msgid "Players"
+msgstr "Jugadores"
+
+msgid "Create a room"
+msgstr "Crear una sala"
+
+msgid "Create"
+msgstr "Crear"
+
+msgid "Choose a name"
+msgstr "Elige un nombre"
+
+msgid "No active rooms found"
+msgstr "No se encontraron salas activas"
+
+msgid "No active tournaments found"
+msgstr "No se encontraron torneos activos"
+
+msgid "Number of Players"
+msgstr "Número de jugadores"
+
+msgid "Winner"
+msgstr "Ganador"
+
+msgid "Tournament started"
+msgstr "Torneo comenzado"
+
+msgid "Start"
+msgstr "Iniciar"
+
+msgid "TBD"
+msgstr "P/D"
+
+msgid "waiting for game"
+msgstr "esperando el juego"
+
+#: Edit Profile
+msgid "Complete Your Profile"
+msgstr "Completa tu perfil"
+
+msgid "Edit Your Profile"
+msgstr "Edita tu perfil"
+
+#: Menu Flutuante
+msgid "View profile"
+msgstr "Ver perfil"
+
+msgid "Add friend"
+msgstr "Agregar amigo"
+
+msgid "Delete friend"
+msgstr "Eliminar amigo"
+
+msgid "Challenge to match"
+msgstr "Retar a duelo"

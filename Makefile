@@ -20,7 +20,7 @@ env:
 remove-env:
 	@if [ -f srcs/.env ]; then \
 		echo "🔧 Removing .env file..."; \
-		sudo rm -rf srcs/.env > /dev/null; \
+		rm srcs/.env > /dev/null; \
 		echo "✅ .env file removed successfully."; \
 	else \
 		echo "🟡 .env file not present."; \
@@ -30,24 +30,29 @@ remove-env:
 # Setup and Configurations
 # ======================
 
-setup: sudoers env certs docker
+check-setup:
+	@if [ ! -f srcs/.env ]; then \
+		read -p "Do you want to run the setup? (y/N): " choice && \
+		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
+			$(MAKE) --no-print-directory setup; \
+		fi; \
+	fi
 
-remove-setup: remove-certs remove-env remove-sudoers
+setup: env certs
+
+remove-setup: remove-certs remove-env
 
 sudoers:
-	@echo -ne "✅ Checking sudo... " && \
-	if sudo -v; then \
-		echo "OK!"; \
-		if ! sudo grep -q "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" /etc/sudoers.d/$(USER)-permissions 2>/dev/null; then \
-			echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions > /dev/null; \
-			echo "✅ Sudoers configuration added for $(USER)"; \
-		else \
-			echo "🟡 Sudoers configuration for $(USER) already exists."; \
-		fi; \
-	else \
+	@echo -ne "✅ Checking sudo... " && sudo -v && echo -ne "OK!\n" || { \
 		echo "🟡 Sudo check failed! Please ensure you have sudo privileges."; \
 		exit 1; \
-	fi
+	}; \
+	if ! sudo grep -q "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" /etc/sudoers.d/$(USER)-permissions 2>/dev/null; then \
+		echo "$(USER) ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/$(USER)-permissions > /dev/null; \
+		echo "✅ Sudoers configuration added for $(USER)"; \
+	else \
+		echo "🟡 Sudoers configuration for $(USER) already exists."; \
+	fi;
 
 remove-sudoers:
 	@if [ -f /etc/sudoers.d/$(USER)-permissions ]; then \
@@ -61,18 +66,28 @@ docker:
 	@if ! command -v docker >/dev/null 2>&1; then \
 		echo "🟡 Docker is not installed. Installing..."; \
 		sudo apt-get update > /dev/null 2>&1; \
-		sudo apt-get install -y ca-certificates curl make > /dev/null 2>&1; \
+		sudo apt-get install -y ca-certificates curl make gnupg lsb-release > /dev/null 2>&1; \
 		sudo install -m 0755 -d /etc/apt/keyrings > /dev/null 2>&1; \
-		if grep -qi "ubuntu" /etc/os-release; then \
+		DISTRO=$$(lsb_release -si); \
+		if [ "$$DISTRO" = "Ubuntu" ] || [ "$$DISTRO" = "Linuxmint" ]; then \
 			DOCKER_REPO="https://download.docker.com/linux/ubuntu"; \
-		else \
+			CODENAME=$$(lsb_release -c | awk '{print $$2}'); \
+			if [ "$$CODENAME" = "xia" ]; then \
+				CODENAME="jammy"; \
+			fi; \
+		elif [ "$$DISTRO" = "Debian" ]; then \
 			DOCKER_REPO="https://download.docker.com/linux/debian"; \
+			CODENAME=$$(lsb_release -c | awk '{print $$2}'); \
+		else \
+			echo "❌ Unsupported distribution: $$DISTRO"; \
+			exit 1; \
 		fi; \
-		sudo curl -fsSL $$DOCKER_REPO/gpg -o /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
+		sudo mkdir -p /etc/apt/keyrings; \
+		curl -fsSL $$DOCKER_REPO/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
 		sudo chmod a+r /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
-		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $$DOCKER_REPO $$(. /etc/os-release && echo "$$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
+		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] $$DOCKER_REPO $$CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
 		sudo apt-get update > /dev/null 2>&1; \
-		sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1; \
+		sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose > /dev/null 2>&1; \
 		echo "🔧 Adding ${USER} to the Docker group..."; \
 		sudo usermod -aG docker ${USER} > /dev/null 2>&1; \
 		echo "✅ ${USER} has been added to the Docker group."; \
@@ -82,6 +97,32 @@ docker:
 	else \
 		echo "🟡 Docker is already installed."; \
 	fi;
+
+remove-docker:
+	@echo "🔧 Checking if Docker is installed..."
+	@if systemctl list-units --type=service --all | grep -q docker > /dev/null 2>&1; then \
+		echo "🛑 Stopping Docker services..."; \
+		sudo systemctl stop docker docker.socket containerd > /dev/null 2>&1 || true; \
+	fi; \
+	@if dpkg -l | grep -q docker; then \
+		echo "🔧 Removing Docker packages..."; \
+		sudo apt-get purge -y docker-ce docker-ce-cli containerd.io docker-compose docker-compose-plugin docker-buildx-plugin > /dev/null 2>&1; \
+	fi; \
+	@if command -v snap > /dev/null 2>&1 && snap list | grep -q docker; then \
+		echo "🔧 Removing Docker from Snap..."; \
+		sudo snap remove docker > /dev/null 2>&1; \
+	fi; \
+	@echo "🔧 Cleaning up leftover packages..."; \
+	sudo apt-get autoremove -y > /dev/null 2>&1; \
+	sudo apt-get autoclean > /dev/null 2>&1; \
+	@echo "🔧 Removing Docker files..."; \
+	sudo rm -rf /var/lib/docker > /dev/null 2>&1; \
+	sudo rm -rf /var/lib/containerd > /dev/null 2>&1; \
+	sudo rm -rf /etc/docker > /dev/null 2>&1; \
+	sudo rm -rf $$HOME/.docker > /dev/null 2>&1; \
+	sudo rm -f /etc/apt/sources.list.d/docker.list > /dev/null 2>&1; \
+	sudo rm -f /etc/apt/keyrings/docker.asc > /dev/null 2>&1; \
+	echo "✅ Docker has been completely removed from your system."
 
 # ======================
 # SSL Certificates
@@ -104,7 +145,7 @@ certs:
 remove-certs:
 	@if [ -d srcs/requirements/certs ]; then \
 		echo "🔧 Removing certificates..."; \
-		sudo rm -rf srcs/requirements/certs > /dev/null; \
+		rm -r srcs/requirements/certs > /dev/null; \
 		echo "✅ Certificates removed successfully."; \
 	else \
 		echo "🟡 Certificates not present."; \
@@ -114,67 +155,32 @@ remove-certs:
 # Docker Services
 # ======================
 
-all:
-	@if [ ! -f srcs/.env ]; then \
-		read -p "Do you want to run the setup? (y/N): " choice && \
-		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
-			$(MAKE) --no-print-directory setup; \
-		fi; \
-	fi
+all: check-setup
 	@echo -e "🔧 Launching production for ${name}..."
-	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="0"/' $(ENV_FILE)
-	@sed -i 's/^WINDOWS=.*/WINDOWS="0"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
 
-build:
+build: check-setup
 	@echo -e "🔧 Building ${name}..."
 	@bash srcs/requirements/tools/make_db_dirs.sh
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		echo "🔧 Building development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env build; \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		echo "🔧 Building windows development environment..."; \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env build; \
 	else \
 		echo "🔧 Building production environment...\n"; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env build; \
 	fi
 
-dev:
-	@if [ ! -f srcs/.env ]; then \
-		read -p "Do you want to run the setup? (y/N): " choice && \
-		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
-			$(MAKE) --no-print-directory setup; \
-		fi; \
-	fi
+dev: check-setup
 	@echo -e "🔧 Launching development for ${name}..."
-	@bash srcs/requirements/tools/make_db_dirs.sh
 	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@sed -i 's/^WINDOWS=.*/WINDOWS="0"/' $(ENV_FILE)
 	@docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up --build
 
-win:
-	@if [ ! -f srcs/.env ]; then \
-		read -p "Do you want to run the setup? (y/N): " choice && \
-		if [ "$$choice" = "y" ] || [ "$$choice" = "Y" ]; then \
-			$(MAKE) --no-print-directory setup; \
-		fi; \
-	fi
-	@echo -e "🔧 Launching windows development for ${name}..."
-	@bash srcs/requirements/tools/make_db_dirs.sh
-	@sed -i 's/^DEBUG=.*/DEBUG="1"/' $(ENV_FILE)
-	@sed -i 's/^WINDOWS=.*/WINDOWS="1"/' $(ENV_FILE)
-	@docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env up --build
-
-down:
+down: check-setup
 	@echo -e "🔧 Stopping ${name}..."
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		echo "🔧 Stopping development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down; \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		echo "🔧 Stopping windows development environment..."; \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down; \
 	else \
 		echo "🔧 Stopping production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down; \
@@ -184,41 +190,32 @@ down:
 # Additional Docker Services
 # ======================
 
-service:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+service: check-setup
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env up -d --build $(name); \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env up -d --build $(name); \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi local $(name); \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build $(name); \
 	fi
 
-restart-service:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+restart-service: check-setup
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env restart $(name); \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env restart $(name); \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env restart $(name); \
 	fi
 
-restart:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+restart: check-setup
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env restart; \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env restart; \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env restart; \
 	fi
 
-getin:
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+getin: check-setup
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env exec -it $(name) sh; \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env exec -it $(name) sh; \
 	else \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env exec -it $(name) sh; \
 	fi
@@ -227,28 +224,22 @@ getin:
 # Cleaning
 # ======================
 
-clean:
+clean: check-setup
 	@echo -e "🔧 Cleaning ${name}..."
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		echo "🔧 Cleaning development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi local; \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		echo "🔧 Cleaning windows development environment..."; \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down --volumes --rmi local; \
 	else \
 		echo "🔧 Cleaning production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi local; \
 	fi
 	@$(MAKE) --no-print-directory clean-host
 
-fclean:
+fclean: check-setup
 	@echo -e "🔧 Full cleaning of ${name}..."
-	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "0" ]; then \
+	@if [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
 		echo "🔧 Full cleaning of development environment..."; \
 		docker compose -f ./docker-compose-dev.yml --env-file ./srcs/.env down --volumes --rmi all; \
-	elif [ "$(shell grep ^DEBUG= ./srcs/.env | cut -d '=' -f2)" = "1" ] && [ "$(shell grep ^WINDOWS= ./srcs/.env | cut -d '=' -f2)" = "1" ]; then \
-		echo "🔧 Full cleaning of windows development environment..."; \
-		docker compose -f ./docker-compose-win.yml --env-file ./srcs/.env down --volumes --rmi all; \
 	else \
 		echo "🔧 Full cleaning of production environment..."; \
 		docker compose -f ./docker-compose.yml --env-file ./srcs/.env down --volumes --rmi all; \
@@ -260,19 +251,16 @@ deepclean: fclean
 	@echo -e "\n💀 Removing all Docker configurations...\n"
 	@docker system prune --all
 
-clean-host: clean-dirs clean-migrations clean-staticfiles clean-logs
-
-clean-dirs:
-	@sudo rm -rf ~/data > /dev/null 2>&1
+clean-host: clean-migrations clean-staticfiles clean-logs
 
 clean-migrations:
-	@sudo find . -path '*/migrations/*.py' -not -name '__init__.py' -delete > /dev/null 2>&1
+	@find . -path '*/migrations/*.py' -not -name '__init__.py' -delete > /dev/null 2>&1
 
 clean-staticfiles:
-	@sudo rm -rf ./srcs/app/transcendence/staticfiles/ > /dev/null 2>&1
+	@rm -rf ./srcs/app/transcendence/staticfiles/ > /dev/null 2>&1
 
 clean-logs:
-	@sudo rm -rf ./srcs/app/transcendence/logs/
+	@rm -rf ./srcs/app/transcendence/logs/
 
 # ======================
 # Auxiliary Commands
@@ -280,10 +268,9 @@ clean-logs:
 
 re: fclean
 	@echo -e "🔧 Rebuilding ${name}..."
-	@bash srcs/requirements/tools/make_db_dirs.sh
 	@docker compose -f ./docker-compose.yml --env-file ./srcs/.env up -d --build
 
-.PHONY : all build down re clean fclean dev info sudoers remove-sudoers \
-	certs env setup remove-setup docker remove-env \
-	remove-certs clean-host clean-dirs clean-migrations clean-staticfiles
-	restart-service restart win clean-logs
+.PHONY : info env remove-env check-setup setup remove-setup sudoers remove-sudoers \
+	docker remove-docker all build dev down service restart-service restart \
+	getin clean fclean deepclean clean-host clean-migrations clean-staticfiles \
+	clean-logs re
